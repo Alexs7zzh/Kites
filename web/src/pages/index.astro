@@ -5,11 +5,34 @@ import MagneticDangoLine from '../components/MagneticDangoLine'
 const title = 'Kites'
 const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? ''
 
+function getRequiredEnv(name) {
+  const rawValue = import.meta.env[name]
+  if (typeof rawValue !== 'string' || rawValue.trim() === '') {
+    throw new Error(`Missing required environment variable: ${name}`)
+  }
+  return rawValue.trim()
+}
+
+const sanityProjectId = getRequiredEnv('PUBLIC_SANITY_PROJECT_ID')
+const sanityDataset = getRequiredEnv('PUBLIC_SANITY_DATASET')
+const sanityApiVersion = getRequiredEnv('PUBLIC_SANITY_API_VERSION')
+const sanityUseCdnRaw = getRequiredEnv('PUBLIC_SANITY_USE_CDN')
+
+if (!/^\d{4}-\d{2}-\d{2}$/.test(sanityApiVersion)) {
+  throw new Error(
+    'Invalid PUBLIC_SANITY_API_VERSION. Expected an ISO date in YYYY-MM-DD format.'
+  )
+}
+
+if (sanityUseCdnRaw !== 'true' && sanityUseCdnRaw !== 'false') {
+  throw new Error('Invalid PUBLIC_SANITY_USE_CDN. Expected "true" or "false".')
+}
+
 const client = createClient({
-  projectId: 'wmjirbvx',
-  dataset: 'production',
-  useCdn: false,
-  apiVersion: '2025-02-08',
+  projectId: sanityProjectId,
+  dataset: sanityDataset,
+  useCdn: sanityUseCdnRaw === 'true',
+  apiVersion: sanityApiVersion,
 })
 
 const query = `*[_id == "siteContent"][0]{

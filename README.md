@@ -11,3 +11,26 @@
 - `pnpm build:web`
 - `pnpm build:studio`
 - `pnpm lint`
+
+## Web Sanity Environment
+
+The web app requires these environment variables:
+
+- `PUBLIC_SANITY_PROJECT_ID`
+- `PUBLIC_SANITY_DATASET`
+- `PUBLIC_SANITY_API_VERSION` (`YYYY-MM-DD`)
+- `PUBLIC_SANITY_USE_CDN` (`true` or `false`)
+
+Defaults for this project are provided in `/Users/alex/dev/kites/web/.env.example`.
+
+## Deploy Sanity Studio (Hosted)
+
+Run the Studio deploy flow locally:
+
+1. `pnpm -C /Users/alex/dev/kites/studio exec sanity projects list`
+2. `pnpm -C /Users/alex/dev/kites/studio build`
+3. `pnpm -C /Users/alex/dev/kites/studio run deploy`
+
+Hosted Studio URLs use:
+
+- `https://<hostname>.sanity.studio`
