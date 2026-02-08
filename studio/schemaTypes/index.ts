@@ -1,3 +1,4 @@
 import {siteContentSchemaTypes} from './siteContent'
+import {siteSettingsSchemaTypes} from './siteSettings'
 
-export const schemaTypes = [...siteContentSchemaTypes]
+export const schemaTypes = [...siteContentSchemaTypes, ...siteSettingsSchemaTypes]

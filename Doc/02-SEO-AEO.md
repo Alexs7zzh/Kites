@@ -1,0 +1,49 @@
+# SEO And AEO TODOs
+
+## Current Repo Signals
+
+- `<head>` in `/Users/alex/dev/kites/web/src/pages/index.astro` currently has only charset, viewport, and title.
+- No meta description, Open Graph tags, Twitter tags, canonical URL, robots directives, or JSON-LD.
+- No `robots.txt` or `sitemap.xml` exists under `/Users/alex/dev/kites/web/public`.
+- Most meaningful page content is rendered inside a client-only React island, limiting crawler-readable semantic HTML.
+- Sanity schema has no site-level SEO/settings singleton yet (`/Users/alex/dev/kites/studio/schemaTypes/siteContent.ts` only models content sections).
+
+## P0 TODOs (High Impact)
+
+- [x] Add a Sanity `siteSettings` singleton with SEO essentials:
+- Site name, default title template, default description, canonical domain, default OG image, social handles.
+- [x] Add per-page SEO object fields (even for single-page site) with title, description, noindex, OG overrides, canonical override.
+- [x] Render full SEO head tags from Sanity data in Astro:
+- `<title>`, `<meta name="description">`, OG tags, Twitter tags, canonical link.
+- [x] Ensure content is server-rendered in HTML so crawlers can index copy without waiting for JS hydration.
+- [x] Add `robots.txt` and include sitemap location.
+- [x] Generate sitemap files from real published content via Astro sitemap integration and exclude `noindex` entries.
+- [x] Set `site` in Astro config so canonical/sitemap generation has a stable production origin.
+
+## P1 TODOs
+
+- [ ] Add structured data (JSON-LD) relevant to this site:
+- `Organization`, `WebSite`, and content-specific schemas (for portfolio/artwork entities as appropriate).
+- [ ] Add `dateModified` and freshness signals if content model tracks updates.
+- [ ] Move image alt text into Sanity and render meaningful, content-specific alt text (not generic placeholders).
+- [ ] Introduce semantic heading structure (`h1`, `h2`, etc.) instead of purely visual spacing (`<br>` stacks).
+- [ ] Add social image strategy:
+- Default OG image from settings.
+- Per-page override from content.
+- [ ] Add canonical host redirect policy (www/non-www normalization) via deployment rules.
+- [ ] Support staging noindex policy to avoid indexing preview environments.
+
+## P2 TODOs
+
+- [ ] Add richer AEO content blocks where appropriate (FAQ/Q&A, direct-answer snippets).
+- [ ] Add EEAT-support fields in CMS:
+- Author/artist profile, credentials/context, contact, source links when claims are made.
+- [ ] Add internal link architecture (if adding multiple pages) to improve crawl paths and entity relationships.
+- [ ] Add `hreflang` strategy if localization is introduced later.
+
+## Validation Checklist
+
+- [ ] Run Rich Results Test for JSON-LD.
+- [ ] Run Schema.org validator for structured data integrity.
+- [ ] Verify meta tags in rendered static HTML, not only after hydration.
+- [ ] Verify indexability and canonical behavior in Search Console after go-live.

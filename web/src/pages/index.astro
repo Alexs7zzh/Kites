@@ -2,7 +2,6 @@
 import {createClient} from '@sanity/client'
 import MagneticDangoLine from '../components/MagneticDangoLine'
 
-const title = 'Kites'
 const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? ''
 
 function getRequiredEnv(name) {
@@ -11,6 +10,48 @@ function getRequiredEnv(name) {
     throw new Error(`Missing required environment variable: ${name}`)
   }
   return rawValue.trim()
+}
+
+function nonEmpty(value) {
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  const trimmedValue = value.trim()
+  return trimmedValue === '' ? null : trimmedValue
+}
+
+function normalizeHandle(value) {
+  const handle = nonEmpty(value)
+  if (!handle) {
+    return null
+  }
+  return handle.startsWith('@') ? handle : `@${handle}`
+}
+
+function buildTitle({pageTitle, defaultTitleTemplate, siteName}) {
+  const fallbackTitle = siteName ?? 'Kites'
+  if (!pageTitle) {
+    return fallbackTitle
+  }
+
+  if (defaultTitleTemplate && defaultTitleTemplate.includes('%s')) {
+    return defaultTitleTemplate.replace('%s', pageTitle)
+  }
+
+  return pageTitle
+}
+
+function toRootUrl(value) {
+  if (!value) {
+    return null
+  }
+
+  try {
+    return new URL('/', value).toString()
+  } catch {
+    return null
+  }
 }
 
 const sanityProjectId = getRequiredEnv('PUBLIC_SANITY_PROJECT_ID')
@@ -35,56 +76,100 @@ const client = createClient({
   apiVersion: sanityApiVersion,
 })
 
-const query = `*[_id == "siteContent"][0]{
-  "about": about{
-    "main_image": main_image.asset->url,
-    text_1,
-    "notation_image": notation_image.asset->url,
-    text_2
-  },
-  "scent": scent{
-    "main_image": main_image.asset->url,
-    title,
-    description,
-    details,
-    "comparison_images": coalesce(comparison_images[].asset->url, [])
-  },
-  "process": process{
-    text_1,
-    text_2,
-    text_3,
-    "gallery_images": coalesce(gallery_images[].asset->url, [])
-  },
-  "studio": studio{
-    "header_images": coalesce(header_images[].asset->url, []),
-    intro_text,
-    "projects": coalesce(projects[]{
-      title,
-      materials,
-      location,
-      description,
+const query = `{
+  "siteContent": *[_id == "siteContent"][0]{
+    "about": about{
       "main_image": main_image.asset->url,
-      "secondary_image": secondary_image.asset->url,
-      "extra_image": extra_image.asset->url,
-      "gallery": coalesce(gallery[].asset->url, []),
-      "gallery_vertical": coalesce(gallery_vertical[].asset->url, [])
-    }, [])
+      text_1,
+      "notation_image": notation_image.asset->url,
+      text_2
+    },
+    "scent": scent{
+      "main_image": main_image.asset->url,
+      title,
+      description,
+      details,
+      "comparison_images": coalesce(comparison_images[].asset->url, [])
+    },
+    "process": process{
+      text_1,
+      text_2,
+      text_3,
+      "gallery_images": coalesce(gallery_images[].asset->url, [])
+    },
+    "studio": studio{
+      "header_images": coalesce(header_images[].asset->url, []),
+      intro_text,
+      "projects": coalesce(projects[]{
+        title,
+        materials,
+        location,
+        description,
+        "main_image": main_image.asset->url,
+        "secondary_image": secondary_image.asset->url,
+        "extra_image": extra_image.asset->url,
+        "gallery": coalesce(gallery[].asset->url, []),
+        "gallery_vertical": coalesce(gallery_vertical[].asset->url, [])
+      }, [])
+    },
+    "contact": contact{
+      bio_text,
+      "bio_image": bio_image.asset->url,
+      form_action
+    },
+    "seo": seo{
+      title,
+      description,
+      noindex,
+      canonicalUrl,
+      "ogImage": ogImage.asset->url
+    }
   },
-  "contact": contact{
-    bio_text,
-    "bio_image": bio_image.asset->url,
-    form_action
+  "siteSettings": *[_id == "siteSettings"][0]{
+    siteName,
+    defaultTitleTemplate,
+    defaultDescription,
+    canonicalDomain,
+    "defaultOgImage": defaultOgImage.asset->url,
+    social{
+      xHandle,
+      instagramHandle
+    }
   }
 }`
 
 let siteContent = null
+let siteSettings = null
 
 try {
-  siteContent = await client.fetch(query)
+  const response = await client.fetch(query)
+  siteContent = response?.siteContent ?? null
+  siteSettings = response?.siteSettings ?? null
 } catch (error) {
   const message = error instanceof Error ? error.message : String(error)
-  console.error(`Failed to fetch siteContent from Sanity: ${message}`)
+  console.error(`Failed to fetch content from Sanity: ${message}`)
 }
+
+const pageSeo = siteContent?.seo ?? null
+
+const siteName = nonEmpty(siteSettings?.siteName)
+const defaultTitleTemplate = nonEmpty(siteSettings?.defaultTitleTemplate)
+const pageTitle = nonEmpty(pageSeo?.title)
+const title = buildTitle({
+  pageTitle,
+  defaultTitleTemplate,
+  siteName,
+})
+
+const description =
+  nonEmpty(pageSeo?.description) ?? nonEmpty(siteSettings?.defaultDescription)
+const canonical =
+  nonEmpty(pageSeo?.canonicalUrl) ??
+  toRootUrl(nonEmpty(siteSettings?.canonicalDomain))
+const ogImage = nonEmpty(pageSeo?.ogImage) ?? nonEmpty(siteSettings?.defaultOgImage)
+const twitterSite = normalizeHandle(siteSettings?.social?.xHandle)
+const robots = pageSeo?.noindex === true ? 'noindex,nofollow' : 'index,follow'
+const twitterCard = ogImage ? 'summary_large_image' : 'summary'
 ---
 
 <!doctype html>
@@ -93,11 +178,28 @@ try {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
+
+    {description && <meta name="description" content={description} />}
+    <meta name="robots" content={robots} />
+    {canonical && <link rel="canonical" href={canonical} />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    {canonical && <meta property="og:url" content={canonical} />}
+    {siteName && <meta property="og:site_name" content={siteName} />}
+    {ogImage && <meta property="og:image" content={ogImage} />}
+
+    <meta name="twitter:card" content={twitterCard} />
+    <meta name="twitter:title" content={title} />
+    {description && <meta name="twitter:description" content={description} />}
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
+    {twitterSite && <meta name="twitter:site" content={twitterSite} />}
   </head>
   <body>
     {siteContent ? (
       <MagneticDangoLine
-        client:only="react"
+        client:load
         initialData={siteContent}
         turnstileSiteKey={turnstileSiteKey}
       />

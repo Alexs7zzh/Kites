@@ -222,6 +222,45 @@ export const contactSectionType = defineType({
   ],
 })
 
+export const seoType = defineType({
+  name: 'seo',
+  title: 'SEO',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'title',
+      title: 'Title',
+      type: 'string',
+      validation: (rule) => rule.max(70).warning('Consider staying under 70 characters.'),
+    }),
+    defineField({
+      name: 'description',
+      title: 'Description',
+      type: 'text',
+      rows: 3,
+      validation: (rule) => rule.max(160).warning('Consider staying under 160 characters.'),
+    }),
+    defineField({
+      name: 'noindex',
+      title: 'Noindex',
+      type: 'boolean',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'canonicalUrl',
+      title: 'Canonical URL Override',
+      type: 'url',
+      validation: (rule) => rule.uri({scheme: ['http', 'https']}),
+    }),
+    defineField({
+      name: 'ogImage',
+      title: 'Open Graph Image Override',
+      type: 'image',
+      options: {hotspot: true},
+    }),
+  ],
+})
+
 export const siteContentType = defineType({
   name: 'siteContent',
   title: 'Site Content',
@@ -257,6 +296,11 @@ export const siteContentType = defineType({
       type: 'contactSection',
       validation: (rule) => rule.required(),
     }),
+    defineField({
+      name: 'seo',
+      title: 'SEO',
+      type: 'seo',
+    }),
   ],
   preview: {
     prepare() {
@@ -275,5 +319,6 @@ export const siteContentSchemaTypes = [
   studioProjectType,
   studioSectionType,
   contactSectionType,
+  seoType,
   siteContentType,
 ]
