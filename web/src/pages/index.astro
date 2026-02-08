@@ -29,19 +29,6 @@ function normalizeHandle(value) {
   return handle.startsWith('@') ? handle : `@${handle}`
 }
 
-function buildTitle({pageTitle, defaultTitleTemplate, siteName}) {
-  const fallbackTitle = siteName ?? 'Kites'
-  if (!pageTitle) {
-    return fallbackTitle
-  }
-
-  if (defaultTitleTemplate && defaultTitleTemplate.includes('%s')) {
-    return defaultTitleTemplate.replace('%s', pageTitle)
-  }
-
-  return pageTitle
-}
-
 function toRootUrl(value) {
   if (!value) {
     return null
@@ -127,7 +114,6 @@ const query = `{
   },
   "siteSettings": *[_id == "siteSettings"][0]{
     siteName,
-    defaultTitleTemplate,
     defaultDescription,
     canonicalDomain,
     "defaultOgImage": defaultOgImage.asset->url,
@@ -153,13 +139,7 @@ try {
 const pageSeo = siteContent?.seo ?? null
 
 const siteName = nonEmpty(siteSettings?.siteName)
-const defaultTitleTemplate = nonEmpty(siteSettings?.defaultTitleTemplate)
-const pageTitle = nonEmpty(pageSeo?.title)
-const title = buildTitle({
-  pageTitle,
-  defaultTitleTemplate,
-  siteName,
-})
+const title = siteName ?? 'Kites'
 
 const description =
   nonEmpty(pageSeo?.description) ?? nonEmpty(siteSettings?.defaultDescription)

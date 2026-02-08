@@ -31,12 +31,6 @@ export const siteSettingsType = defineType({
       type: 'string',
     }),
     defineField({
-      name: 'defaultTitleTemplate',
-      title: 'Default Title Template',
-      type: 'string',
-      description: 'Optional template with %s placeholder, e.g. %s | Kites.',
-    }),
-    defineField({
       name: 'defaultDescription',
       title: 'Default Description',
       type: 'text',
