@@ -1,0 +1,6 @@
+# Enforce HTTPS across all hosts.
+http://* https://:splat 301!
+
+# Canonical paths.
+/index.html / 301!
+/sitemap.xml /sitemap-index.xml 301

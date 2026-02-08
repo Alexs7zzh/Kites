@@ -3,7 +3,7 @@
 ## Current Repo Signals
 
 - Netlify monorepo config now exists at `/Users/alex/dev/kites/netlify.toml` with root base/build and `web/dist` publish output.
-- Cache header policy file now exists at `/Users/alex/dev/kites/web/public/_headers`; `_redirects` is still pending.
+- Netlify cache and redirect policy files now exist at `/Users/alex/dev/kites/web/public/_headers` and `/Users/alex/dev/kites/web/public/_redirects`.
 - No webhook implementation found for Sanity publish events triggering frontend rebuild.
 - Web build fails without required env vars (`PUBLIC_SANITY_*`) if not configured in deploy environment.
 - Old project had a minimal Netlify config at `/Users/alex/dev/kite/netlify.toml`; new repo currently does not.
@@ -24,7 +24,7 @@
 - Long cache for hashed JS/CSS and immutable assets.
 - Long cache for static fonts/images where safe.
 - Short/no-cache for HTML documents.
-- [ ] Add redirect/canonical host rules in `_redirects` or `netlify.toml`.
+- [x] Add redirect/canonical host rules in `_redirects` or `netlify.toml`.
 - [ ] Add `robots.txt` and sitemap hosting in production output.
 
 ## P1 TODOs
