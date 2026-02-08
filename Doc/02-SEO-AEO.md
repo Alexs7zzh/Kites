@@ -25,7 +25,9 @@
 - [ ] Add structured data (JSON-LD) relevant to this site:
 - `Organization`, `WebSite`, and content-specific schemas (for portfolio/artwork entities as appropriate).
 - [ ] Add `dateModified` and freshness signals if content model tracks updates.
-- [ ] Move image alt text into Sanity and render meaningful, content-specific alt text (not generic placeholders).
+- [x] Move image alt text into Sanity and render meaningful, content-specific alt text (not generic placeholders).
+- All Sanity content images now support optional `alt` text fields in Studio.
+- Frontend now renders `alt` from Sanity on every content `<img>` and falls back to `alt=""` when no alt text is set.
 - [ ] Introduce semantic heading structure (`h1`, `h2`, etc.) instead of purely visual spacing (`<br>` stacks).
 - [ ] Add social image strategy:
 - Default OG image from settings.

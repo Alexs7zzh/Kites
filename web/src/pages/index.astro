@@ -72,42 +72,78 @@ const client = createClient({
 const query = `{
   "siteContent": *[_id == "siteContent"][0]{
     "about": about{
-      "main_image": main_image.asset->url,
+      "main_image": main_image{
+        "url": asset->url,
+        alt
+      },
       text_1,
-      "notation_image": notation_image.asset->url,
+      "notation_image": notation_image{
+        "url": asset->url,
+        alt
+      },
       text_2
     },
     "scent": scent{
-      "main_image": main_image.asset->url,
+      "main_image": main_image{
+        "url": asset->url,
+        alt
+      },
       title,
       description,
       details,
-      "comparison_images": coalesce(comparison_images[].asset->url, [])
+      "comparison_images": coalesce(comparison_images[]{
+        "url": asset->url,
+        alt
+      }, [])
     },
     "process": process{
       text_1,
       text_2,
       text_3,
-      "gallery_images": coalesce(gallery_images[].asset->url, [])
+      "gallery_images": coalesce(gallery_images[]{
+        "url": asset->url,
+        alt
+      }, [])
     },
     "studio": studio{
-      "header_images": coalesce(header_images[].asset->url, []),
+      "header_images": coalesce(header_images[]{
+        "url": asset->url,
+        alt
+      }, []),
       intro_text,
       "projects": coalesce(projects[]{
         title,
         materials,
         location,
         description,
-        "main_image": main_image.asset->url,
-        "secondary_image": secondary_image.asset->url,
-        "extra_image": extra_image.asset->url,
-        "gallery": coalesce(gallery[].asset->url, []),
-        "gallery_vertical": coalesce(gallery_vertical[].asset->url, [])
+        "main_image": main_image{
+          "url": asset->url,
+          alt
+        },
+        "secondary_image": secondary_image{
+          "url": asset->url,
+          alt
+        },
+        "extra_image": extra_image{
+          "url": asset->url,
+          alt
+        },
+        "gallery": coalesce(gallery[]{
+          "url": asset->url,
+          alt
+        }, []),
+        "gallery_vertical": coalesce(gallery_vertical[]{
+          "url": asset->url,
+          alt
+        }, [])
       }, [])
     },
     "contact": contact{
       bio_text,
-      "bio_image": bio_image.asset->url,
+      "bio_image": bio_image{
+        "url": asset->url,
+        alt
+      },
       form_action
     },
     "seo": seo{

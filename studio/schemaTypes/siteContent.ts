@@ -1,5 +1,17 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
+function imageAltFields() {
+  return [
+    defineField({
+      name: 'alt',
+      title: 'Alt Text',
+      type: 'string',
+      description:
+        'Meaningful description for screen readers. Leave empty when the image is decorative.',
+    }),
+  ]
+}
+
 export const aboutSectionType = defineType({
   name: 'aboutSection',
   title: 'About Section',
@@ -10,6 +22,7 @@ export const aboutSectionType = defineType({
       title: 'Main Image',
       type: 'image',
       options: {hotspot: true},
+      fields: imageAltFields(),
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -23,6 +36,7 @@ export const aboutSectionType = defineType({
       title: 'Notation Image',
       type: 'image',
       options: {hotspot: true},
+      fields: imageAltFields(),
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -44,6 +58,7 @@ export const scentSectionType = defineType({
       title: 'Main Image',
       type: 'image',
       options: {hotspot: true},
+      fields: imageAltFields(),
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -68,7 +83,7 @@ export const scentSectionType = defineType({
       name: 'comparison_images',
       title: 'Comparison Images',
       type: 'array',
-      of: [defineArrayMember({type: 'image', options: {hotspot: true}})],
+      of: [defineArrayMember({type: 'image', options: {hotspot: true}, fields: imageAltFields()})],
       validation: (rule) => rule.required().min(2).max(2),
     }),
   ],
@@ -101,7 +116,7 @@ export const processSectionType = defineType({
       name: 'gallery_images',
       title: 'Gallery Images',
       type: 'array',
-      of: [defineArrayMember({type: 'image', options: {hotspot: true}})],
+      of: [defineArrayMember({type: 'image', options: {hotspot: true}, fields: imageAltFields()})],
       validation: (rule) => rule.required().min(1),
     }),
   ],
@@ -139,30 +154,33 @@ export const studioProjectType = defineType({
       title: 'Main Image',
       type: 'image',
       options: {hotspot: true},
+      fields: imageAltFields(),
     }),
     defineField({
       name: 'secondary_image',
       title: 'Secondary Image',
       type: 'image',
       options: {hotspot: true},
+      fields: imageAltFields(),
     }),
     defineField({
       name: 'extra_image',
       title: 'Extra Image',
       type: 'image',
       options: {hotspot: true},
+      fields: imageAltFields(),
     }),
     defineField({
       name: 'gallery',
       title: 'Gallery',
       type: 'array',
-      of: [defineArrayMember({type: 'image', options: {hotspot: true}})],
+      of: [defineArrayMember({type: 'image', options: {hotspot: true}, fields: imageAltFields()})],
     }),
     defineField({
       name: 'gallery_vertical',
       title: 'Gallery Vertical',
       type: 'array',
-      of: [defineArrayMember({type: 'image', options: {hotspot: true}})],
+      of: [defineArrayMember({type: 'image', options: {hotspot: true}, fields: imageAltFields()})],
     }),
   ],
 })
@@ -176,7 +194,7 @@ export const studioSectionType = defineType({
       name: 'header_images',
       title: 'Header Images',
       type: 'array',
-      of: [defineArrayMember({type: 'image', options: {hotspot: true}})],
+      of: [defineArrayMember({type: 'image', options: {hotspot: true}, fields: imageAltFields()})],
       validation: (rule) => rule.required().min(1),
     }),
     defineField({
@@ -211,6 +229,7 @@ export const contactSectionType = defineType({
       title: 'Bio Image',
       type: 'image',
       options: {hotspot: true},
+      fields: imageAltFields(),
       validation: (rule) => rule.required(),
     }),
     defineField({
