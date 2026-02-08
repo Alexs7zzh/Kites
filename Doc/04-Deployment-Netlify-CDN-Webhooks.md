@@ -2,7 +2,7 @@
 
 ## Current Repo Signals
 
-- No `netlify.toml` in `/Users/alex/dev/kites` or `/Users/alex/dev/kites/web`.
+- Netlify monorepo config now exists at `/Users/alex/dev/kites/netlify.toml` with root base/build and `web/dist` publish output.
 - No `_headers` or `_redirects` file under `/Users/alex/dev/kites/web/public`.
 - No webhook implementation found for Sanity publish events triggering frontend rebuild.
 - Web build fails without required env vars (`PUBLIC_SANITY_*`) if not configured in deploy environment.
@@ -10,7 +10,7 @@
 
 ## P0 TODOs (High Impact)
 
-- [ ] Add Netlify config for monorepo deployment:
+- [x] Add Netlify config for monorepo deployment:
 - Base dir: repo root.
 - Build command: `pnpm -C web build`.
 - Publish dir: `web/dist`.
@@ -64,4 +64,3 @@
 - [ ] Verify production deploy includes expected headers and redirects.
 - [ ] Verify cache behavior using response headers on HTML vs static assets.
 - [ ] Verify no manual deploy is needed for regular content updates.
-
