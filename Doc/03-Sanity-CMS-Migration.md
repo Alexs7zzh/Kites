@@ -12,10 +12,10 @@
 
 - [ ] Decide final content model scope:
 - Keep single-page singleton only, or evolve to multi-document pages/projects.
-- [ ] Add `siteSettings` singleton schema:
+- [x] Add `siteSettings` singleton schema:
 - Brand/site identity, SEO defaults, canonical domain, social links, contact data.
 - [ ] Add reusable SEO object schema and attach to page-level content.
-- [ ] Add image metadata fields (at minimum `alt`) for every editorial image slot.
+- [x] Add image metadata fields (at minimum `alt`) for every editorial image slot.
 - [ ] Add schema validations beyond `required()`:
 - SEO title/description length warnings.
 - URL validations with clear error messages.
