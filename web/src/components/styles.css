@@ -1,0 +1,133 @@
+@font-face {
+  font-family: "Victor Mono Medium";
+  src: url('./fonts/VictorMono-Medium.woff') format('woff');
+}
+@font-face {
+  font-family: "Victor Mono Regular";
+  src: url('./fonts/VictorMono-Regular.woff') format('woff');
+}
+
+/* --- RESPONSIVE LAYOUT FIXES --- */
+
+/* Standard section spacing */
+.content-section {
+  width: 100%;
+  margin-bottom: 60px;
+}
+
+/* Wrappers for Bio and Project Captions */
+.caption-wrapper, .bio-wrapper {
+  display: flex;
+  flex-direction: row; /* Horizontal by default */
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  gap: 40px; /* Space between text and image */
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.caption-text, .bio-text {
+  flex: 1;
+  min-width: 300px;
+}
+
+.caption-image, .bio-image {
+  flex: 0 0 45%; /* Image takes 45% of width */
+  max-width: 600px;
+  height: auto;
+  display: block;
+}
+
+/* Grid for comparison/header images */
+.responsive-grid {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  margin: 20px 0;
+  gap: 2%;
+}
+
+/* Base image behavior */
+.responsive-image, .large-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* --- THE "GAP" FIX (1000px - 1300px) --- */
+@media (max-width: 1200px) {
+  .caption-wrapper, .bio-wrapper, .responsive-grid {
+    flex-direction: column !important; /* Force stack */
+    gap: 20px;
+  }
+
+  .caption-image, .bio-image, .responsive-grid img {
+    width: 100% !important; /* Images take full width when stacked */
+    flex: none;
+  }
+  
+  .caption-text, .bio-text {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* --- FORM STYLING --- */
+.contact-block {
+  max-width: 520px;
+  margin-top: 20px;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 28px; 
+  max-width: 100%; 
+  margin-top: 20px;
+  font-family: inherit;
+  font-size: 12px;
+  text-align: left;
+}
+
+.contact-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 6px 2px;
+  border: none;
+  border-bottom: 1px solid black;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  outline: none;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-bottom: 1px solid #444;
+}
+
+.contact-form button {
+  align-self: flex-start;
+  padding: 8px 18px;
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  background: transparent;
+  border: 1px solid black;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.contact-form button:hover {
+  background: black;
+  color: white;
+}

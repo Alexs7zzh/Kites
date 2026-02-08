@@ -1,5 +1,67 @@
 ---
+import {createClient} from '@sanity/client'
+import MagneticDangoLine from '../components/MagneticDangoLine'
+
 const title = 'Kites'
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? ''
+
+const client = createClient({
+  projectId: 'wmjirbvx',
+  dataset: 'production',
+  useCdn: false,
+  apiVersion: '2025-02-08',
+})
+
+const query = `*[_id == "siteContent"][0]{
+  "about": about{
+    "main_image": main_image.asset->url,
+    text_1,
+    "notation_image": notation_image.asset->url,
+    text_2
+  },
+  "scent": scent{
+    "main_image": main_image.asset->url,
+    title,
+    description,
+    details,
+    "comparison_images": coalesce(comparison_images[].asset->url, [])
+  },
+  "process": process{
+    text_1,
+    text_2,
+    text_3,
+    "gallery_images": coalesce(gallery_images[].asset->url, [])
+  },
+  "studio": studio{
+    "header_images": coalesce(header_images[].asset->url, []),
+    intro_text,
+    "projects": coalesce(projects[]{
+      title,
+      materials,
+      location,
+      description,
+      "main_image": main_image.asset->url,
+      "secondary_image": secondary_image.asset->url,
+      "extra_image": extra_image.asset->url,
+      "gallery": coalesce(gallery[].asset->url, []),
+      "gallery_vertical": coalesce(gallery_vertical[].asset->url, [])
+    }, [])
+  },
+  "contact": contact{
+    bio_text,
+    "bio_image": bio_image.asset->url,
+    form_action
+  }
+}`
+
+let siteContent = null
+
+try {
+  siteContent = await client.fetch(query)
+} catch (error) {
+  const message = error instanceof Error ? error.message : String(error)
+  console.error(`Failed to fetch siteContent from Sanity: ${message}`)
+}
 ---
 
 <!doctype html>
@@ -10,9 +72,16 @@ const title = 'Kites'
     <title>{title}</title>
   </head>
   <body>
-    <main>
-      <h1>{title}</h1>
-      <p>Astro is ready. Sanity integration is configured.</p>
-    </main>
+    {siteContent ? (
+      <MagneticDangoLine
+        client:only="react"
+        initialData={siteContent}
+        turnstileSiteKey={turnstileSiteKey}
+      />
+    ) : (
+      <main style="padding: 2rem; font-family: monospace;">
+        Unable to load site content from Sanity.
+      </main>
+    )}
   </body>
 </html>

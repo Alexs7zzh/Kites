@@ -12,8 +12,9 @@
   },
   "dependencies": {
     "@astrojs/react": "latest",
-    "@sanity/astro": "latest",
+    "@sanity/client": "latest",
     "astro": "latest",
+    "framer-motion": "12.23.25",
     "react": "latest",
     "react-dom": "latest"
   },
