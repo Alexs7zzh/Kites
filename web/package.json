@@ -11,15 +11,15 @@
     "lint": "astro check"
   },
   "dependencies": {
-    "@astrojs/react": "latest",
+    "@astrojs/react": "4.4.2",
     "@astrojs/sitemap": "^3.7.0",
-    "@sanity/client": "latest",
-    "astro": "latest",
+    "@sanity/client": "7.14.1",
+    "astro": "5.17.1",
     "framer-motion": "12.23.25",
-    "react": "latest",
-    "react-dom": "latest"
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
   },
   "devDependencies": {
-    "typescript": "latest"
+    "typescript": "5.9.3"
   }
 }
