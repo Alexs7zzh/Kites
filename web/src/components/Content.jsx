@@ -16,6 +16,20 @@ const HTMLText = ({ content, className = "" }) => {
   );
 };
 
+const getImageUrl = (image) => {
+  if (typeof image === "string") {
+    return image;
+  }
+  return typeof image?.url === "string" ? image.url : "";
+};
+
+const getImageAlt = (image) => {
+  if (typeof image === "string") {
+    return "";
+  }
+  return typeof image?.alt === "string" ? image.alt : "";
+};
+
 const Content = forwardRef(({ data, isMobile, sectionRefs, turnstileSiteKey }, ref) => {
   const [formStatus, setFormStatus] = useState("");
   const [turnstileReady, setTurnstileReady] = useState(false);
@@ -126,22 +140,25 @@ const Content = forwardRef(({ data, isMobile, sectionRefs, turnstileSiteKey }, r
 
   if (!data) return <div style={{ padding: "50px" }}>Loading content...</div>;
 
+  const scentComparisonImageLeft = data.scent.comparison_images?.[0];
+  const scentComparisonImageRight = data.scent.comparison_images?.[1];
+
   return (
     <div ref={ref}>
       {/* --- ABOUT SECTION --- */}
       <div id="ABOUT" ref={(el) => (sectionRefs.current["ABOUT"] = el)} className="content-section">
-        <img src={data.about.main_image} alt="About Main" style={{ width: isMobile ? "100%" : "50%", height: "auto", display: "block", marginLeft: "auto", marginRight: "auto" }} />
+        <img src={getImageUrl(data.about.main_image)} alt={getImageAlt(data.about.main_image)} style={{ width: isMobile ? "100%" : "50%", height: "auto", display: "block", marginLeft: "auto", marginRight: "auto" }} />
         <br /><br /><br />
         <HTMLText content={data.about.text_1} />
         <br /><br /><br /><br /><br /><br />
-        <img src={data.about.notation_image} alt="Notation Art" className="large-image" />
+        <img src={getImageUrl(data.about.notation_image)} alt={getImageAlt(data.about.notation_image)} className="large-image" />
         <br /><br />
         <HTMLText content={data.about.text_2} />
       </div>
 
       {/* --- SCENT SECTION --- */}
       <div id="SCENT" ref={(el) => (sectionRefs.current["SCENT"] = el)} className="content-section">
-        <img src={data.scent.main_image} alt="Scent Main" className="large-image" />
+        <img src={getImageUrl(data.scent.main_image)} alt={getImageAlt(data.scent.main_image)} className="large-image" />
         <br /><br />
         {data.scent.title} <br /><br />
         <HTMLText content={data.scent.description} />
@@ -151,8 +168,12 @@ const Content = forwardRef(({ data, isMobile, sectionRefs, turnstileSiteKey }, r
         <div className="responsive-grid">
           {data.scent.comparison_images && (
             <>
-              <img src={data.scent.comparison_images[0]} alt="Weather Scan" style={{ width: "52%", height: "auto" }} />
-              <img src={data.scent.comparison_images[1]} alt="Bottle X-Ray" style={{ width: "44%", height: "auto" }} />
+              {getImageUrl(scentComparisonImageLeft) && (
+                <img src={getImageUrl(scentComparisonImageLeft)} alt={getImageAlt(scentComparisonImageLeft)} style={{ width: "52%", height: "auto" }} />
+              )}
+              {getImageUrl(scentComparisonImageRight) && (
+                <img src={getImageUrl(scentComparisonImageRight)} alt={getImageAlt(scentComparisonImageRight)} style={{ width: "44%", height: "auto" }} />
+              )}
             </>
           )}
         </div>
@@ -164,54 +185,60 @@ const Content = forwardRef(({ data, isMobile, sectionRefs, turnstileSiteKey }, r
         <HTMLText content={data.process.text_2} /><br /><br />
         <HTMLText content={data.process.text_3} />
         <br /><br />
-        {data.process.gallery_images.map((imgSrc, index) => (
-          <img key={index} src={imgSrc} alt={`Process ${index}`} className="responsive-image" style={{marginBottom: '20px'}} />
+        {data.process.gallery_images.map((image, index) => (
+          getImageUrl(image) && <img key={index} src={getImageUrl(image)} alt={getImageAlt(image)} className="responsive-image" style={{marginBottom: '20px'}} />
         ))}
       </div>
 
       {/* --- STUDIO SECTION --- */}
       <div id="STUDIO" ref={(el) => (sectionRefs.current["STUDIO"] = el)} className="content-section">
         <div className="responsive-grid">
-          {data.studio.header_images.map((img, i) => (
-            <img key={i} src={img} alt="Pola Scan" style={{ width: "31%", height: "auto" }} />
+          {data.studio.header_images.map((image, i) => (
+            getImageUrl(image) && <img key={i} src={getImageUrl(image)} alt={getImageAlt(image)} style={{ width: "31%", height: "auto" }} />
           ))}
         </div>
         <HTMLText content={data.studio.intro_text} />
         <br /><br />
 
-        {data.studio.projects.map((project, index) => (
-          <div key={index} className="project-block">
-            {project.extra_image && <img src={project.extra_image} alt={project.title} className="responsive-image" />}
-            
-            <div className="caption-wrapper">
-              <div className="caption-text">
-                <strong>{project.title}</strong><br /><br />
-                <HTMLText content={project.materials} />
-                {project.location && <><br /><br />{project.location}</>}
+        {data.studio.projects.map((project, index) => {
+          const projectExtraImageUrl = getImageUrl(project.extra_image);
+          const projectMainImageUrl = getImageUrl(project.main_image);
+          const projectSecondaryImageUrl = getImageUrl(project.secondary_image);
+
+          return (
+            <div key={index} className="project-block">
+              {projectExtraImageUrl && <img src={projectExtraImageUrl} alt={getImageAlt(project.extra_image)} className="responsive-image" />}
+              
+              <div className="caption-wrapper">
+                <div className="caption-text">
+                  <strong>{project.title}</strong><br /><br />
+                  <HTMLText content={project.materials} />
+                  {project.location && <><br /><br />{project.location}</>}
+                </div>
+                {projectMainImageUrl && <img src={projectMainImageUrl} alt={getImageAlt(project.main_image)} className="caption-image" />}
+                {project.gallery && (
+                  <div className="caption-image" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between" }}>
+                    {project.gallery.map((image, gIndex) => (
+                      getImageUrl(image) && <img key={gIndex} src={getImageUrl(image)} alt={getImageAlt(image)} style={{ width: "48%", marginBottom: "10px" }} />
+                    ))}
+                  </div>
+                )}
               </div>
-              {project.main_image && <img src={project.main_image} alt={project.title} className="caption-image" />}
-              {project.gallery && (
-                <div className="caption-image" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between" }}>
-                  {project.gallery.map((gImg, gIndex) => (
-                    <img key={gIndex} src={gImg} alt={`${project.title} ${gIndex}`} style={{ width: "48%", marginBottom: "10px" }} />
-                  ))}
+
+              {projectSecondaryImageUrl && (
+                <div className="caption-wrapper">
+                  <div className="caption-text">{project.location}</div>
+                  <img src={projectSecondaryImageUrl} className="responsive-image" alt={getImageAlt(project.secondary_image)} />
                 </div>
               )}
+              <br />
+              {project.description && <p><HTMLText content={project.description} /></p>}
+              {project.gallery_vertical && project.gallery_vertical.map((image, vIndex) => (
+                getImageUrl(image) && <img key={vIndex} src={getImageUrl(image)} className="responsive-image" alt={getImageAlt(image)} style={{marginBottom: '20px'}} />
+              ))}
             </div>
-
-            {project.secondary_image && (
-              <div className="caption-wrapper">
-                <div className="caption-text">{project.location}</div>
-                <img src={project.secondary_image} className="responsive-image" alt="Secondary" />
-              </div>
-            )}
-            <br />
-            {project.description && <p><HTMLText content={project.description} /></p>}
-            {project.gallery_vertical && project.gallery_vertical.map((vImg, vIndex) => (
-              <img key={vIndex} src={vImg} className="responsive-image" alt="Detail" style={{marginBottom: '20px'}} />
-            ))}
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* --- CONTACT SECTION --- */}
@@ -220,7 +247,7 @@ const Content = forwardRef(({ data, isMobile, sectionRefs, turnstileSiteKey }, r
           <div className="bio-text">
             <HTMLText content={data.contact.bio_text} />
           </div>
-          <img src={data.contact.bio_image} alt="Bio" className="bio-image" />
+          <img src={getImageUrl(data.contact.bio_image)} alt={getImageAlt(data.contact.bio_image)} className="bio-image" />
         </div>
 
         <div className="contact-block">
