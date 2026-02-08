@@ -26,7 +26,13 @@ function normalizeHandle(value) {
   if (!handle) {
     return null
   }
-  return handle.startsWith('@') ? handle : `@${handle}`
+
+  const sanitizedHandle = handle.replace(/^@+/, '')
+  if (!sanitizedHandle) {
+    return null
+  }
+
+  return `@${sanitizedHandle}`
 }
 
 function toRootUrl(value) {

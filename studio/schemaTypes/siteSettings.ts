@@ -9,13 +9,31 @@ export const socialHandlesType = defineType({
       name: 'xHandle',
       title: 'X (Twitter) Handle',
       type: 'string',
-      description: 'Use only the handle, e.g. kitesstudio or @kitesstudio.',
+      description: 'Use only the handle, e.g. kitesstudio (no @).',
+      validation: (rule) =>
+        rule.custom((value) => {
+          if (!value) {
+            return true
+          }
+          return value.includes('@')
+            ? 'Do not include "@". Use only the handle, e.g. kitesstudio.'
+            : true
+        }),
     }),
     defineField({
       name: 'instagramHandle',
       title: 'Instagram Handle',
       type: 'string',
-      description: 'Use only the handle, e.g. kitesstudio.',
+      description: 'Use only the handle, e.g. kitesstudio (no @).',
+      validation: (rule) =>
+        rule.custom((value) => {
+          if (!value) {
+            return true
+          }
+          return value.includes('@')
+            ? 'Do not include "@". Use only the handle, e.g. kitesstudio.'
+            : true
+        }),
     }),
   ],
 })
@@ -46,7 +64,7 @@ export const siteSettingsType = defineType({
     }),
     defineField({
       name: 'defaultOgImage',
-      title: 'Default Open Graph Image',
+      title: 'Link Preview Image',
       type: 'image',
       options: {hotspot: true},
     }),
