@@ -6,7 +6,8 @@
 - Netlify cache and redirect policy files now exist at `/Users/alex/dev/kites/web/public/_headers` and `/Users/alex/dev/kites/web/public/_redirects`.
 - No webhook implementation found for Sanity publish events triggering frontend rebuild.
 - Web build fails without required env vars (`PUBLIC_SANITY_*`) if not configured in deploy environment.
-- Old project had a minimal Netlify config at `/Users/alex/dev/kite/netlify.toml`; new repo currently does not.
+- Frontend build emits `robots.txt` and Astro sitemap files (`sitemap-index.xml`, `sitemap-0.xml`) in `/Users/alex/dev/kites/web/dist` when required env vars are set.
+- Old project had a minimal Netlify config at `/Users/alex/dev/kite/netlify.toml`; new repo now has a dedicated monorepo Netlify config.
 
 ## P0 TODOs (High Impact)
 
@@ -25,7 +26,7 @@
 - Long cache for static fonts/images where safe.
 - Short/no-cache for HTML documents.
 - [x] Add redirect/canonical host rules in `_redirects` or `netlify.toml`.
-- [ ] Add `robots.txt` and sitemap hosting in production output.
+- [x] Add `robots.txt` and sitemap hosting in production output.
 
 ## P1 TODOs
 
