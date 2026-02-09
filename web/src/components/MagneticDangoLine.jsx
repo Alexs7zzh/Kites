@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, useMemo } from "react";
 import { useAnimationFrame } from "framer-motion";
 import Content from "./Content";
+import KitesLogo from "./KitesLogo";
 import "./MagneticDangoLine.css";
 import "./styles.css";
 
@@ -233,7 +234,7 @@ export default function MagneticDangoLine({
 
   useEffect(() => {
     const preloadAssets = async () => {
-      const assets = ["/2025-08-05-Background.png", "/Kites-Logo.svg"];
+      const assets = ["/2025-08-05-Background.png"];
       const imagePromises = assets.map((src) => {
         return new Promise((resolve, reject) => {
           const img = new Image();
@@ -797,7 +798,7 @@ export default function MagneticDangoLine({
           })}
         </svg>
 
-        <img src="/Kites-Logo.svg" alt="Kites" style={logoStyle} />
+        <KitesLogo style={logoStyle} />
 
         {leftElements.map((element) => {
           if (element.type === "button") {
