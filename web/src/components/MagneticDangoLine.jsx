@@ -247,7 +247,6 @@ export default function MagneticDangoLine({
       });
       const fontPromises = [
         document.fonts.load("500 1em Victor Mono"),
-        document.fonts.load("normal 1em Source Serif"),
       ];
       try {
         await Promise.all([...imagePromises, ...fontPromises]);
