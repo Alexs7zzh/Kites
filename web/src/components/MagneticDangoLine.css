@@ -162,6 +162,7 @@ body {
   margin-bottom: 10px;
 }
 .bio-text {
+  min-width: 0;
   order: 2;
   font-family: "Victor Mono", monospace;
   font-size: 9px;
