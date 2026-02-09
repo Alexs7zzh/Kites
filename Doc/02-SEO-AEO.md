@@ -28,9 +28,18 @@
 - [x] Move image alt text into Sanity and render meaningful, content-specific alt text (not generic placeholders).
 - All Sanity content images now support optional `alt` text fields in Studio.
 - Frontend now renders `alt` from Sanity on every content `<img>` and falls back to `alt=""` when no alt text is set.
-- [ ] Introduce semantic heading structure (`h1`, `h2`, etc.) instead of purely visual spacing (`<br>` stacks).
-- [ ] Add canonical host redirect policy (www/non-www normalization) via deployment rules.
-- [ ] Support staging noindex policy to avoid indexing preview environments.
+- [x] Add canonical host redirect policy (www/non-www normalization) via deployment rules.
+- [x] Support staging noindex policy to avoid indexing preview environments.
+
+### Accessibility And Semantics (SEO Impact)
+
+- [ ] Convert clickable nav `div`s to semantic `button`/`a` elements with keyboard support.
+- [ ] Ensure visible focus states for all interactive elements.
+- [ ] Replace spacing via repeated `<br>` with semantic structure and CSS.
+- [ ] Audit heading hierarchy and landmark usage (`main`, `nav`, etc.).
+- [ ] Improve alt text quality through CMS fields and editorial guidance.
+- [ ] Add `prefers-reduced-motion` handling for heavy animation.
+- [ ] Validate color contrast and text scaling behavior on mobile.
 
 ## P2 TODOs
 
