@@ -32,6 +32,17 @@ body {
   display: none;
 }
 
+.scrollable-text-container strong,
+.scrollable-text-container b,
+.scrollable-text-container h1,
+.scrollable-text-container h2,
+.scrollable-text-container h3,
+.scrollable-text-container h4,
+.scrollable-text-container h5,
+.scrollable-text-container h6 {
+  font-weight: 500;
+}
+
 .content-section {
   padding-top: 60px;
 }

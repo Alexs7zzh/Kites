@@ -247,7 +247,6 @@ export default function MagneticDangoLine({
       });
       const fontPromises = [
         document.fonts.load("500 1em Victor Mono"),
-        document.fonts.load("700 1em Victor Mono"),
         document.fonts.load("normal 1em Source Serif"),
       ];
       try {
@@ -826,7 +825,7 @@ export default function MagneticDangoLine({
                   cursor: "pointer",
                   transition:
                     "color 0.3s ease, left 0.5s ease, font-weight 0.3s ease",
-                  fontWeight: isActive ? "700" : "500",
+                  fontWeight: "500",
                 }}
               >
                 {element.label}
