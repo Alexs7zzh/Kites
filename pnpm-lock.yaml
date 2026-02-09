@@ -26,9 +26,6 @@ importers:
         specifier: ^6.3.9
         version: 6.3.9(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
     devDependencies:
-      '@types/react':
-        specifier: ^19.2
-        version: 19.2.13
       prettier:
         specifier: ^3.8
         version: 3.8.1
