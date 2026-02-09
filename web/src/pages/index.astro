@@ -1,7 +1,9 @@
 ---
+import {getImage} from 'astro:assets'
 import {createClient} from '@sanity/client'
 import MagneticDangoLine from '../components/MagneticDangoLine'
 import {SANITY_API_VERSION, SANITY_USE_CDN} from '../lib/sanityConfig.js'
+import {imageProjection, prepareSiteContent} from '../lib/siteContentImagePreparation'
 
 const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? ''
 
@@ -62,27 +64,23 @@ const query = `{
   "siteContent": *[_id == "siteContent"][0]{
     "about": about{
       "main_image": main_image{
-        "url": asset->url,
-        alt
+        ${imageProjection}
       },
       text_1,
       "notation_image": notation_image{
-        "url": asset->url,
-        alt
+        ${imageProjection}
       },
       text_2
     },
     "scent": scent{
       "main_image": main_image{
-        "url": asset->url,
-        alt
+        ${imageProjection}
       },
       title,
       description,
       details,
       "comparison_images": coalesce(comparison_images[]{
-        "url": asset->url,
-        alt
+        ${imageProjection}
       }, [])
     },
     "process": process{
@@ -90,14 +88,12 @@ const query = `{
       text_2,
       text_3,
       "gallery_images": coalesce(gallery_images[]{
-        "url": asset->url,
-        alt
+        ${imageProjection}
       }, [])
     },
     "studio": studio{
       "header_images": coalesce(header_images[]{
-        "url": asset->url,
-        alt
+        ${imageProjection}
       }, []),
       intro_text,
       "projects": coalesce(projects[]{
@@ -106,32 +102,26 @@ const query = `{
         location,
         description,
         "main_image": main_image{
-          "url": asset->url,
-          alt
+          ${imageProjection}
         },
         "secondary_image": secondary_image{
-          "url": asset->url,
-          alt
+          ${imageProjection}
         },
         "extra_image": extra_image{
-          "url": asset->url,
-          alt
+          ${imageProjection}
         },
         "gallery": coalesce(gallery[]{
-          "url": asset->url,
-          alt
+          ${imageProjection}
         }, []),
         "gallery_vertical": coalesce(gallery_vertical[]{
-          "url": asset->url,
-          alt
+          ${imageProjection}
         }, [])
       }, [])
     },
     "contact": contact{
       bio_text,
       "bio_image": bio_image{
-        "url": asset->url,
-        alt
+        ${imageProjection}
       },
       form_action
     },
@@ -159,6 +149,8 @@ try {
   const message = error instanceof Error ? error.message : String(error)
   console.error(`Failed to fetch content from Sanity: ${message}`)
 }
+
+const preparedSiteContent = await prepareSiteContent(siteContent, getImage)
 
 const siteName = nonEmpty(siteSettings?.siteName)
 const title = siteName ?? 'Kites'
@@ -205,10 +197,10 @@ const twitterCard = ogImage ? 'summary_large_image' : 'summary'
     {twitterSite && <meta name="twitter:site" content={twitterSite} />}
   </head>
   <body>
-    {siteContent ? (
+    {preparedSiteContent ? (
       <MagneticDangoLine
         client:load
-        initialData={siteContent}
+        initialData={preparedSiteContent as any}
         turnstileSiteKey={turnstileSiteKey}
       />
     ) : (

@@ -25,6 +25,13 @@ const siteUrl =
   normalizeSiteUrl(process.env.URL) ??
   FALLBACK_SITE_URL
 
+const cacheDir = process.env.NETLIFY_BUILD_BASE
+  ? new URL(
+      './cache/astro/',
+      `file://${process.env.NETLIFY_BUILD_BASE.replace(/\/?$/, '/')}`,
+    ).pathname
+  : './node_modules/.astro'
+
 function isHomepageUrl(value) {
   try {
     const url = new URL(value)
@@ -40,6 +47,10 @@ async function getHomepageNoindex() {
 
 export default defineConfig({
   site: siteUrl,
+  cacheDir,
+  image: {
+    domains: ['cdn.sanity.io'],
+  },
   integrations: [
     react(),
     sitemap({
