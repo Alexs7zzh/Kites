@@ -5,7 +5,8 @@
 - Netlify monorepo config now exists at `/Users/alex/dev/kites/netlify.toml` with root base/build and `web/dist` publish output.
 - Netlify cache and redirect policy files now exist at `/Users/alex/dev/kites/web/public/_headers` and `/Users/alex/dev/kites/web/public/_redirects`.
 - No webhook implementation found for Sanity publish events triggering frontend rebuild.
-- Web build fails without required env vars (`PUBLIC_SANITY_*`) if not configured in deploy environment.
+- Web build fails without required env vars (`PUBLIC_SANITY_PROJECT_ID`, `PUBLIC_SANITY_DATASET`) if not configured in deploy environment.
+- Sanity web API contract is now pinned in code as `2026-02-09` with `useCdn=false` (not Netlify env-driven).
 - Frontend build emits `robots.txt` and Astro sitemap files (`sitemap-index.xml`, `sitemap-0.xml`) in `/Users/alex/dev/kites/web/dist` when required env vars are set.
 - Old project had a minimal Netlify config at `/Users/alex/dev/kite/netlify.toml`; new repo now has a dedicated monorepo Netlify config.
 
@@ -15,11 +16,9 @@
 - Base dir: repo root.
 - Build command: `pnpm -C web build`.
 - Publish dir: `web/dist`.
-- [ ] Define required Netlify environment variables for production:
+- [x] Define required Netlify environment variables for production:
 - `PUBLIC_SANITY_PROJECT_ID`
 - `PUBLIC_SANITY_DATASET`
-- `PUBLIC_SANITY_API_VERSION`
-- `PUBLIC_SANITY_USE_CDN`
 - `PUBLIC_TURNSTILE_SITE_KEY` (if captcha enabled)
 - [x] Add cache headers in `_headers`:
 - Long cache for hashed JS/CSS and immutable assets.

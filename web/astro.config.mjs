@@ -2,6 +2,7 @@ import {createClient} from '@sanity/client'
 import {defineConfig} from 'astro/config'
 import react from '@astrojs/react'
 import sitemap from '@astrojs/sitemap'
+import {SANITY_API_VERSION, SANITY_USE_CDN} from './src/lib/sanityConfig.js'
 
 const FALLBACK_SITE_URL = 'https://example.com/'
 
@@ -37,26 +38,16 @@ function getOptionalEnv(name) {
 function getSanityClientConfig() {
   const projectId = getOptionalEnv('PUBLIC_SANITY_PROJECT_ID')
   const dataset = getOptionalEnv('PUBLIC_SANITY_DATASET')
-  const apiVersion = getOptionalEnv('PUBLIC_SANITY_API_VERSION')
-  const useCdnRaw = getOptionalEnv('PUBLIC_SANITY_USE_CDN')
 
-  if (!projectId || !dataset || !apiVersion || !useCdnRaw) {
-    return null
-  }
-
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(apiVersion)) {
-    return null
-  }
-
-  if (useCdnRaw !== 'true' && useCdnRaw !== 'false') {
+  if (!projectId || !dataset) {
     return null
   }
 
   return {
     projectId,
     dataset,
-    apiVersion,
-    useCdn: useCdnRaw === 'true',
+    apiVersion: SANITY_API_VERSION,
+    useCdn: SANITY_USE_CDN,
   }
 }
 

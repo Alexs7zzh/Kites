@@ -18,8 +18,11 @@ The web app requires these environment variables:
 
 - `PUBLIC_SANITY_PROJECT_ID`
 - `PUBLIC_SANITY_DATASET`
-- `PUBLIC_SANITY_API_VERSION` (`YYYY-MM-DD`)
-- `PUBLIC_SANITY_USE_CDN` (`true` or `false`)
+
+Sanity client runtime values are pinned in code:
+
+- `SANITY_API_VERSION = 2026-02-09`
+- `SANITY_USE_CDN = false`
 
 Defaults for this project are provided in `/Users/alex/dev/kites/web/.env.example`.
 

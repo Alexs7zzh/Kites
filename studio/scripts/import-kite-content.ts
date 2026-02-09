@@ -6,6 +6,7 @@ import {getCliClient} from 'sanity/cli'
 const DEFAULT_SOURCE_PATH = '/Users/alex/dev/kite/public/content.json'
 const DOCUMENT_ID = 'siteContent'
 const DOCUMENT_TYPE = 'siteContent'
+const SANITY_API_VERSION = '2026-02-09'
 
 type LegacyProject = {
   title: string
@@ -88,7 +89,7 @@ async function main() {
     return
   }
 
-  const client = getCliClient({apiVersion: '2025-02-08'})
+  const client = getCliClient({apiVersion: SANITY_API_VERSION})
   const toImageField = createImageUploader(client, args.publicDir)
   const document = await mapDocument(content, toImageField)
 

@@ -1,6 +1,7 @@
 ---
 import {createClient} from '@sanity/client'
 import MagneticDangoLine from '../components/MagneticDangoLine'
+import {SANITY_API_VERSION, SANITY_USE_CDN} from '../lib/sanityConfig.js'
 
 const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? ''
 
@@ -49,24 +50,12 @@ function toRootUrl(value) {
 
 const sanityProjectId = getRequiredEnv('PUBLIC_SANITY_PROJECT_ID')
 const sanityDataset = getRequiredEnv('PUBLIC_SANITY_DATASET')
-const sanityApiVersion = getRequiredEnv('PUBLIC_SANITY_API_VERSION')
-const sanityUseCdnRaw = getRequiredEnv('PUBLIC_SANITY_USE_CDN')
-
-if (!/^\d{4}-\d{2}-\d{2}$/.test(sanityApiVersion)) {
-  throw new Error(
-    'Invalid PUBLIC_SANITY_API_VERSION. Expected an ISO date in YYYY-MM-DD format.'
-  )
-}
-
-if (sanityUseCdnRaw !== 'true' && sanityUseCdnRaw !== 'false') {
-  throw new Error('Invalid PUBLIC_SANITY_USE_CDN. Expected "true" or "false".')
-}
 
 const client = createClient({
   projectId: sanityProjectId,
   dataset: sanityDataset,
-  useCdn: sanityUseCdnRaw === 'true',
-  apiVersion: sanityApiVersion,
+  useCdn: SANITY_USE_CDN,
+  apiVersion: SANITY_API_VERSION,
 })
 
 const query = `{
