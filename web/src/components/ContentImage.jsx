@@ -62,8 +62,13 @@ export default function ContentImage({ image, className, style }) {
     return null;
   }
 
+  const wrapperStyle = {
+    display: "block",
+    ...(style || {}),
+  };
+
   return (
-    <picture style={{ display: "contents" }}>
+    <picture className={className} style={wrapperStyle}>
       {normalizedImage.sources.map((source, index) => (
         <source
           key={`${source.type ?? "source"}-${index}`}
@@ -75,13 +80,12 @@ export default function ContentImage({ image, className, style }) {
       <img
         src={normalizedImage.fallbackSrc}
         alt={normalizedImage.alt}
-        className={className}
-        style={style}
         width={normalizedImage.width}
         height={normalizedImage.height}
         loading={normalizedImage.loading}
         decoding={normalizedImage.decoding}
         fetchPriority={normalizedImage.fetchPriority}
+        style={{ width: "100%", height: "auto", display: "block" }}
       />
     </picture>
   );

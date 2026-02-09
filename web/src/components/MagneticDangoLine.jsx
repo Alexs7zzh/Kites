@@ -1,8 +1,8 @@
 import React, { useRef, useState, useEffect, useMemo } from "react";
 import Content from "./Content";
 import kitesLogoSvg from "../assets/Kites-Logo.svg?raw";
-import "./MagneticDangoLine.css";
 import "./styles.css";
+import "./MagneticDangoLine.css";
 
 const EMBEDDED_KITES_LOGO_SVG = kitesLogoSvg.trim();
 

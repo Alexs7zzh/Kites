@@ -55,7 +55,7 @@
     gap: 20px;
   }
 
-  .caption-image, .bio-image, .responsive-grid img {
+  .caption-image, .bio-image, .responsive-grid > picture, .responsive-grid img {
     width: 100% !important; /* Images take full width when stacked */
     flex: none;
   }
