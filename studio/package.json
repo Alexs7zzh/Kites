@@ -18,15 +18,15 @@
   ],
   "dependencies": {
     "@sanity/vision": "5.8.1",
-    "react": "^19.1",
-    "react-dom": "^19.1",
+    "react": "^19.2",
+    "react-dom": "^19.2",
     "sanity": "5.8.1",
-    "styled-components": "^6.1.18"
+    "styled-components": "^6.3.9"
   },
   "devDependencies": {
-    "@types/react": "^19.1",
-    "prettier": "^3.5",
-    "typescript": "^5.8"
+    "@types/react": "^19.2",
+    "prettier": "^3.8",
+    "typescript": "^5.9"
   },
   "prettier": {
     "semi": false,
