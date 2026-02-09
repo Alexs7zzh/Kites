@@ -5,7 +5,7 @@
 - Main page content is delivered through `client:only="react"` in `/Users/alex/dev/kites/web/src/pages/index.astro`, so almost the entire experience waits on React hydration.
 - Sanity content images now use a build-time Astro optimization pipeline (AVIF/WebP `source` sets + original Sanity fallback) before rendering in `/Users/alex/dev/kites/web/src/components/Content.jsx`.
 - Content images now render explicit intrinsic `width`/`height`, use lazy/async defaults, and reserve eager/high priority for the primary above-the-fold hero image.
-- Background image is now processed through Astro from `/Users/alex/dev/kites/web/src/assets/2025-08-05-Background.png` with hashed AVIF/WebP/JPEG variants for first paint.
+- Background image is now processed through Astro from `/Users/alex/dev/kites/web/src/assets/2025-08-05-Background.jpg` with hashed AVIF/WebP/JPEG variants for first paint.
 - Fonts are duplicated in both `/Users/alex/dev/kites/web/public/fonts` and `/Users/alex/dev/kites/web/src/components/fonts`, and CSS defines `@font-face` multiple times.
 - `MagneticDangoLine` blocks initial reveal on asset/font preloading (`document.fonts.load(...)`) in `/Users/alex/dev/kites/web/src/components/MagneticDangoLine.jsx`.
 - Turnstile script now loads on first contact-form interaction (focus or submit attempt) instead of on initial page load (`/Users/alex/dev/kites/web/src/components/Content.jsx`).
