@@ -32,6 +32,7 @@ const getImageAlt = (image) => {
 
 const Content = forwardRef(({ data, isMobile, sectionRefs, turnstileSiteKey }, ref) => {
   const [formStatus, setFormStatus] = useState("");
+  const [shouldLoadTurnstile, setShouldLoadTurnstile] = useState(false);
   const [turnstileReady, setTurnstileReady] = useState(false);
   const [showTurnstile, setShowTurnstile] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
@@ -41,28 +42,43 @@ const Content = forwardRef(({ data, isMobile, sectionRefs, turnstileSiteKey }, r
   const pendingFormDataRef = useRef(null);
   const pendingFormRef = useRef(null);
 
-  useEffect(() => {
+  const requestTurnstileScript = useCallback(() => {
     if (!turnstileSiteKey) {
+      return;
+    }
+    setShouldLoadTurnstile(true);
+  }, [turnstileSiteKey]);
+
+  useEffect(() => {
+    if (!turnstileSiteKey || !shouldLoadTurnstile) {
       return undefined;
     }
-
     if (window.turnstile) {
       setTurnstileReady(true);
       return undefined;
     }
-    const script = document.createElement("script");
-    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-    script.async = true;
-    script.defer = true;
-    script.onload = () => setTurnstileReady(true);
-    script.onerror = () => setFormStatus("ERROR");
-    document.body.appendChild(script);
+
+    const existingScript = document.querySelector('script[data-turnstile-script="true"]');
+    const script = existingScript || document.createElement("script");
+    const handleLoad = () => setTurnstileReady(true);
+    const handleError = () => setFormStatus("ERROR");
+
+    script.addEventListener("load", handleLoad);
+    script.addEventListener("error", handleError);
+
+    if (!existingScript) {
+      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+      script.async = true;
+      script.defer = true;
+      script.dataset.turnstileScript = "true";
+      document.body.appendChild(script);
+    }
+
     return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
+      script.removeEventListener("load", handleLoad);
+      script.removeEventListener("error", handleError);
     };
-  }, []);
+  }, [shouldLoadTurnstile, turnstileSiteKey]);
 
   const submitFormData = useCallback(
     (formData, formElement, tokenOverride) => {
@@ -135,6 +151,7 @@ const Content = forwardRef(({ data, isMobile, sectionRefs, turnstileSiteKey }, r
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    requestTurnstileScript();
     submitFormData(new FormData(event.target), event.target);
   };
 
@@ -252,7 +269,7 @@ const Content = forwardRef(({ data, isMobile, sectionRefs, turnstileSiteKey }, r
 
         <div className="contact-block">
           <p className="contact-heading">Request &amp; Purchase</p>
-          <form onSubmit={handleSubmit} className="contact-form">
+          <form onSubmit={handleSubmit} onFocusCapture={requestTurnstileScript} className="contact-form">
             <label>Name <input type="text" name="name" required /></label>
             <label>Email <input type="email" name="email" required /></label>
             <label>Message <textarea name="message" rows="4" required></textarea></label>

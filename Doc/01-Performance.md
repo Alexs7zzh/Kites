@@ -8,7 +8,7 @@
 - Very large background asset (`/Users/alex/dev/kites/web/public/2025-08-05-Background.png`, ~4.6 MB) is loaded on first paint.
 - Fonts are duplicated in both `/Users/alex/dev/kites/web/public/fonts` and `/Users/alex/dev/kites/web/src/components/fonts`, and CSS defines `@font-face` multiple times.
 - `MagneticDangoLine` blocks initial reveal on asset/font preloading (`document.fonts.load(...)`) in `/Users/alex/dev/kites/web/src/components/MagneticDangoLine.jsx`.
-- Turnstile script is injected on page load when key is set, not on user intent (`/Users/alex/dev/kites/web/src/components/Content.jsx`).
+- Turnstile script now loads on first contact-form interaction (focus or submit attempt) instead of on initial page load (`/Users/alex/dev/kites/web/src/components/Content.jsx`).
 
 ## P0 TODOs (High Impact)
 
@@ -26,7 +26,7 @@
 
 - [ ] Avoid waiting on full asset preload before showing UI; reveal content quickly and let non-critical assets stream.
 - [ ] Add `preconnect` for external hosts used at startup (`https://cdn.sanity.io`, optionally Turnstile host when captcha is expected).
-- [ ] Defer Turnstile script loading until form interaction (submit attempt/focus), not initial load.
+- [x] Defer Turnstile script loading until form interaction (submit attempt/focus), not initial load.
 - [ ] Review `framer-motion` footprint and replace portions with lightweight native animation where feasible.
 - [ ] Add a performance budget for total JS, image bytes, and LCP asset size.
 - [ ] Move repeated inline styles to CSS classes to reduce markup size and improve caching/diffing.
@@ -45,4 +45,3 @@
 - [ ] Confirm first contentful HTML is visible with JavaScript disabled.
 - [ ] Confirm no image ships at original resolution when displayed much smaller.
 - [ ] Confirm font loading no longer causes FOIT.
-
