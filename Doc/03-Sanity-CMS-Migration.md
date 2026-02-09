@@ -16,10 +16,11 @@
 - Brand/site identity, SEO defaults, canonical domain, social links, contact data.
 - [ ] Add reusable SEO object schema and attach to page-level content.
 - [x] Add image metadata fields (at minimum `alt`) for every editorial image slot.
-- [ ] Add schema validations beyond `required()`:
-- SEO title/description length warnings.
-- URL validations with clear error messages.
-- Field constraints for arrays and key business rules.
+- [x] Add schema validations beyond `required()`:
+- Implemented with selected profile:
+- SEO: balanced warnings (`siteName`, `defaultDescription`).
+- URLs: balanced error messages (`canonicalDomain`, `contact.form_action`).
+- Arrays/business rules: minimal constraints with clearer error messages.
 
 ## P1 TODOs
 
@@ -57,4 +58,3 @@
 - [ ] Confirm all legacy assets were uploaded and linked.
 - [ ] Confirm no operational dependency remains on CloudCannon config (`cloudcannon.config.yml`).
 - [ ] Archive legacy project with clear read-only status after production cutover.
-

@@ -1,5 +1,38 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
+function parseAbsoluteUrl(value: string): URL | null {
+  try {
+    return new URL(value)
+  } catch {
+    return null
+  }
+}
+
+function validateContactFormAction(value: unknown): true | string {
+  if (typeof value !== 'string' || value.trim() === '') {
+    return true
+  }
+
+  const parsedUrl = parseAbsoluteUrl(value.trim())
+  if (!parsedUrl) {
+    return 'Enter a valid URL, for example https://formspree.io/f/your-form-id.'
+  }
+
+  if (parsedUrl.protocol === 'https:') {
+    return true
+  }
+
+  const isLocalDevHttpUrl =
+    parsedUrl.protocol === 'http:' &&
+    (parsedUrl.hostname === 'localhost' || parsedUrl.hostname === '127.0.0.1')
+
+  if (isLocalDevHttpUrl) {
+    return true
+  }
+
+  return 'Use an https URL. For local development only, http://localhost or http://127.0.0.1 is allowed.'
+}
+
 function imageAltFields() {
   return [
     defineField({
@@ -84,7 +117,20 @@ export const scentSectionType = defineType({
       title: 'Comparison Images',
       type: 'array',
       of: [defineArrayMember({type: 'image', options: {hotspot: true}, fields: imageAltFields()})],
-      validation: (rule) => rule.required().min(2).max(2),
+      validation: (rule) => [
+        rule.required().error('Add exactly 2 comparison images.'),
+        rule
+          .custom((value) => {
+            if (value === undefined) {
+              return true
+            }
+            if (!Array.isArray(value) || value.length !== 2) {
+              return 'Add exactly 2 comparison images.'
+            }
+            return true
+          })
+          .error('Add exactly 2 comparison images.'),
+      ],
     }),
   ],
 })
@@ -117,7 +163,10 @@ export const processSectionType = defineType({
       title: 'Gallery Images',
       type: 'array',
       of: [defineArrayMember({type: 'image', options: {hotspot: true}, fields: imageAltFields()})],
-      validation: (rule) => rule.required().min(1),
+      validation: (rule) => [
+        rule.required().error('Add at least 1 gallery image.'),
+        rule.min(1).error('Add at least 1 gallery image.'),
+      ],
     }),
   ],
 })
@@ -195,7 +244,10 @@ export const studioSectionType = defineType({
       title: 'Header Images',
       type: 'array',
       of: [defineArrayMember({type: 'image', options: {hotspot: true}, fields: imageAltFields()})],
-      validation: (rule) => rule.required().min(1),
+      validation: (rule) => [
+        rule.required().error('Add at least 1 header image.'),
+        rule.min(1).error('Add at least 1 header image.'),
+      ],
     }),
     defineField({
       name: 'intro_text',
@@ -208,7 +260,10 @@ export const studioSectionType = defineType({
       title: 'Projects',
       type: 'array',
       of: [defineArrayMember({type: 'studioProject'})],
-      validation: (rule) => rule.required().min(1),
+      validation: (rule) => [
+        rule.required().error('Add at least 1 project.'),
+        rule.min(1).error('Add at least 1 project.'),
+      ],
     }),
   ],
 })
@@ -236,7 +291,8 @@ export const contactSectionType = defineType({
       name: 'form_action',
       title: 'Form Action',
       type: 'url',
-      validation: (rule) => rule.required().uri({scheme: ['http', 'https']}),
+      validation: (rule) =>
+        rule.required().error('Add a form endpoint URL.').custom(validateContactFormAction),
     }),
   ],
 })
