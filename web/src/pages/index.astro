@@ -135,13 +135,6 @@ const query = `{
       },
       form_action
     },
-    "seo": seo{
-      title,
-      description,
-      noindex,
-      canonicalUrl,
-      "ogImage": ogImage.asset->url
-    }
   },
   "siteSettings": *[_id == "siteSettings"][0]{
     siteName,
@@ -167,19 +160,16 @@ try {
   console.error(`Failed to fetch content from Sanity: ${message}`)
 }
 
-const pageSeo = siteContent?.seo ?? null
-
 const siteName = nonEmpty(siteSettings?.siteName)
 const title = siteName ?? 'Kites'
 
 const description =
-  nonEmpty(pageSeo?.description) ?? nonEmpty(siteSettings?.defaultDescription)
+  nonEmpty(siteSettings?.defaultDescription)
 const canonical =
-  nonEmpty(pageSeo?.canonicalUrl) ??
   toRootUrl(nonEmpty(siteSettings?.canonicalDomain))
-const ogImage = nonEmpty(pageSeo?.ogImage) ?? nonEmpty(siteSettings?.defaultOgImage)
+const ogImage = nonEmpty(siteSettings?.defaultOgImage)
 const twitterSite = normalizeHandle(siteSettings?.social?.xHandle)
-const robots = pageSeo?.noindex === true ? 'noindex,nofollow' : 'index,follow'
+const robots = 'index,follow'
 const twitterCard = ogImage ? 'summary_large_image' : 'summary'
 ---
 

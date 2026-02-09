@@ -1,8 +1,6 @@
-import {createClient} from '@sanity/client'
 import {defineConfig} from 'astro/config'
 import react from '@astrojs/react'
 import sitemap from '@astrojs/sitemap'
-import {SANITY_API_VERSION, SANITY_USE_CDN} from './src/lib/sanityConfig.js'
 
 const FALLBACK_SITE_URL = 'https://example.com/'
 
@@ -27,30 +25,6 @@ const siteUrl =
   normalizeSiteUrl(process.env.URL) ??
   FALLBACK_SITE_URL
 
-function getOptionalEnv(name) {
-  const rawValue = process.env[name]
-  if (typeof rawValue !== 'string' || rawValue.trim() === '') {
-    return null
-  }
-  return rawValue.trim()
-}
-
-function getSanityClientConfig() {
-  const projectId = getOptionalEnv('PUBLIC_SANITY_PROJECT_ID')
-  const dataset = getOptionalEnv('PUBLIC_SANITY_DATASET')
-
-  if (!projectId || !dataset) {
-    return null
-  }
-
-  return {
-    projectId,
-    dataset,
-    apiVersion: SANITY_API_VERSION,
-    useCdn: SANITY_USE_CDN,
-  }
-}
-
 function isHomepageUrl(value) {
   try {
     const url = new URL(value)
@@ -60,35 +34,8 @@ function isHomepageUrl(value) {
   }
 }
 
-let homepageNoindexPromise
-
 async function getHomepageNoindex() {
-  if (homepageNoindexPromise) {
-    return homepageNoindexPromise
-  }
-
-  homepageNoindexPromise = (async () => {
-    const sanityClientConfig = getSanityClientConfig()
-    if (!sanityClientConfig) {
-      return false
-    }
-
-    try {
-      const client = createClient(sanityClientConfig)
-      const response = await client.fetch(`*[_id == "siteContent"][0]{
-        "noindex": seo.noindex
-      }`)
-      return response?.noindex === true
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
-      console.warn(
-        `Sitemap noindex check failed, keeping homepage in sitemap. Reason: ${message}`
-      )
-      return false
-    }
-  })()
-
-  return homepageNoindexPromise
+  return false
 }
 
 export default defineConfig({
