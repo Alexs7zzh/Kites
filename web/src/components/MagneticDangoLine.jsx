@@ -216,9 +216,49 @@ function useAnimationFrame(callback) {
   }, []);
 }
 
+function normalizeBackgroundVariant(value) {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const src = typeof value.src === "string" ? value.src : "";
+  const srcSet = typeof value.srcSet === "string" ? value.srcSet : "";
+
+  if (!src || !srcSet) {
+    return null;
+  }
+
+  return { src, srcSet };
+}
+
+function normalizeBackgroundImagePayload(value) {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const avif = normalizeBackgroundVariant(value.avif);
+  const webp = normalizeBackgroundVariant(value.webp);
+  const jpeg = normalizeBackgroundVariant(value.jpeg);
+  if (!avif || !webp || !jpeg) {
+    return null;
+  }
+
+  return {
+    placeholderColor:
+      typeof value.placeholderColor === "string" && value.placeholderColor
+        ? value.placeholderColor
+        : "#e7e4df",
+    sizes: typeof value.sizes === "string" ? value.sizes : "100vw",
+    avif,
+    webp,
+    jpeg,
+  };
+}
+
 export default function MagneticDangoLine({
   initialData = null,
   turnstileSiteKey = "",
+  backgroundImage = null,
 }) {
   const svgRef = useRef(null);
   const scrollRef = useRef(null);
@@ -244,6 +284,10 @@ export default function MagneticDangoLine({
   const [activeSection, setActiveSection] = useState(BUTTON_LABELS[0]);
   const [navXPosition, setNavXPosition] = useState(DESKTOP_NAV_LOGO_X_POSITION);
   const data = initialData;
+  const resolvedBackgroundImage = useMemo(
+    () => normalizeBackgroundImagePayload(backgroundImage),
+    [backgroundImage],
+  );
 
   const anchorYPositions = useMemo(() => {
     const height = windowSize.height;
@@ -701,19 +745,43 @@ export default function MagneticDangoLine({
   return (
     <>
       <div
+        className="magnetic-dango-root"
         style={{
           position: "fixed",
           top: 0,
           left: 0,
           width: "100vw",
           height: "100dvh",
-          backgroundImage: "url(/2025-08-05-Background.png)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          backgroundColor: resolvedBackgroundImage?.placeholderColor || "#e7e4df",
           overflow: "hidden",
           overscrollBehavior: "none",
         }}
       >
+        {resolvedBackgroundImage && (
+          <picture className="magnetic-dango-background-layer" aria-hidden="true">
+            <source
+              type="image/avif"
+              srcSet={resolvedBackgroundImage.avif.srcSet}
+              sizes={resolvedBackgroundImage.sizes}
+            />
+            <source
+              type="image/webp"
+              srcSet={resolvedBackgroundImage.webp.srcSet}
+              sizes={resolvedBackgroundImage.sizes}
+            />
+            <img
+              className="magnetic-dango-background-image"
+              src={resolvedBackgroundImage.jpeg.src}
+              srcSet={resolvedBackgroundImage.jpeg.srcSet}
+              sizes={resolvedBackgroundImage.sizes}
+              alt=""
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
+            />
+          </picture>
+        )}
+        <div className="magnetic-dango-foreground-layer">
         <svg
           ref={svgRef}
           viewBox={`0 0 ${windowSize.width} ${windowSize.height}`}
@@ -863,6 +931,7 @@ export default function MagneticDangoLine({
             sectionRefs={sectionRefs}
             turnstileSiteKey={turnstileSiteKey}
           />
+        </div>
         </div>
       </div>
     </>

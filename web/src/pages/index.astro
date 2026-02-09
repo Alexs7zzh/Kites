@@ -3,6 +3,8 @@ import {getImage} from 'astro:assets'
 import {createClient} from '@sanity/client'
 import MagneticDangoLine from '../components/MagneticDangoLine'
 import {SANITY_API_VERSION, SANITY_USE_CDN} from '../lib/sanityConfig.js'
+import backgroundSource from '../assets/2025-08-05-Background.png'
+import {prepareBackgroundImage} from '../lib/backgroundImagePreparation'
 import {imageProjection, prepareSiteContent} from '../lib/siteContentImagePreparation'
 
 const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? ''
@@ -151,6 +153,10 @@ try {
 }
 
 const preparedSiteContent = await prepareSiteContent(siteContent, getImage)
+const preparedBackgroundImage = await prepareBackgroundImage({
+  src: backgroundSource,
+  getImage,
+})
 
 const siteName = nonEmpty(siteSettings?.siteName)
 const title = siteName ?? 'Kites'
@@ -171,6 +177,15 @@ const twitterCard = ogImage ? 'summary_large_image' : 'summary'
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
+    <link
+      rel="preload"
+      href={preparedBackgroundImage.preload.href}
+      as="image"
+      type={preparedBackgroundImage.preload.type}
+      imagesrcset={preparedBackgroundImage.preload.imageSrcSet}
+      imagesizes={preparedBackgroundImage.preload.imageSizes}
+      fetchpriority="high"
+    />
     <link
       rel="preload"
       href="/fonts/VictorMono-Regular.c6ba95eb.woff2"
@@ -202,6 +217,7 @@ const twitterCard = ogImage ? 'summary_large_image' : 'summary'
         client:load
         initialData={preparedSiteContent as any}
         turnstileSiteKey={turnstileSiteKey}
+        backgroundImage={preparedBackgroundImage as any}
       />
     ) : (
       <main style="padding: 2rem; font-family: monospace;">

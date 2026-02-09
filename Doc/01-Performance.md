@@ -5,7 +5,7 @@
 - Main page content is delivered through `client:only="react"` in `/Users/alex/dev/kites/web/src/pages/index.astro`, so almost the entire experience waits on React hydration.
 - Sanity content images now use a build-time Astro optimization pipeline (AVIF/WebP `source` sets + original Sanity fallback) before rendering in `/Users/alex/dev/kites/web/src/components/Content.jsx`.
 - Content images now render explicit intrinsic `width`/`height`, use lazy/async defaults, and reserve eager/high priority for the primary above-the-fold hero image.
-- Very large background asset (`/Users/alex/dev/kites/web/public/2025-08-05-Background.png`, ~4.6 MB) is loaded on first paint.
+- Background image is now processed through Astro from `/Users/alex/dev/kites/web/src/assets/2025-08-05-Background.png` with hashed AVIF/WebP/JPEG variants for first paint.
 - Fonts are duplicated in both `/Users/alex/dev/kites/web/public/fonts` and `/Users/alex/dev/kites/web/src/components/fonts`, and CSS defines `@font-face` multiple times.
 - `MagneticDangoLine` blocks initial reveal on asset/font preloading (`document.fonts.load(...)`) in `/Users/alex/dev/kites/web/src/components/MagneticDangoLine.jsx`.
 - Turnstile script now loads on first contact-form interaction (focus or submit attempt) instead of on initial page load (`/Users/alex/dev/kites/web/src/components/Content.jsx`).
@@ -18,7 +18,7 @@
   - Use Astro `Image` where possible, or use Sanity URL params (`w`, `h`, `fit`, `auto=format`) consistently.
 - [x] Query image metadata (`dimensions`, `lqip`) and render explicit width/height to reduce CLS.
 - [x] Add `loading="lazy"` and `decoding="async"` for below-the-fold images; set `fetchpriority="high"` only for the most important above-the-fold image(s).
-- [ ] Convert oversized PNG hero/background assets to modern formats (WebP/AVIF variants) and serve responsive versions by viewport.
+- [x] Convert oversized PNG hero/background assets to modern formats (WebP/AVIF variants) and serve responsive versions by viewport.
 - [x] Remove duplicate font sources and ship only one canonical set (prefer WOFF2 first, WOFF fallback only if needed).
 - [x] Add `font-display: swap` and preload only the minimum critical font file(s).
 
