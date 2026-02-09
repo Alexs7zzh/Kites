@@ -62,6 +62,14 @@ body {
   display: none;
 }
 
+@media (min-width: 1000px) {
+  .scrollable-text-container {
+    --caption-left-gutter: 236px;
+    width: calc(55vw + var(--caption-left-gutter)) !important;
+    padding: 60px 80px 60px calc(80px + var(--caption-left-gutter)) !important;
+  }
+}
+
 .scrollable-text-container strong,
 .scrollable-text-container b,
 .scrollable-text-container h1,
@@ -130,6 +138,7 @@ body {
 @media (min-width: 1000px) {
   .caption-wrapper {
     display: block;
+    --caption-gap: 16px;
   }
   .caption-image {
     margin: 0 auto;
@@ -137,9 +146,14 @@ body {
   }
   .caption-text {
     position: absolute;
-    left: -80px;
     bottom: 0;
-    width: 160px;
+    left: calc((100% - min(100%, 400px)) / 2 - var(--caption-gap));
+    transform: translateX(-100%);
+    width: 220px;
+    max-width: 220px;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
     margin: 0;
   }
 }
@@ -162,7 +176,6 @@ body {
   margin-bottom: 10px;
 }
 .bio-text {
-  min-width: 0;
   order: 2;
   font-family: "Victor Mono", monospace;
   font-size: 9px;
