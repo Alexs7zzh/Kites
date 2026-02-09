@@ -5,6 +5,7 @@ import MagneticDangoLine from '../components/MagneticDangoLine'
 import {SANITY_API_VERSION, SANITY_USE_CDN} from '../lib/sanityConfig.js'
 import backgroundSource from '../assets/2025-08-05-Background.jpg'
 import {prepareBackgroundImage} from '../lib/backgroundImagePreparation'
+import {prepareOgImage} from '../lib/ogImagePreparation'
 import {imageProjection, prepareSiteContent} from '../lib/siteContentImagePreparation'
 
 const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? ''
@@ -49,6 +50,22 @@ function toRootUrl(value: string | URL | null | undefined): string | null {
     return new URL('/', value).toString()
   } catch {
     return null
+  }
+}
+
+function toAbsoluteUrl(value: string, base: string | null): string {
+  try {
+    return new URL(value).toString()
+  } catch {
+    if (!base) {
+      return value
+    }
+
+    try {
+      return new URL(value, base).toString()
+    } catch {
+      return value
+    }
   }
 }
 
@@ -132,7 +149,15 @@ const query = `{
     siteName,
     defaultDescription,
     canonicalDomain,
-    "defaultOgImage": defaultOgImage.asset->url,
+    "defaultOgImage": defaultOgImage{
+      "url": asset->url,
+      "metadata": asset->metadata{
+        dimensions{
+          width,
+          height
+        }
+      }
+    },
     social{
       xHandle,
       instagramHandle
@@ -157,6 +182,11 @@ const preparedBackgroundImage = await prepareBackgroundImage({
   src: backgroundSource,
   getImage,
 })
+const preparedOgImage = await prepareOgImage({
+  image: siteSettings?.defaultOgImage ?? null,
+  getImage,
+  maxDimension: 1200,
+})
 
 const siteName = nonEmpty(siteSettings?.siteName)
 const title = siteName ?? 'Kites'
@@ -165,7 +195,9 @@ const description =
   nonEmpty(siteSettings?.defaultDescription)
 const canonical =
   toRootUrl(nonEmpty(siteSettings?.canonicalDomain))
-const ogImage = nonEmpty(siteSettings?.defaultOgImage)
+const ogImage = preparedOgImage
+  ? toAbsoluteUrl(preparedOgImage.src, canonical)
+  : null
 const twitterSite = normalizeHandle(siteSettings?.social?.xHandle)
 const robots = 'index,follow'
 const twitterCard = ogImage ? 'summary_large_image' : 'summary'
@@ -204,6 +236,8 @@ const twitterCard = ogImage ? 'summary_large_image' : 'summary'
     {canonical && <meta property="og:url" content={canonical} />}
     {siteName && <meta property="og:site_name" content={siteName} />}
     {ogImage && <meta property="og:image" content={ogImage} />}
+    {preparedOgImage && <meta property="og:image:width" content={String(preparedOgImage.width)} />}
+    {preparedOgImage && <meta property="og:image:height" content={String(preparedOgImage.height)} />}
 
     <meta name="twitter:card" content={twitterCard} />
     <meta name="twitter:title" content={title} />
