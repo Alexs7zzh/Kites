@@ -41,6 +41,15 @@ function normalizeHandle(value: unknown): string | null {
   return `@${sanitizedHandle}`
 }
 
+function handleToProfileUrl(value: unknown, baseUrl: string): string | null {
+  const handle = normalizeHandle(value)
+  if (!handle) {
+    return null
+  }
+
+  return `${baseUrl}/${handle.slice(1)}`
+}
+
 function toRootUrl(value: string | URL | null | undefined): string | null {
   if (!value) {
     return null
@@ -150,6 +159,7 @@ const query = `{
     defaultDescription,
     canonicalDomain,
     "defaultOgImage": defaultOgImage{
+      alt,
       "url": asset->url,
       "metadata": asset->metadata{
         dimensions{
@@ -201,6 +211,40 @@ const ogImage = preparedOgImage
 const twitterSite = normalizeHandle(siteSettings?.social?.xHandle)
 const robots = 'index,follow'
 const twitterCard = ogImage ? 'summary_large_image' : 'summary'
+const twitterCreator = twitterSite
+const ogLocale = 'en_US'
+const ogImageAlt = nonEmpty(siteSettings?.defaultOgImage?.alt) ??
+  (ogImage ? `${title} link preview image` : null)
+const socialProfiles = [
+  handleToProfileUrl(siteSettings?.social?.xHandle, 'https://x.com'),
+  handleToProfileUrl(siteSettings?.social?.instagramHandle, 'https://www.instagram.com'),
+].filter((value): value is string => Boolean(value))
+const organizationId = canonical ? `${canonical}#organization` : '#organization'
+const websiteId = canonical ? `${canonical}#website` : '#website'
+const structuredData = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': organizationId,
+      name: title,
+      ...(canonical ? {url: canonical} : {}),
+      ...(ogImage ? {logo: ogImage} : {}),
+      ...(socialProfiles.length > 0 ? {sameAs: socialProfiles} : {}),
+    },
+    {
+      '@type': 'WebSite',
+      '@id': websiteId,
+      name: title,
+      inLanguage: 'en-US',
+      ...(canonical ? {url: canonical} : {}),
+      ...(description ? {description} : {}),
+      publisher: {
+        '@id': organizationId,
+      },
+    },
+  ],
+})
 ---
 
 <!doctype html>
@@ -209,6 +253,7 @@ const twitterCard = ogImage ? 'summary_large_image' : 'summary'
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
+    <link rel="icon" href="/favicon.ico" />
     <link
       rel="preload"
       href={preparedBackgroundImage.preload.href}
@@ -231,11 +276,15 @@ const twitterCard = ogImage ? 'summary_large_image' : 'summary'
     {canonical && <link rel="canonical" href={canonical} />}
 
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content={ogLocale} />
     <meta property="og:title" content={title} />
     {description && <meta property="og:description" content={description} />}
     {canonical && <meta property="og:url" content={canonical} />}
     {siteName && <meta property="og:site_name" content={siteName} />}
     {ogImage && <meta property="og:image" content={ogImage} />}
+    {ogImage && <meta property="og:image:secure_url" content={ogImage} />}
+    {ogImage && <meta property="og:image:type" content="image/jpeg" />}
+    {ogImageAlt && <meta property="og:image:alt" content={ogImageAlt} />}
     {preparedOgImage && <meta property="og:image:width" content={String(preparedOgImage.width)} />}
     {preparedOgImage && <meta property="og:image:height" content={String(preparedOgImage.height)} />}
 
@@ -243,7 +292,10 @@ const twitterCard = ogImage ? 'summary_large_image' : 'summary'
     <meta name="twitter:title" content={title} />
     {description && <meta name="twitter:description" content={description} />}
     {ogImage && <meta name="twitter:image" content={ogImage} />}
+    {ogImageAlt && <meta name="twitter:image:alt" content={ogImageAlt} />}
     {twitterSite && <meta name="twitter:site" content={twitterSite} />}
+    {twitterCreator && <meta name="twitter:creator" content={twitterCreator} />}
+    <script type="application/ld+json" set:html={structuredData} />
   </head>
   <body>
     {preparedSiteContent ? (

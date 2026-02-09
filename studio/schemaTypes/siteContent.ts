@@ -1,4 +1,5 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {imageAltFields} from './imageFields'
 
 function parseAbsoluteUrl(value: string): URL | null {
   try {
@@ -31,18 +32,6 @@ function validateContactFormAction(value: unknown): true | string {
   }
 
   return 'Use an https URL. For local development only, http://localhost or http://127.0.0.1 is allowed.'
-}
-
-function imageAltFields() {
-  return [
-    defineField({
-      name: 'alt',
-      title: 'Alt Text',
-      type: 'string',
-      description:
-        'Meaningful description for screen readers. Leave empty when the image is decorative.',
-    }),
-  ]
 }
 
 export const aboutSectionType = defineType({

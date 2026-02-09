@@ -22,7 +22,7 @@
 
 ## P1 TODOs
 
-- [ ] Add structured data (JSON-LD) relevant to this site:
+- [x] Add structured data (JSON-LD) relevant to this site:
 - `Organization`, `WebSite`, and content-specific schemas (for portfolio/artwork entities as appropriate).
 - [ ] Add `dateModified` and freshness signals if content model tracks updates.
 - [x] Move image alt text into Sanity and render meaningful, content-specific alt text (not generic placeholders).
@@ -53,5 +53,5 @@
 
 - [ ] Run Rich Results Test for JSON-LD.
 - [ ] Run Schema.org validator for structured data integrity.
-- [ ] Verify meta tags in rendered static HTML, not only after hydration.
+- [x] Verify meta tags in rendered static HTML, not only after hydration.
 - [ ] Verify indexability and canonical behavior in Search Console after go-live.

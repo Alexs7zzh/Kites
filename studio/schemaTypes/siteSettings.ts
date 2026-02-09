@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {imageAltFields} from './imageFields'
 
 const SITE_NAME_WARNING_MAX_LENGTH = 60
 const SEO_DESCRIPTION_MIN_WARNING_LENGTH = 50
@@ -139,6 +140,7 @@ export const siteSettingsType = defineType({
       title: 'Link Preview Image',
       type: 'image',
       options: {hotspot: true},
+      fields: imageAltFields(),
     }),
     defineField({
       name: 'social',
