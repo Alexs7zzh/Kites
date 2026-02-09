@@ -196,7 +196,6 @@ export default function MagneticDangoLine({
 
   const sectionRefs = useRef({});
 
-  const [isLoading, setIsLoading] = useState(true);
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const [isMobile, setIsMobile] = useState(false);
   const [dotCount, setDotCount] = useState(100);
@@ -233,31 +232,6 @@ export default function MagneticDangoLine({
   const currentFrequency = useRef(5.0);
   const targetWaveSpeed = useRef(0.008);
   const currentWaveSpeed = useRef(0.008);
-
-  useEffect(() => {
-    const preloadAssets = async () => {
-      const assets = ["/2025-08-05-Background.png"];
-      const imagePromises = assets.map((src) => {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.src = src;
-          img.onload = resolve;
-          img.onerror = reject;
-        });
-      });
-      const fontPromises = [
-        document.fonts.load("500 1em Victor Mono"),
-      ];
-      try {
-        await Promise.all([...imagePromises, ...fontPromises]);
-      } catch (error) {
-        console.error("Failed to preload assets:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    preloadAssets();
-  }, []);
 
   useEffect(() => {
     if (dotCount > 0 && anchorYPositions && anchorYPositions.length > 0) {
@@ -308,7 +282,7 @@ export default function MagneticDangoLine({
     resizeObserver.observe(contentElement);
     calculateAnimationMaxScroll();
     return () => resizeObserver.disconnect();
-  }, [windowSize, isLoading]); // Added isLoading to ensure content is ready
+  }, [windowSize]);
 
   useEffect(() => {
     const calculateLayout = () => {
@@ -696,27 +670,10 @@ export default function MagneticDangoLine({
           left: 0,
           width: "100vw",
           height: "100dvh",
-          backgroundColor: "white",
-          zIndex: 9999,
-          opacity: isLoading ? 1 : 0,
-          visibility: isLoading ? "visible" : "hidden",
-          transition: "opacity 0.5s ease-out, visibility 0.5s ease-out",
-          pointerEvents: "none",
-        }}
-      />
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100dvh",
           backgroundImage: "url(/2025-08-05-Background.png)",
           backgroundSize: "cover",
           backgroundPosition: "center",
           overflow: "hidden",
-          opacity: isLoading ? 0 : 1,
-          transition: "opacity 0.5s ease-in",
           overscrollBehavior: "none",
         }}
       >
