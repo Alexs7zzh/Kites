@@ -1,12 +1,3 @@
-@font-face {
-  font-family: "Victor Mono Medium";
-  src: url('./fonts/VictorMono-Medium.woff') format('woff');
-}
-@font-face {
-  font-family: "Victor Mono Regular";
-  src: url('./fonts/VictorMono-Regular.woff') format('woff');
-}
-
 /* --- RESPONSIVE LAYOUT FIXES --- */
 
 /* Standard section spacing */
