@@ -29,9 +29,6 @@
 - All Sanity content images now support optional `alt` text fields in Studio.
 - Frontend now renders `alt` from Sanity on every content `<img>` and falls back to `alt=""` when no alt text is set.
 - [ ] Introduce semantic heading structure (`h1`, `h2`, etc.) instead of purely visual spacing (`<br>` stacks).
-- [ ] Add social image strategy:
-- Default OG image from settings.
-- Per-page override from content.
 - [ ] Add canonical host redirect policy (www/non-www normalization) via deployment rules.
 - [ ] Support staging noindex policy to avoid indexing preview environments.
 

@@ -10,7 +10,7 @@
 
 ## Code Quality TODOs
 
-- [ ] Pin dependency versions instead of `latest` for reproducible builds.
+- [x] Pin dependency versions instead of `latest` for reproducible builds.
 - [ ] Add linting/formatting consistency across `web` and `studio`.
 - [ ] Add shared scripts for type-check/lint/build in CI.
 - [ ] Add smoke tests for critical rendering and metadata behavior.

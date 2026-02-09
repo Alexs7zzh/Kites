@@ -20,8 +20,6 @@
 - SEO title/description length warnings.
 - URL validations with clear error messages.
 - Field constraints for arrays and key business rules.
-- [ ] Replace absolute path defaults in import tooling with repo-relative or CLI-required inputs.
-- [ ] Define cutover checklist to freeze CloudCannon edits before final Sanity import.
 
 ## P1 TODOs
 

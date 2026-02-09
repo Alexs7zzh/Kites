@@ -19,8 +19,8 @@
 - [ ] Query image metadata (`dimensions`, `lqip`) and render explicit width/height to reduce CLS.
 - [ ] Add `loading="lazy"` and `decoding="async"` for below-the-fold images; set `fetchpriority="high"` only for the most important above-the-fold image(s).
 - [ ] Convert oversized PNG hero/background assets to modern formats (WebP/AVIF variants) and serve responsive versions by viewport.
-- [ ] Remove duplicate font sources and ship only one canonical set (prefer WOFF2 first, WOFF fallback only if needed).
-- [ ] Add `font-display: swap` and preload only the minimum critical font file(s).
+- [x] Remove duplicate font sources and ship only one canonical set (prefer WOFF2 first, WOFF fallback only if needed).
+- [x] Add `font-display: swap` and preload only the minimum critical font file(s).
 
 ## P1 TODOs
 

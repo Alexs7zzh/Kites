@@ -29,7 +29,7 @@
 
 ## P1 TODOs
 
-- [ ] Create Netlify build hook for frontend site.
+- [x] Create Netlify build hook for frontend site.
 - [ ] Configure Sanity webhook to trigger that hook on publish/unpublish for relevant document types (`siteContent`, `siteSettings`, and future page docs).
 - [ ] Use a secret/signed webhook strategy:
 - Either Netlify build hook token management.
