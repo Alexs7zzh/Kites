@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect, useMemo } from "react";
-import { useAnimationFrame } from "framer-motion";
 import Content from "./Content";
 import kitesLogoSvg from "../assets/Kites-Logo.svg?raw";
 import "./MagneticDangoLine.css";
@@ -177,6 +176,44 @@ function calculatePiecewiseDotPositions(startX, endX, totalDots) {
   }
   positions[positions.length - 1] = endX;
   return positions;
+}
+
+function useAnimationFrame(callback) {
+  const callbackRef = useRef(callback);
+  const frameRef = useRef(null);
+  const initialTimestampRef = useRef(null);
+  const previousTimestampRef = useRef(null);
+
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
+
+  useEffect(() => {
+    const onFrame = (timestamp) => {
+      if (initialTimestampRef.current === null) {
+        initialTimestampRef.current = timestamp;
+        previousTimestampRef.current = timestamp;
+      }
+
+      const previousTimestamp = previousTimestampRef.current ?? timestamp;
+      callbackRef.current(
+        timestamp - initialTimestampRef.current,
+        timestamp - previousTimestamp
+      );
+      previousTimestampRef.current = timestamp;
+      frameRef.current = window.requestAnimationFrame(onFrame);
+    };
+
+    frameRef.current = window.requestAnimationFrame(onFrame);
+    return () => {
+      if (frameRef.current !== null) {
+        window.cancelAnimationFrame(frameRef.current);
+      }
+      frameRef.current = null;
+      initialTimestampRef.current = null;
+      previousTimestampRef.current = null;
+    };
+  }, []);
 }
 
 export default function MagneticDangoLine({

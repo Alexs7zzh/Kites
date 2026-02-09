@@ -5,7 +5,7 @@ import {SANITY_API_VERSION, SANITY_USE_CDN} from '../lib/sanityConfig.js'
 
 const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? ''
 
-function getRequiredEnv(name) {
+function getRequiredEnv(name: string): string {
   const rawValue = import.meta.env[name]
   if (typeof rawValue !== 'string' || rawValue.trim() === '') {
     throw new Error(`Missing required environment variable: ${name}`)
@@ -13,7 +13,7 @@ function getRequiredEnv(name) {
   return rawValue.trim()
 }
 
-function nonEmpty(value) {
+function nonEmpty(value: unknown): string | null {
   if (typeof value !== 'string') {
     return null
   }
@@ -22,7 +22,7 @@ function nonEmpty(value) {
   return trimmedValue === '' ? null : trimmedValue
 }
 
-function normalizeHandle(value) {
+function normalizeHandle(value: unknown): string | null {
   const handle = nonEmpty(value)
   if (!handle) {
     return null
@@ -36,7 +36,7 @@ function normalizeHandle(value) {
   return `@${sanitizedHandle}`
 }
 
-function toRootUrl(value) {
+function toRootUrl(value: string | URL | null | undefined): string | null {
   if (!value) {
     return null
   }
