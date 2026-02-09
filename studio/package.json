@@ -8,8 +8,6 @@
     "dev": "sanity dev",
     "start": "sanity start",
     "build": "sanity build",
-    "import:kite": "sanity exec ./scripts/import-kite-content.ts --with-user-token",
-    "import:kite:dry": "sanity exec ./scripts/import-kite-content.ts -- --dry-run",
     "deploy": "sanity deploy",
     "deploy-graphql": "sanity graphql deploy"
   },

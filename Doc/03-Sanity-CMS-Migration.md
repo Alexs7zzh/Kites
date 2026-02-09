@@ -4,8 +4,6 @@
 
 - Studio currently models only one singleton document: `siteContent` in `/Users/alex/dev/kites/studio/schemaTypes/siteContent.ts`.
 - Structure singleton wiring exists (`/Users/alex/dev/kites/studio/structure.ts`) but no global settings singleton.
-- Import script exists (`/Users/alex/dev/kites/studio/scripts/import-kite-content.ts`) and maps legacy `/Users/alex/dev/kite/public/content.json` into `siteContent`.
-- Import defaults use an absolute local path (`/Users/alex/dev/kite/...`), which is not portable across machines/CI.
 - Schema currently uses mostly plain `text` fields and hardcoded image fields without dedicated alt/caption metadata.
 
 ## P0 TODOs (High Impact)
