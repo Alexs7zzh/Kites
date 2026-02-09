@@ -24,7 +24,7 @@ Sanity client runtime values are pinned in code:
 - `SANITY_API_VERSION = 2026-02-09`
 - `SANITY_USE_CDN = false`
 
-Defaults for this project are provided in `/Users/alex/dev/kites/web/.env.example`.
+Set these values in your local `/Users/alex/dev/kites/web/.env` file (not committed).
 
 ## Deploy Sanity Studio (Hosted)
 
