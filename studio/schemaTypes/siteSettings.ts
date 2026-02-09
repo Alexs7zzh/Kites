@@ -4,6 +4,76 @@ import {imageAltFields} from './imageFields'
 const SITE_NAME_WARNING_MAX_LENGTH = 60
 const SEO_DESCRIPTION_MIN_WARNING_LENGTH = 50
 const SEO_DESCRIPTION_MAX_WARNING_LENGTH = 160
+const OG_IMAGE_RECOMMENDED_WIDTH = 1200
+const OG_IMAGE_RECOMMENDED_HEIGHT = 630
+const OG_IMAGE_MIN_WIDTH = 600
+const OG_IMAGE_MIN_HEIGHT = 315
+const OG_IMAGE_RECOMMENDED_ASPECT_RATIO = OG_IMAGE_RECOMMENDED_WIDTH / OG_IMAGE_RECOMMENDED_HEIGHT
+const OG_IMAGE_ASPECT_RATIO_TOLERANCE = 0.1
+
+function getImageDimensionsFromAssetRef(
+  value: unknown
+): {width: number; height: number} | null {
+  if (!value || typeof value !== 'object') {
+    return null
+  }
+
+  const assetRef = (value as {asset?: {_ref?: unknown}}).asset?._ref
+  if (typeof assetRef !== 'string') {
+    return null
+  }
+
+  const dimensionMatch = assetRef.match(/-(\d+)x(\d+)-[a-z0-9]+$/i)
+  if (!dimensionMatch) {
+    return null
+  }
+
+  const width = Number.parseInt(dimensionMatch[1], 10)
+  const height = Number.parseInt(dimensionMatch[2], 10)
+  if (!Number.isFinite(width) || !Number.isFinite(height)) {
+    return null
+  }
+
+  return {width, height}
+}
+
+function validateOgImageDimensions(value: unknown): true | string {
+  const dimensions = getImageDimensionsFromAssetRef(value)
+  if (!dimensions) {
+    return true
+  }
+
+  const {width, height} = dimensions
+  const aspectRatio = width / height
+  const minAspectRatio = OG_IMAGE_RECOMMENDED_ASPECT_RATIO - OG_IMAGE_ASPECT_RATIO_TOLERANCE
+  const maxAspectRatio = OG_IMAGE_RECOMMENDED_ASPECT_RATIO + OG_IMAGE_ASPECT_RATIO_TOLERANCE
+  const isBelowMinimum = width < OG_IMAGE_MIN_WIDTH || height < OG_IMAGE_MIN_HEIGHT
+  const isBelowRecommended =
+    width < OG_IMAGE_RECOMMENDED_WIDTH || height < OG_IMAGE_RECOMMENDED_HEIGHT
+  const hasAspectRatioMismatch = aspectRatio < minAspectRatio || aspectRatio > maxAspectRatio
+
+  if (!isBelowMinimum && !isBelowRecommended && !hasAspectRatioMismatch) {
+    return true
+  }
+
+  const recommendations: string[] = []
+
+  if (isBelowMinimum) {
+    recommendations.push(`at least ${OG_IMAGE_MIN_WIDTH}x${OG_IMAGE_MIN_HEIGHT}px`)
+  }
+  if (!isBelowMinimum && isBelowRecommended) {
+    recommendations.push(`around ${OG_IMAGE_RECOMMENDED_WIDTH}x${OG_IMAGE_RECOMMENDED_HEIGHT}px`)
+  }
+  if (hasAspectRatioMismatch) {
+    recommendations.push(
+      `an aspect ratio near ${OG_IMAGE_RECOMMENDED_WIDTH}:${OG_IMAGE_RECOMMENDED_HEIGHT} (1.91:1)`
+    )
+  }
+
+  return `OG previews work best with ${recommendations.join(
+    ' and '
+  )}. Current image is ${width}x${height}px.`
+}
 
 function parseAbsoluteUrl(value: string): URL | null {
   try {
@@ -141,6 +211,7 @@ export const siteSettingsType = defineType({
       type: 'image',
       options: {hotspot: true},
       fields: imageAltFields(),
+      validation: (rule) => rule.custom(validateOgImageDimensions).warning(),
     }),
     defineField({
       name: 'social',
