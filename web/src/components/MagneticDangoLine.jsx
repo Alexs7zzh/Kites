@@ -1,9 +1,11 @@
 import React, { useRef, useState, useEffect, useMemo } from "react";
 import { useAnimationFrame } from "framer-motion";
 import Content from "./Content";
-import KitesLogo from "./KitesLogo";
+import kitesLogoSvg from "../assets/Kites-Logo.svg?raw";
 import "./MagneticDangoLine.css";
 import "./styles.css";
+
+const EMBEDDED_KITES_LOGO_SVG = kitesLogoSvg.trim();
 
 // --- CONSTANTS ---
 const DESKTOP_NAV_LOGO_X_POSITION = 200;
@@ -798,7 +800,12 @@ export default function MagneticDangoLine({
           })}
         </svg>
 
-        <KitesLogo style={logoStyle} />
+        <div
+          dangerouslySetInnerHTML={{ __html: EMBEDDED_KITES_LOGO_SVG }}
+          role="img"
+          aria-label="Kites"
+          style={logoStyle}
+        />
 
         {leftElements.map((element) => {
           if (element.type === "button") {
