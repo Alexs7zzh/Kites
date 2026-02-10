@@ -60,6 +60,30 @@ const HERO_IMAGE_LOADING_CONFIG: LoadingConfig = {
   fetchPriority: 'high' as const,
 }
 
+const MOBILE_CONTENT_WIDTH = 'calc(65vw - 40px)'
+const DESKTOP_CONTENT_WIDTH_PRE_GUTTER = 'calc(55vw - 160px)'
+const DESKTOP_CONTENT_WIDTH_POST_GUTTER =
+  'calc((55vw + 236px) - (80px + (80px + 236px)))'
+
+function scaleSize(baseSize: string, factor: number): string {
+  return `calc(${baseSize} * ${factor})`
+}
+
+const FULL_WIDTH_SIZES =
+  `(max-width: 769px) ${MOBILE_CONTENT_WIDTH}, ` +
+  `(max-width: 999px) ${DESKTOP_CONTENT_WIDTH_PRE_GUTTER}, ` +
+  `${DESKTOP_CONTENT_WIDTH_POST_GUTTER}`
+
+const FULL_WIDTH_SIZES_THROUGH_1200 =
+  `(max-width: 769px) ${MOBILE_CONTENT_WIDTH}, ` +
+  `(max-width: 999px) ${DESKTOP_CONTENT_WIDTH_PRE_GUTTER}, ` +
+  `(max-width: 1200px) ${DESKTOP_CONTENT_WIDTH_POST_GUTTER}`
+
+const HALF_WIDTH_SIZES =
+  `(max-width: 769px) ${MOBILE_CONTENT_WIDTH}, ` +
+  `(max-width: 999px) ${scaleSize(DESKTOP_CONTENT_WIDTH_PRE_GUTTER, 0.5)}, ` +
+  `${scaleSize(DESKTOP_CONTENT_WIDTH_POST_GUTTER, 0.5)}`
+
 function createSlotConfig(
   sizes: string,
   widths: number[],
@@ -74,36 +98,33 @@ function createSlotConfig(
 
 const SLOT_CONFIGS = {
   aboutMainImage: createSlotConfig(
-    '(max-width: 769px) calc(65vw - 40px), calc((55vw - 160px) * 0.5)',
+    HALF_WIDTH_SIZES,
     [320, 640, 768],
     HERO_IMAGE_LOADING_CONFIG,
   ),
-  largeImage: createSlotConfig(
-    '(max-width: 769px) calc(65vw - 40px), calc(55vw - 160px)',
-    [480, 768, 1024],
-  ),
-  responsiveImage: createSlotConfig(
-    '(max-width: 769px) calc(65vw - 40px), calc(55vw - 160px)',
-    [480, 768, 1024],
-  ),
+  largeImage: createSlotConfig(FULL_WIDTH_SIZES, [480, 768, 1024]),
+  responsiveImage: createSlotConfig(FULL_WIDTH_SIZES, [480, 768, 1024]),
   scentComparisonLeft: createSlotConfig(
-    '(max-width: 769px) calc(65vw - 40px), (max-width: 1200px) calc(55vw - 160px), calc((55vw - 160px) * 0.52)',
+    `${FULL_WIDTH_SIZES_THROUGH_1200}, ${scaleSize(DESKTOP_CONTENT_WIDTH_POST_GUTTER, 0.52)}`,
     [320, 480, 640],
   ),
   scentComparisonRight: createSlotConfig(
-    '(max-width: 769px) calc(65vw - 40px), (max-width: 1200px) calc(55vw - 160px), calc((55vw - 160px) * 0.44)',
+    `${FULL_WIDTH_SIZES_THROUGH_1200}, ${scaleSize(DESKTOP_CONTENT_WIDTH_POST_GUTTER, 0.44)}`,
     [280, 440, 600],
   ),
   studioHeaderImage: createSlotConfig(
-    '(max-width: 769px) calc(65vw - 40px), (max-width: 1200px) calc(55vw - 160px), calc((55vw - 160px) * 0.31)',
+    `${FULL_WIDTH_SIZES_THROUGH_1200}, ${scaleSize(DESKTOP_CONTENT_WIDTH_POST_GUTTER, 0.31)}`,
     [220, 340, 520],
   ),
   captionBioImage: createSlotConfig(
-    '(max-width: 769px) calc(65vw - 40px), (max-width: 1200px) calc(55vw - 160px), calc((55vw - 160px) * 0.45)',
+    `${FULL_WIDTH_SIZES_THROUGH_1200}, ${scaleSize(DESKTOP_CONTENT_WIDTH_POST_GUTTER, 0.45)}`,
     [320, 480, 640, 768],
   ),
   projectInlineGallery: createSlotConfig(
-    '(max-width: 769px) calc((65vw - 40px) * 0.48), (max-width: 1200px) calc((55vw - 160px) * 0.48), calc((55vw - 160px) * 0.216)',
+    `(max-width: 769px) ${scaleSize(MOBILE_CONTENT_WIDTH, 0.48)}, ` +
+      `(max-width: 999px) ${scaleSize(DESKTOP_CONTENT_WIDTH_PRE_GUTTER, 0.48)}, ` +
+      `(max-width: 1200px) ${scaleSize(DESKTOP_CONTENT_WIDTH_POST_GUTTER, 0.48)}, ` +
+      `${scaleSize(DESKTOP_CONTENT_WIDTH_POST_GUTTER, 0.216)}`,
     [220, 380, 560],
   ),
 }
