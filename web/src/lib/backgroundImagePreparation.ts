@@ -8,6 +8,8 @@ type ImageVariant = {
 export type PreparedBackgroundImage = {
   placeholderColor: string
   sizes: string
+  width?: number
+  height?: number
   avif: ImageVariant
   webp: ImageVariant
   jpeg: ImageVariant
@@ -68,6 +70,19 @@ function resolveSourceWidth(src: ImageInput): number | null {
   return Math.round(width)
 }
 
+function resolveSourceHeight(src: ImageInput): number | null {
+  if (!src || typeof src !== 'object' || !('height' in src)) {
+    return null
+  }
+
+  const height = (src as {height?: unknown}).height
+  if (typeof height !== 'number' || !Number.isFinite(height) || height <= 0) {
+    return null
+  }
+
+  return Math.round(height)
+}
+
 function buildVariant(image: {
   src: string
   srcSet: {
@@ -87,7 +102,9 @@ export async function prepareBackgroundImage({
   widths = DEFAULT_WIDTHS,
   placeholderColor = DEFAULT_PLACEHOLDER_COLOR,
 }: PrepareBackgroundImageOptions): Promise<PreparedBackgroundImage> {
-  const targetWidths = clampWidths(widths, resolveSourceWidth(src))
+  const sourceWidth = resolveSourceWidth(src)
+  const sourceHeight = resolveSourceHeight(src)
+  const targetWidths = clampWidths(widths, sourceWidth)
 
   const [avifImage, webpImage, jpegImage] = await Promise.all([
     getImage({
@@ -119,6 +136,12 @@ export async function prepareBackgroundImage({
   return {
     placeholderColor,
     sizes,
+    ...(sourceWidth && sourceHeight
+      ? {
+          width: sourceWidth,
+          height: sourceHeight,
+        }
+      : {}),
     avif,
     webp: buildVariant(webpImage),
     jpeg: buildVariant(jpegImage),

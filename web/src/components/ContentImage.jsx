@@ -42,13 +42,16 @@ function normalizeImagePayload(image) {
   const sources = Array.isArray(image.sources)
     ? image.sources.map(normalizeSource).filter(Boolean)
     : [];
+  const width = toDimension(image.width);
+  const height = toDimension(image.height);
+  const hasIntrinsicSize = width !== undefined && height !== undefined;
 
   return {
     fallbackSrc,
     alt: typeof image.alt === "string" ? image.alt : "",
     sizes: typeof image.sizes === "string" ? image.sizes : undefined,
-    width: toDimension(image.width),
-    height: toDimension(image.height),
+    width: hasIntrinsicSize ? width : undefined,
+    height: hasIntrinsicSize ? height : undefined,
     loading: image.loading === "eager" ? "eager" : "lazy",
     decoding: image.decoding === "sync" ? "sync" : "async",
     fetchPriority: image.fetchPriority === "high" ? "high" : "auto",

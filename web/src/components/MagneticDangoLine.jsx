@@ -231,6 +231,14 @@ function normalizeBackgroundVariant(value) {
   return { src, srcSet };
 }
 
+function toDimension(value) {
+  if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
+    return undefined;
+  }
+
+  return Math.round(value);
+}
+
 function normalizeBackgroundImagePayload(value) {
   if (!value || typeof value !== "object") {
     return null;
@@ -243,12 +251,18 @@ function normalizeBackgroundImagePayload(value) {
     return null;
   }
 
+  const width = toDimension(value.width);
+  const height = toDimension(value.height);
+  const hasIntrinsicSize = width !== undefined && height !== undefined;
+
   return {
     placeholderColor:
       typeof value.placeholderColor === "string" && value.placeholderColor
         ? value.placeholderColor
         : "#e7e4df",
     sizes: typeof value.sizes === "string" ? value.sizes : "100vw",
+    width: hasIntrinsicSize ? width : undefined,
+    height: hasIntrinsicSize ? height : undefined,
     avif,
     webp,
     jpeg,
@@ -774,6 +788,8 @@ export default function MagneticDangoLine({
               src={resolvedBackgroundImage.jpeg.src}
               srcSet={resolvedBackgroundImage.jpeg.srcSet}
               sizes={resolvedBackgroundImage.sizes}
+              width={resolvedBackgroundImage.width}
+              height={resolvedBackgroundImage.height}
               alt=""
               loading="eager"
               decoding="async"
