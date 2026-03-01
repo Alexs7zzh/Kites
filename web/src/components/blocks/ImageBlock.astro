@@ -1,0 +1,80 @@
+---
+import type {PreparedPageContentBlock} from '../../lib/pageContentPreparation'
+
+type ImageBlockType = Extract<PreparedPageContentBlock, {_type: 'pageImageBlock'}>
+
+interface Props {
+  block: ImageBlockType
+}
+
+const {block} = Astro.props as Props
+const image = block.image
+const layoutClass = `content-image--${block.layout}`
+const alignClass = `content-image--align-${block.align}`
+---
+
+<picture class={`content-image ${layoutClass} ${alignClass}`}>
+  {image.sources.map((source) => (
+    <source
+      srcset={source.srcSet}
+      type={source.type}
+      sizes={image.sizes}
+    />
+  ))}
+  <img
+    src={image.fallbackSrc}
+    alt={image.alt}
+    width={image.width}
+    height={image.height}
+    loading={image.loading}
+    decoding={image.decoding}
+    fetchpriority={image.fetchPriority}
+  />
+</picture>
+
+<style>
+  .content-image {
+    margin: 20px 0;
+  }
+
+  .content-image img {
+    width: 100%;
+    height: auto;
+  }
+
+  .content-image--full {
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .content-image--half {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .content-image--align-left {
+    margin-left: 0;
+    margin-right: auto;
+  }
+
+  .content-image--align-center {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .content-image--align-right {
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  @media (max-width: 1200px) {
+    .content-image,
+    .content-image--full,
+    .content-image--half {
+      width: 100%;
+      max-width: 100%;
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+</style>

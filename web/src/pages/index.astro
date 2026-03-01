@@ -1,12 +1,13 @@
 ---
 import {getImage} from 'astro:assets'
 import {createClient} from '@sanity/client'
-import MagneticDangoLine from '../components/MagneticDangoLine'
-import {SANITY_API_VERSION, SANITY_USE_CDN} from '../lib/sanityConfig.js'
-import backgroundSource from '../assets/2025-08-05-Background.jpg'
+import PageShell from '../components/PageShell.astro'
 import {prepareBackgroundImage} from '../lib/backgroundImagePreparation'
+import backgroundSource from '../assets/2025-08-05-Background.jpg'
 import {prepareOgImage} from '../lib/ogImagePreparation'
-import {imageProjection, prepareSiteContent} from '../lib/siteContentImagePreparation'
+import {PAGE_CONTENT_QUERY} from '../lib/pageContentQuery'
+import {prepareLegacySiteContentPage, preparePageContent} from '../lib/pageContentPreparation'
+import {SANITY_API_VERSION, SANITY_USE_CDN} from '../lib/sanityConfig.js'
 
 const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? ''
 
@@ -88,106 +89,24 @@ const client = createClient({
   apiVersion: SANITY_API_VERSION,
 })
 
-const query = `{
-  "siteContent": *[_id == "siteContent"][0]{
-    "about": about{
-      "main_image": main_image{
-        ${imageProjection}
-      },
-      text_1,
-      "notation_image": notation_image{
-        ${imageProjection}
-      },
-      text_2
-    },
-    "scent": scent{
-      "main_image": main_image{
-        ${imageProjection}
-      },
-      title,
-      description,
-      details,
-      "comparison_images": coalesce(comparison_images[]{
-        ${imageProjection}
-      }, [])
-    },
-    "process": process{
-      text_1,
-      text_2,
-      text_3,
-      "gallery_images": coalesce(gallery_images[]{
-        ${imageProjection}
-      }, [])
-    },
-    "studio": studio{
-      "header_images": coalesce(header_images[]{
-        ${imageProjection}
-      }, []),
-      intro_text,
-      "projects": coalesce(projects[]{
-        title,
-        materials,
-        location,
-        description,
-        "main_image": main_image{
-          ${imageProjection}
-        },
-        "secondary_image": secondary_image{
-          ${imageProjection}
-        },
-        "extra_image": extra_image{
-          ${imageProjection}
-        },
-        "gallery": coalesce(gallery[]{
-          ${imageProjection}
-        }, []),
-        "gallery_vertical": coalesce(gallery_vertical[]{
-          ${imageProjection}
-        }, [])
-      }, [])
-    },
-    "contact": contact{
-      bio_text,
-      "bio_image": bio_image{
-        ${imageProjection}
-      },
-      form_action
-    },
-  },
-  "siteSettings": *[_id == "siteSettings"][0]{
-    siteName,
-    defaultDescription,
-    canonicalDomain,
-    "defaultOgImage": defaultOgImage{
-      alt,
-      "url": asset->url,
-      "metadata": asset->metadata{
-        dimensions{
-          width,
-          height
-        }
-      }
-    },
-    social{
-      xHandle,
-      instagramHandle
-    }
-  }
-}`
-
-let siteContent = null
+let sitePage = null
+let legacySiteContent = null
 let siteSettings = null
 
 try {
-  const response = await client.fetch(query)
-  siteContent = response?.siteContent ?? null
+  const response = await client.fetch(PAGE_CONTENT_QUERY)
+  sitePage = response?.sitePage ?? null
+  legacySiteContent = response?.legacySiteContent ?? null
   siteSettings = response?.siteSettings ?? null
 } catch (error) {
   const message = error instanceof Error ? error.message : String(error)
   console.error(`Failed to fetch content from Sanity: ${message}`)
 }
 
-const preparedSiteContent = await prepareSiteContent(siteContent, getImage)
+let preparedPageContent = await preparePageContent(sitePage, getImage)
+if (!preparedPageContent) {
+  preparedPageContent = await prepareLegacySiteContentPage(legacySiteContent, getImage)
+}
 const preparedBackgroundImage = await prepareBackgroundImage({
   src: backgroundSource,
   getImage,
@@ -201,13 +120,9 @@ const preparedOgImage = await prepareOgImage({
 const siteName = nonEmpty(siteSettings?.siteName)
 const title = siteName ?? 'Kites'
 
-const description =
-  nonEmpty(siteSettings?.defaultDescription)
-const canonical =
-  toRootUrl(nonEmpty(siteSettings?.canonicalDomain))
-const ogImage = preparedOgImage
-  ? toAbsoluteUrl(preparedOgImage.src, canonical)
-  : null
+const description = nonEmpty(siteSettings?.defaultDescription)
+const canonical = toRootUrl(nonEmpty(siteSettings?.canonicalDomain))
+const ogImage = preparedOgImage ? toAbsoluteUrl(preparedOgImage.src, canonical) : null
 const twitterSite = normalizeHandle(siteSettings?.social?.xHandle)
 const robots = 'index,follow'
 const twitterCard = ogImage ? 'summary_large_image' : 'summary'
@@ -295,15 +210,14 @@ const structuredData = JSON.stringify({
     {ogImageAlt && <meta name="twitter:image:alt" content={ogImageAlt} />}
     {twitterSite && <meta name="twitter:site" content={twitterSite} />}
     {twitterCreator && <meta name="twitter:creator" content={twitterCreator} />}
-    <script type="application/ld+json" set:html={structuredData} />
+    <script is:inline type="application/ld+json" set:html={structuredData} />
   </head>
   <body>
-    {preparedSiteContent ? (
-      <MagneticDangoLine
-        client:load
-        initialData={preparedSiteContent as any}
+    {preparedPageContent ? (
+      <PageShell
+        pageContent={preparedPageContent}
         turnstileSiteKey={turnstileSiteKey}
-        backgroundImage={preparedBackgroundImage as any}
+        backgroundImage={preparedBackgroundImage}
       />
     ) : (
       <main style="padding: 2rem; font-family: monospace;">

@@ -1,0 +1,53 @@
+---
+import type {PreparedPageSection} from '../lib/pageContentPreparation'
+
+interface Props {
+  sections: PreparedPageSection[]
+}
+
+const {sections} = Astro.props as Props
+---
+
+<div class="left-nav" data-left-nav>
+  {sections.map((section) => (
+    <button
+      type="button"
+      class="left-nav-button"
+      data-nav-button
+      data-section-target={section.sectionId}
+    >
+      {section.navLabel}
+    </button>
+  ))}
+</div>
+
+<style>
+  .left-nav {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .left-nav-button {
+    position: absolute;
+    background: transparent;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    color: #6a6a6a;
+    font-size: 12px;
+    line-height: 1;
+    font-family: 'Victor Mono', monospace;
+    font-weight: 500;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: color 0.25s ease;
+    text-align: left;
+  }
+
+  .left-nav-button.is-active,
+  .left-nav-button:hover {
+    color: #000;
+  }
+</style>

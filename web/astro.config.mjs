@@ -1,5 +1,4 @@
 import {defineConfig} from 'astro/config'
-import react from '@astrojs/react'
 import sitemap from '@astrojs/sitemap'
 
 const FALLBACK_SITE_URL = 'https://example.com/'
@@ -52,7 +51,6 @@ export default defineConfig({
     domains: ['cdn.sanity.io'],
   },
   integrations: [
-    react(),
     sitemap({
       serialize: async (item) => {
         if (!isHomepageUrl(item.url)) {

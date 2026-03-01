@@ -288,38 +288,60 @@ export const contactSectionType = defineType({
 
 export const siteContentType = defineType({
   name: 'siteContent',
-  title: 'Site Content',
+  title: 'Site Content (Legacy)',
   type: 'document',
+  description:
+    'Legacy fixed-section model kept for rollback safety. Do not edit; use Site Page + Page Sections.',
   fields: [
     defineField({
       name: 'about',
-      title: 'About',
+      title: 'About (Legacy)',
       type: 'aboutSection',
       validation: (rule) => rule.required(),
+      readOnly: true,
+      deprecated: {
+        reason: 'Legacy model. Use Site Page sections instead.',
+      },
     }),
     defineField({
       name: 'scent',
-      title: 'Scent',
+      title: 'Scent (Legacy)',
       type: 'scentSection',
       validation: (rule) => rule.required(),
+      readOnly: true,
+      deprecated: {
+        reason: 'Legacy model. Use Site Page sections instead.',
+      },
     }),
     defineField({
       name: 'process',
-      title: 'Process',
+      title: 'Process (Legacy)',
       type: 'processSection',
       validation: (rule) => rule.required(),
+      readOnly: true,
+      deprecated: {
+        reason: 'Legacy model. Use Site Page sections instead.',
+      },
     }),
     defineField({
       name: 'studio',
-      title: 'Studio',
+      title: 'Studio (Legacy)',
       type: 'studioSection',
       validation: (rule) => rule.required(),
+      readOnly: true,
+      deprecated: {
+        reason: 'Legacy model. Use Site Page sections instead.',
+      },
     }),
     defineField({
       name: 'contact',
-      title: 'Contact',
+      title: 'Contact (Legacy)',
       type: 'contactSection',
       validation: (rule) => rule.required(),
+      readOnly: true,
+      deprecated: {
+        reason: 'Legacy model. Use Site Page sections instead.',
+      },
     }),
   ],
   preview: {

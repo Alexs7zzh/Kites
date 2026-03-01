@@ -1,0 +1,96 @@
+---
+import type {PreparedPageContentBlock} from '../../lib/pageContentPreparation'
+
+type ImagePairBlockType = Extract<PreparedPageContentBlock, {_type: 'pageImagePairBlock'}>
+
+interface Props {
+  block: ImagePairBlockType
+}
+
+const {block} = Astro.props as Props
+const ratioClass = `content-image-pair--${block.ratio}`
+---
+
+<div class={`content-image-pair ${ratioClass}`}>
+  <picture class="content-image-pair__item">
+    {block.leftImage.sources.map((source) => (
+      <source
+        srcset={source.srcSet}
+        type={source.type}
+        sizes={block.leftImage.sizes}
+      />
+    ))}
+    <img
+      src={block.leftImage.fallbackSrc}
+      alt={block.leftImage.alt}
+      width={block.leftImage.width}
+      height={block.leftImage.height}
+      loading={block.leftImage.loading}
+      decoding={block.leftImage.decoding}
+      fetchpriority={block.leftImage.fetchPriority}
+    />
+  </picture>
+
+  <picture class="content-image-pair__item">
+    {block.rightImage.sources.map((source) => (
+      <source
+        srcset={source.srcSet}
+        type={source.type}
+        sizes={block.rightImage.sizes}
+      />
+    ))}
+    <img
+      src={block.rightImage.fallbackSrc}
+      alt={block.rightImage.alt}
+      width={block.rightImage.width}
+      height={block.rightImage.height}
+      loading={block.rightImage.loading}
+      decoding={block.rightImage.decoding}
+      fetchpriority={block.rightImage.fetchPriority}
+    />
+  </picture>
+</div>
+
+<style>
+  .content-image-pair {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: 20px 0;
+    width: 100%;
+  }
+
+  .content-image-pair img {
+    width: 100%;
+    height: auto;
+  }
+
+  .content-image-pair__item {
+    min-width: 0;
+  }
+
+  .content-image-pair--50-50 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .content-image-pair--60-40 {
+    grid-template-columns: 3fr 2fr;
+  }
+
+  .content-image-pair--40-60 {
+    grid-template-columns: 2fr 3fr;
+  }
+
+  @media (max-width: 1200px) {
+    .content-image-pair {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .content-image-pair,
+    .content-image-pair__item {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+</style>
