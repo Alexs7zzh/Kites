@@ -1,0 +1,152 @@
+---
+import type {PreparedPageContentBlock} from '../../lib/pageContentPreparation'
+import {renderPortableTextToHtml} from '../../lib/portableTextRender'
+
+type ContactFormBlockType = Extract<PreparedPageContentBlock, {_type: 'contactFormBlock'}>
+
+interface Props {
+  block: ContactFormBlockType
+  turnstileSiteKey: string
+}
+
+const {block, turnstileSiteKey} = Astro.props as Props
+const bodyMarkup = renderPortableTextToHtml(block.body)
+---
+
+<div class="contact-block" data-contact-form-block>
+  <p class="contact-heading">{block.heading}</p>
+  {block.body.length > 0 && <div class="contact-body content-richtext" set:html={bodyMarkup} />}
+
+  <form
+    class="contact-form"
+    data-contact-form
+    data-form-action={block.formAction}
+    data-turnstile-site-key={turnstileSiteKey}
+  >
+    <label>Name <input type="text" name="name" required /></label>
+    <label>Email <input type="email" name="email" required /></label>
+    <label>Message <textarea name="message" rows="4" required></textarea></label>
+    <button type="submit">Send</button>
+    <div class="contact-turnstile" data-turnstile-wrapper hidden>
+      <div data-turnstile-container></div>
+    </div>
+    <p class="contact-status" data-form-status hidden></p>
+  </form>
+</div>
+
+<style>
+  .contact-block {
+    max-width: 520px;
+    margin-top: 20px;
+  }
+
+  .contact-heading {
+    margin: 0 0 12px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .contact-body {
+    margin-bottom: 20px;
+  }
+
+  .content-richtext :where(p, h2, h3, blockquote) {
+    margin: 0 0 1.2em;
+  }
+
+  .content-richtext :where(p, blockquote):last-child,
+  .content-richtext :where(h2, h3):last-child {
+    margin-bottom: 0;
+  }
+
+  .content-richtext h2,
+  .content-richtext h3 {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.8;
+    letter-spacing: 0.04em;
+  }
+
+  .content-richtext blockquote {
+    padding-left: 0.8rem;
+    border-left: 1px solid rgba(0, 0, 0, 0.35);
+  }
+
+  .content-richtext a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    max-width: 100%;
+    margin-top: 20px;
+    font-family: inherit;
+    font-size: 12px;
+    text-align: left;
+  }
+
+  .contact-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .contact-form input,
+  .contact-form textarea {
+    width: 100%;
+    padding: 6px 2px;
+    border: none;
+    border-bottom: 1px solid black;
+    background: transparent;
+    font-family: inherit;
+    font-size: 12px;
+    outline: none;
+  }
+
+  .contact-form input:focus,
+  .contact-form textarea:focus {
+    border-bottom: 1px solid #444;
+  }
+
+  .contact-form button {
+    align-self: flex-start;
+    padding: 8px 18px;
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    background: transparent;
+    border: 1px solid black;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .contact-form button:hover {
+    background: black;
+    color: white;
+  }
+
+  .contact-turnstile {
+    margin-top: 4px;
+  }
+
+  .contact-status {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .contact-status[data-status='ERROR'],
+  .contact-status[data-status='TURNSTILE_CONFIG_ERROR'] {
+    color: #a00;
+  }
+
+  .contact-status[data-status='SUCCESS'] {
+    color: #1f5f2c;
+  }
+</style>

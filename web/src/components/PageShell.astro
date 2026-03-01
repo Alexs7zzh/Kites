@@ -1,0 +1,205 @@
+---
+import kitesLogoSvg from '../assets/Kites-Logo.svg?raw'
+import type {PreparedBackgroundImage} from '../lib/backgroundImagePreparation'
+import type {PreparedPageContent} from '../lib/pageContentPreparation'
+import LeftNav from './LeftNav.astro'
+import SectionRenderer from './SectionRenderer.astro'
+
+interface Props {
+  pageContent: PreparedPageContent
+  backgroundImage: PreparedBackgroundImage
+  turnstileSiteKey: string
+}
+
+const {pageContent, backgroundImage, turnstileSiteKey} = Astro.props as Props
+const embeddedLogoSvg = kitesLogoSvg.trim()
+---
+
+<div
+  class="magnetic-dango-root"
+  data-page-shell
+  style={`--background-placeholder: ${backgroundImage.placeholderColor};`}
+>
+  <picture class="magnetic-dango-background-layer" aria-hidden="true">
+    <source type="image/avif" srcset={backgroundImage.avif.srcSet} sizes={backgroundImage.sizes} />
+    <source type="image/webp" srcset={backgroundImage.webp.srcSet} sizes={backgroundImage.sizes} />
+    <img
+      class="magnetic-dango-background-image"
+      src={backgroundImage.jpeg.src}
+      srcset={backgroundImage.jpeg.srcSet}
+      sizes={backgroundImage.sizes}
+      width={backgroundImage.width}
+      height={backgroundImage.height}
+      alt=""
+      loading="eager"
+      decoding="async"
+      fetchpriority="high"
+    />
+  </picture>
+
+  <div class="magnetic-dango-foreground-layer">
+    <svg data-magnetic-svg viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true">
+      <path
+        data-metaball-path
+        class="metaball-path"
+        fill="transparent"
+        stroke="rgba(0, 0, 0, 0.25)"
+        stroke-width="0.5"
+        vector-effect="non-scaling-stroke"
+      />
+    </svg>
+
+    <div class="site-logo" data-site-logo role="img" aria-label="Kites" set:html={embeddedLogoSvg} />
+
+    <LeftNav sections={pageContent.sections} />
+
+    <div class="scrollable-text-container" data-scroll-container>
+      <div data-content-wrapper>
+        {pageContent.sections.map((section) => (
+          <SectionRenderer
+            section={section}
+            turnstileSiteKey={turnstileSiteKey}
+          />
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import '../scripts/magneticDangoRuntime'
+  import '../scripts/contactFormRuntime'
+</script>
+
+<style is:global>
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  @font-face {
+    font-family: 'Victor Mono';
+    src:
+      url('/fonts/VictorMono-Medium.43bec5ae.woff2') format('woff2'),
+      url('/fonts/VictorMono-Medium.51677612.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Victor Mono';
+    src:
+      url('/fonts/VictorMono-Regular.c6ba95eb.woff2') format('woff2'),
+      url('/fonts/VictorMono-Regular.edbd1797.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  body {
+    font-family: 'Victor Mono', monospace;
+    color: #000;
+    background: var(--background-placeholder, #e7e4df);
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .magnetic-dango-root {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    overflow: hidden;
+    isolation: isolate;
+    overscroll-behavior: none;
+    background: var(--background-placeholder, #e7e4df);
+  }
+
+  .magnetic-dango-background-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .magnetic-dango-background-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .magnetic-dango-foreground-layer {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  [data-magnetic-svg] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .site-logo {
+    position: absolute;
+    opacity: 0;
+    transition: top 0.5s ease, left 0.5s ease, width 0.5s ease, opacity 0.25s ease;
+  }
+
+  .scrollable-text-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 65vw;
+    height: 100dvh;
+    overflow-y: scroll;
+    box-sizing: border-box;
+    padding: 60px 20px;
+    font-size: 12px;
+    line-height: 2;
+    z-index: 2;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollable-text-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollable-text-container strong,
+  .scrollable-text-container b,
+  .scrollable-text-container h1,
+  .scrollable-text-container h2,
+  .scrollable-text-container h3,
+  .scrollable-text-container h4,
+  .scrollable-text-container h5,
+  .scrollable-text-container h6 {
+    font-weight: 500;
+  }
+
+  @media (min-width: 770px) {
+    .scrollable-text-container {
+      right: 10vw;
+      width: 55vw;
+      padding: 60px 80px;
+    }
+  }
+
+  @media (min-width: 1000px) {
+    .scrollable-text-container {
+      --caption-left-gutter: 236px;
+      width: calc(55vw + var(--caption-left-gutter));
+      padding: 60px 80px 60px calc(80px + var(--caption-left-gutter));
+    }
+  }
+</style>

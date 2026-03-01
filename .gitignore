@@ -36,6 +36,8 @@
 # Astro
 /web/.astro
 /web/dist
+/web/test-results
+/web/playwright-report
 
 # Sanity Studio (workspace)
 /studio/dist

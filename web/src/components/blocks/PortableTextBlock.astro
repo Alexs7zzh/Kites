@@ -1,0 +1,57 @@
+---
+import type {PreparedPageContentBlock} from '../../lib/pageContentPreparation'
+import {renderPortableTextToHtml} from '../../lib/portableTextRender'
+
+type PortableTextBlockType = Extract<PreparedPageContentBlock, {_type: 'portableTextBlock'}>
+
+interface Props {
+  block: PortableTextBlockType
+}
+
+const {block} = Astro.props as Props
+const renderedHtml = renderPortableTextToHtml(block.body)
+---
+
+<div class="content-richtext" set:html={renderedHtml} />
+
+<style>
+  .content-richtext {
+    margin: 18px 0;
+    text-align: left;
+  }
+
+  .content-richtext :where(p, h2, h3, blockquote) {
+    margin: 0 0 1.2em;
+  }
+
+  .content-richtext :where(p, blockquote):last-child,
+  .content-richtext :where(h2, h3):last-child {
+    margin-bottom: 0;
+  }
+
+  .content-richtext h2,
+  .content-richtext h3 {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.8;
+    letter-spacing: 0.04em;
+  }
+
+  .content-richtext blockquote {
+    padding-left: 0.8rem;
+    border-left: 1px solid rgba(0, 0, 0, 0.35);
+  }
+
+  .content-richtext a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .content-richtext code {
+    font-family: inherit;
+    font-size: 0.95em;
+    background: rgba(0, 0, 0, 0.08);
+    padding: 0 0.25em;
+  }
+</style>

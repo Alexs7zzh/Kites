@@ -1,0 +1,58 @@
+---
+import type {PreparedPageSection} from '../lib/pageContentPreparation'
+import ContactFormBlock from './blocks/ContactFormBlock.astro'
+import ImageBlock from './blocks/ImageBlock.astro'
+import ImagePairBlock from './blocks/ImagePairBlock.astro'
+import PortableTextBlock from './blocks/PortableTextBlock.astro'
+
+interface Props {
+  section: PreparedPageSection
+  turnstileSiteKey: string
+}
+
+const {section, turnstileSiteKey} = Astro.props as Props
+---
+
+<section id={section.sectionId} class="content-section" data-section-id={section.sectionId}>
+  {section.title && <h2 class="section-title">{section.title}</h2>}
+
+  {section.content.map((block) => {
+    if (block._type === 'portableTextBlock') {
+      return <PortableTextBlock block={block} />
+    }
+
+    if (block._type === 'pageImageBlock') {
+      return <ImageBlock block={block} />
+    }
+
+    if (block._type === 'pageImagePairBlock') {
+      return <ImagePairBlock block={block} />
+    }
+
+    if (block._type === 'contactFormBlock') {
+      return <ContactFormBlock block={block} turnstileSiteKey={turnstileSiteKey} />
+    }
+
+    return null
+  })}
+</section>
+
+<style>
+  .content-section {
+    width: 100%;
+    margin-bottom: 60px;
+    padding-top: 60px;
+  }
+
+  .content-section:first-child {
+    padding-top: 0;
+  }
+
+  .section-title {
+    margin: 0 0 20px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.04em;
+  }
+</style>

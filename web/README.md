@@ -19,7 +19,7 @@ When updating the generated Victor Mono subset files, use this repeatable flow:
 1. Generate WOFF2 from the current subset WOFF files.
 2. Compute MD5 hashes from the final file bytes.
 3. Rename font files with an 8-char hash suffix for cache invalidation.
-4. Update font paths in `/Users/alex/dev/kites/web/src/components/MagneticDangoLine.css` and preload href in `/Users/alex/dev/kites/web/src/pages/index.astro`.
+4. Update font paths in component-level `<style>` blocks (notably `/Users/alex/dev/kites/web/src/components/PageShell.astro`) and preload href in `/Users/alex/dev/kites/web/src/pages/index.astro`.
 
 ```bash
 FONT_DIR="/Users/alex/dev/kites/web/public/fonts"
