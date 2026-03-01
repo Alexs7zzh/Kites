@@ -98,7 +98,7 @@ function createPortableTextNode(nodeKey, text, style = 'normal') {
   }
 }
 
-function createPortableTextBlock(sectionKey, index, {heading = '', paragraphs = []}) {
+function createPortableTextNodes(sectionKey, index, {heading = '', paragraphs = []}) {
   const normalizedHeading = nonEmpty(heading)
   const normalizedParagraphs = paragraphs
     .flatMap((value) => toParagraphs(value))
@@ -120,15 +120,7 @@ function createPortableTextBlock(sectionKey, index, {heading = '', paragraphs = 
     )
   })
 
-  if (body.length === 0) {
-    return null
-  }
-
-  return {
-    _type: 'pagePortableTextBlock',
-    _key: blockKey(sectionKey, 'text', index),
-    body,
-  }
+  return body
 }
 
 function createImageBlock(sectionKey, index, image, layout = 'full', align = 'left') {
@@ -175,35 +167,29 @@ function createContactFormBlock(sectionKey, index, heading, body, formAction) {
     formAction: normalizedFormAction,
   }
 
-  const portableBody = createPortableTextBlock(sectionKey, index, {paragraphs: [body]})
-  if (portableBody) {
-    block.body = portableBody.body
-  }
+  const portableBody = createPortableTextNodes(sectionKey, index, {paragraphs: [body]})
+  block.body = portableBody
 
   return block
 }
 
 function compactBlocks(blocks) {
-  const preparedBlocks = blocks.filter(Boolean)
+  const preparedBlocks = blocks
+    .flatMap((block) => (Array.isArray(block) ? block : [block]))
+    .filter(Boolean)
   if (preparedBlocks.length > 0) {
     return preparedBlocks
   }
 
-  return [
-    {
-      _type: 'pagePortableTextBlock',
-      _key: 'fallback-text-0',
-      body: [createPortableTextNode('fallback-text-node-0', ' ')],
-    },
-  ]
+  return [createPortableTextNode('fallback-text-node-0', ' ')]
 }
 
 function buildAboutContent(legacy) {
   return compactBlocks([
     createImageBlock('about', 0, legacy?.main_image, 'half', 'center'),
-    createPortableTextBlock('about', 1, {paragraphs: [legacy?.text_1]}),
+    createPortableTextNodes('about', 1, {paragraphs: [legacy?.text_1]}),
     createImageBlock('about', 2, legacy?.notation_image, 'full', 'left'),
-    createPortableTextBlock('about', 3, {paragraphs: [legacy?.text_2]}),
+    createPortableTextNodes('about', 3, {paragraphs: [legacy?.text_2]}),
   ])
 }
 
@@ -214,7 +200,7 @@ function buildScentContent(legacy) {
 
   return compactBlocks([
     createImageBlock('scent', 0, legacy?.main_image, 'full', 'left'),
-    createPortableTextBlock('scent', 1, {
+    createPortableTextNodes('scent', 1, {
       heading: legacy?.title,
       paragraphs: [legacy?.description, legacy?.details],
     }),
@@ -229,7 +215,7 @@ function buildProcessContent(legacy) {
   )
 
   return compactBlocks([
-    createPortableTextBlock('process', 0, {
+    createPortableTextNodes('process', 0, {
       paragraphs: [legacy?.text_1, legacy?.text_2, legacy?.text_3],
     }),
     ...galleryBlocks,
@@ -252,13 +238,13 @@ function buildStudioContent(legacy) {
     }
   }
 
-  blocks.push(createPortableTextBlock('studio', index++, {paragraphs: [legacy?.intro_text]}))
+  blocks.push(createPortableTextNodes('studio', index++, {paragraphs: [legacy?.intro_text]}))
 
   const projects = Array.isArray(legacy?.projects) ? legacy.projects : []
   for (const project of projects) {
     blocks.push(createImageBlock('studio', index++, project?.extra_image, 'full', 'left'))
     blocks.push(
-      createPortableTextBlock('studio', index++, {
+      createPortableTextNodes('studio', index++, {
         heading: project?.title,
         paragraphs: [project?.materials, project?.location, project?.description],
       }),
@@ -286,7 +272,7 @@ function buildStudioContent(legacy) {
 
 function buildContactContent(legacy) {
   return compactBlocks([
-    createPortableTextBlock('contact', 0, {paragraphs: [legacy?.bio_text]}),
+    createPortableTextNodes('contact', 0, {paragraphs: [legacy?.bio_text]}),
     createImageBlock('contact', 1, legacy?.bio_image, 'half', 'right'),
     createContactFormBlock('contact', 2, 'Request & Purchase', '', legacy?.form_action),
   ])
@@ -321,7 +307,6 @@ async function main() {
   const sitePageDocument = {
     _id: 'sitePage',
     _type: 'sitePage',
-    title: 'Site Page',
     sections: sectionDocuments.map((sectionDocument) => ({
       _type: 'reference',
       _ref: sectionDocument._id,

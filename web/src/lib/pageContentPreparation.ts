@@ -78,7 +78,6 @@ export type PreparedPageSection = {
 }
 
 export type PreparedPageContent = {
-  title: string
   sections: PreparedPageSection[]
 }
 
@@ -163,43 +162,45 @@ function normalizePortableTextNodes(value: unknown, keyPrefix: string): Prepared
   }
 
   return value
-    .map((rawNode, nodeIndex) => {
-      const node = asRecord(rawNode)
-      if (nonEmpty(node._type) !== 'block') {
+    .map((rawNode, nodeIndex) => normalizePortableTextNode(rawNode, `${keyPrefix}-node-${nodeIndex}`))
+    .filter((node): node is PreparedPortableTextNode => node !== null)
+}
+
+function normalizePortableTextNode(rawNode: unknown, keyPrefix: string): PreparedPortableTextNode | null {
+  const node = asRecord(rawNode)
+  if (nonEmpty(node._type) !== 'block') {
+    return null
+  }
+
+  const childrenValue = Array.isArray(node.children) ? node.children : []
+  const children = childrenValue
+    .map((rawChild, childIndex) => {
+      const child = asRecord(rawChild)
+      if (nonEmpty(child._type) !== 'span') {
         return null
       }
 
-      const childrenValue = Array.isArray(node.children) ? node.children : []
-      const children = childrenValue
-        .map((rawChild, childIndex) => {
-          const child = asRecord(rawChild)
-          if (nonEmpty(child._type) !== 'span') {
-            return null
-          }
-
-          const text = typeof child.text === 'string' ? child.text : ''
-          return {
-            _type: 'span' as const,
-            _key: normalizeBlockKey(child._key, `${keyPrefix}-span-${nodeIndex}-${childIndex}`),
-            text,
-            marks: normalizePortableTextMarks(child.marks),
-          }
-        })
-        .filter((child): child is PreparedPortableTextSpan => child !== null)
-
-      if (children.length === 0) {
-        return null
-      }
-
+      const text = typeof child.text === 'string' ? child.text : ''
       return {
-        _type: 'block' as const,
-        _key: normalizeBlockKey(node._key, `${keyPrefix}-node-${nodeIndex}`),
-        style: normalizePortableTextStyle(node.style),
-        children,
-        markDefs: normalizePortableTextMarkDefs(node.markDefs, `${keyPrefix}-node-${nodeIndex}`),
+        _type: 'span' as const,
+        _key: normalizeBlockKey(child._key, `${keyPrefix}-span-${childIndex}`),
+        text,
+        marks: normalizePortableTextMarks(child.marks),
       }
     })
-    .filter((node): node is PreparedPortableTextNode => node !== null)
+    .filter((child): child is PreparedPortableTextSpan => child !== null)
+
+  if (children.length === 0) {
+    return null
+  }
+
+  return {
+    _type: 'block' as const,
+    _key: normalizeBlockKey(node._key, keyPrefix),
+    style: normalizePortableTextStyle(node.style),
+    children,
+    markDefs: normalizePortableTextMarkDefs(node.markDefs, keyPrefix),
+  }
 }
 
 function plainTextToPortableTextNodes(value: string, keyPrefix: string): PreparedPortableTextNode[] {
@@ -371,19 +372,14 @@ function resolvePairSlots(ratio: '50-50' | '60-40' | '40-60') {
   }
 }
 
-async function prepareBlock(
+async function prepareNonTextBlock(
   rawBlock: unknown,
   blockIndex: number,
   getImage: GetImageFn,
-): Promise<PreparedPageContentBlock | null> {
+): Promise<Exclude<PreparedPageContentBlock, PreparedPortableTextBlock> | null> {
   const blockRecord = asRecord(rawBlock)
   const blockType = nonEmpty(blockRecord._type)
   const blockKey = normalizeBlockKey(blockRecord._key, `block-${blockIndex}`)
-
-  if (blockType === 'pagePortableTextBlock') {
-    const body = normalizePortableTextNodes(blockRecord.body, blockKey)
-    return portableTextBlockFromBody(body, blockKey)
-  }
 
   if (blockType === 'pageImageBlock') {
     const layout = blockRecord.layout === 'half' ? 'half' : 'full'
@@ -454,6 +450,23 @@ async function prepareBlock(
   return null
 }
 
+function mergePortableTextNodesIntoContent(
+  content: PreparedPageContentBlock[],
+  pendingNodes: PreparedPortableTextNode[],
+  keyPrefix: string,
+) {
+  if (pendingNodes.length === 0) {
+    return
+  }
+
+  const firstNodeKey = pendingNodes[0]?._key ?? keyPrefix
+  content.push({
+    _key: normalizeBlockKey(firstNodeKey, keyPrefix),
+    _type: 'portableTextBlock',
+    body: pendingNodes.splice(0),
+  })
+}
+
 export async function preparePageContent(
   rawSitePage: unknown,
   getImage: GetImageFn,
@@ -473,13 +486,46 @@ export async function preparePageContent(
       const sectionKey = normalizeBlockKey(sectionRefRecord._key, `section-${sectionIndex + 1}`)
       const navLabel = nonEmpty(sectionRecord.navLabel) ?? `SECTION ${sectionIndex + 1}`
       const rawBlocks = Array.isArray(sectionRecord.content) ? sectionRecord.content : []
+      const content: PreparedPageContentBlock[] = []
+      const pendingPortableTextNodes: PreparedPortableTextNode[] = []
 
-      const preparedBlocks = await Promise.all(
-        rawBlocks.map((rawBlock, blockIndex) => prepareBlock(rawBlock, blockIndex, getImage)),
-      )
+      for (const [blockIndex, rawBlock] of rawBlocks.entries()) {
+        const blockRecord = asRecord(rawBlock)
+        const blockType = nonEmpty(blockRecord._type)
+        const blockKey = normalizeBlockKey(blockRecord._key, `block-${blockIndex}`)
 
-      const content = preparedBlocks.filter(
-        (preparedBlock): preparedBlock is PreparedPageContentBlock => preparedBlock !== null,
+        if (blockType === 'block') {
+          const portableNode = normalizePortableTextNode(rawBlock, blockKey)
+          if (portableNode) {
+            pendingPortableTextNodes.push(portableNode)
+          }
+          continue
+        }
+
+        if (blockType === 'pagePortableTextBlock') {
+          const portableNodes = normalizePortableTextNodes(blockRecord.body, blockKey)
+          if (portableNodes.length > 0) {
+            pendingPortableTextNodes.push(...portableNodes)
+          }
+          continue
+        }
+
+        mergePortableTextNodesIntoContent(
+          content,
+          pendingPortableTextNodes,
+          `portable-${sectionKey}-${blockIndex}`,
+        )
+
+        const preparedNonTextBlock = await prepareNonTextBlock(rawBlock, blockIndex, getImage)
+        if (preparedNonTextBlock) {
+          content.push(preparedNonTextBlock)
+        }
+      }
+
+      mergePortableTextNodesIntoContent(
+        content,
+        pendingPortableTextNodes,
+        `portable-${sectionKey}-tail`,
       )
 
       return {
@@ -494,7 +540,6 @@ export async function preparePageContent(
   )
 
   return {
-    title: nonEmpty(sitePageRecord.title) ?? 'Site Page',
     sections,
   }
 }
@@ -720,7 +765,6 @@ export async function prepareLegacySiteContentPage(
   ]
 
   return {
-    title: 'Site Page',
     sections,
   }
 }

@@ -2,7 +2,6 @@ import {imageProjection} from './siteContentImagePreparation'
 
 export const PAGE_CONTENT_QUERY = `{
   "sitePage": *[_id == "sitePage"][0]{
-    title,
     "sections": coalesce(sections[]{
       _key,
       "section": @->{
@@ -12,6 +11,17 @@ export const PAGE_CONTENT_QUERY = `{
         "content": coalesce(content[]{
           _key,
           _type,
+          _type == "block" => {
+            ...,
+            markDefs[]{
+              ...,
+              _type == "link" => {
+                _key,
+                _type,
+                href
+              }
+            }
+          },
           _type == "pagePortableTextBlock" => {
             body[]{
               ...,

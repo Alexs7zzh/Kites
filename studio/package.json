@@ -11,7 +11,8 @@
     "deploy": "sanity deploy",
     "deploy-graphql": "sanity graphql deploy",
     "migrate:site-content": "node ./scripts/migrateSiteContentToSitePage.mjs",
-    "migrate:portable-text": "node ./scripts/migratePageBlocksToPortableText.mjs"
+    "migrate:portable-text": "node ./scripts/migratePageBlocksToPortableText.mjs",
+    "migrate:section-inline-content": "node ./scripts/migrateSectionContentToInlinePortableText.mjs"
   },
   "keywords": [
     "sanity"

@@ -85,7 +85,7 @@ function renderNode(node: PreparedPortableTextNode): string {
 
   const innerHtml = node.children
     .map((span) => {
-      let rendered = escapeHtml(span.text).replace(/\n/g, '<br />')
+      let rendered = escapeHtml(span.text)
       for (const mark of span.marks) {
         rendered = wrapWithMark(rendered, mark, markDefs)
       }
