@@ -3,6 +3,7 @@
 ## Apps
 - web: Astro frontend
 - studio: Sanity Studio
+- shopify: Shopify theme scaffold for the migration target
 
 ## Common Commands
 - `pnpm install`
@@ -11,6 +12,22 @@
 - `pnpm build:web`
 - `pnpm build:studio`
 - `pnpm lint`
+- `pnpm shopify:theme:check`
+- `pnpm shopify:migrate`
+
+## Shopify Migration Workspace
+
+The Shopify migration target lives in `/Users/alex/dev/kites/shopify`.
+
+Automation scripts for content/model sync live in `/Users/alex/dev/kites/scripts/shopify` and use:
+
+- `SHOPIFY_STORE_DOMAIN`
+- `SHOPIFY_ADMIN_ACCESS_TOKEN`
+- `SHOPIFY_CLIENT_ID`
+- `SHOPIFY_CLIENT_SECRET`
+- `SHOPIFY_API_VERSION`
+- `PUBLIC_SANITY_PROJECT_ID`
+- `PUBLIC_SANITY_DATASET`
 
 ## Web Sanity Environment
 

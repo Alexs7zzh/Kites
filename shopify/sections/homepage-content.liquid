@@ -1,0 +1,139 @@
+{% liquid
+  assign homepage_content = shop.metaobjects.homepage_content.default
+  assign homepage_sections = blank
+
+  if homepage_content
+    assign homepage_sections = homepage_content.sections.value
+    if homepage_sections == blank
+      assign homepage_sections = homepage_content.sections
+    endif
+  endif
+
+  assign background_placeholder = settings.background_placeholder_color | default: '#e7e4df'
+%}
+
+{% if homepage_content == blank %}
+  <main class="shopify-onboarding">
+    <div class="shopify-onboarding__inner">
+      <h1>Homepage content is not set up yet.</h1>
+      <p>Create the <code>homepage_content</code> metaobject entry with handle <code>default</code>, then run the migration scripts or fill the content manually in Shopify Admin.</p>
+    </div>
+  </main>
+{% else %}
+  <div class="magnetic-dango-root" data-page-shell style="--background-placeholder: {{ background_placeholder }};">
+    <div class="magnetic-dango-background-layer" aria-hidden="true">
+      {% if settings.background_image != blank %}
+        {{
+          settings.background_image
+          | image_url: width: 1920
+          | image_tag:
+            class: 'magnetic-dango-background-image',
+            widths: '640, 960, 1280, 1536, 1920',
+            sizes: '(max-aspect-ratio: 1920/1140) 168.5vh, 100vw',
+            loading: 'eager',
+            fetchpriority: 'high',
+            alt: ''
+        }}
+      {% else %}
+        <img
+          class="magnetic-dango-background-image"
+          src="{{ 'background-default.jpg' | asset_url }}"
+          alt=""
+          width="1920"
+          height="1140"
+          loading="eager"
+          fetchpriority="high"
+        >
+      {% endif %}
+    </div>
+
+    <div class="magnetic-dango-foreground-layer">
+      <svg data-magnetic-svg viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true">
+        <path
+          data-metaball-path
+          class="metaball-path"
+          fill="transparent"
+          stroke="rgba(0, 0, 0, 0.25)"
+          stroke-width="0.5"
+          vector-effect="non-scaling-stroke"
+        ></path>
+      </svg>
+
+      <div class="site-logo" data-site-logo role="img" aria-label="{{ shop.name | escape }}">
+        {% if settings.logo_image != blank %}
+          {{
+            settings.logo_image
+            | image_url: width: 360
+            | image_tag:
+              class: 'site-logo-image',
+              widths: '120, 240, 360',
+              sizes: '120px',
+              loading: 'eager',
+              alt: shop.name
+          }}
+        {% else %}
+          {% render 'site-logo-svg' %}
+        {% endif %}
+      </div>
+
+      <div class="left-nav" data-left-nav>
+        {% for page_section in homepage_sections %}
+          {% liquid
+            assign nav_label = page_section.nav_label.value | default: page_section.nav_label
+            assign section_id = 'section-' | append: page_section.handle
+          %}
+          <button
+            type="button"
+            class="left-nav-button"
+            data-nav-button
+            data-section-target="{{ section_id }}"
+          >
+            {{ nav_label }}
+          </button>
+        {% endfor %}
+        <button
+          type="button"
+          class="left-nav-button"
+          data-nav-button
+          data-section-target="section-contact"
+        >
+          CONTACT
+        </button>
+      </div>
+
+      <div class="scrollable-text-container" data-scroll-container>
+        <div class="page-content-wrapper" data-content-wrapper>
+          {% for page_section in homepage_sections %}
+            {% liquid
+              assign nav_label = page_section.nav_label.value | default: page_section.nav_label
+              assign section_id = 'section-' | append: page_section.handle
+              assign blocks = page_section.blocks.value
+              if blocks == blank
+                assign blocks = page_section.blocks
+              endif
+            %}
+            <section id="{{ section_id }}" class="content-section" data-section-id="{{ section_id }}">
+              {% for block in blocks %}
+                {% render 'render-block', block: block %}
+              {% endfor %}
+            </section>
+          {% endfor %}
+
+          {% render 'contact-section', homepage_content: homepage_content %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Homepage Content",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Homepage Content"
+    }
+  ]
+}
+{% endschema %}

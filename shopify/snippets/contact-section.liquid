@@ -1,0 +1,69 @@
+{% liquid
+  assign contact_heading = homepage_content.contact_form_heading.value | default: homepage_content.contact_form_heading | default: 'Request & Purchase'
+  assign contact_body = homepage_content.contact_body
+  assign contact_image = homepage_content.contact_image.value | default: homepage_content.contact_image
+%}
+
+<section
+  id="section-contact"
+  class="content-section content-section--contact"
+  data-section-id="section-contact"
+>
+  {% if contact_body != blank or contact_image != blank %}
+    <div class="contact-bio">
+      {% if contact_body != blank %}
+        <div class="contact-bio-text content-richtext">
+          {{ contact_body | metafield_tag }}
+        </div>
+      {% endif %}
+
+      {% if contact_image != blank %}
+        {{
+          contact_image
+          | image_url: width: 900
+          | image_tag:
+            class: 'contact-bio-image',
+            widths: '320, 480, 640, 900',
+            sizes: '(max-width: 769px) 100vw, 300px',
+            loading: 'lazy',
+            alt: contact_image.alt | default: ''
+        }}
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="contact-block" data-contact-form-block>
+    <p class="contact-heading">{{ contact_heading }}</p>
+    {% form 'contact', class: 'contact-form' %}
+      <label>
+        Name
+        <input
+          type="text"
+          name="contact[name]"
+          value="{% if form.name %}{{ form.name | escape }}{% endif %}"
+          required
+        >
+      </label>
+      <label>
+        Email
+        <input
+          type="email"
+          name="contact[email]"
+          value="{% if form.email %}{{ form.email | escape }}{% endif %}"
+          required
+        >
+      </label>
+      <label>
+        Message
+        <textarea name="contact[body]" rows="4" required>{% if form.body %}{{ form.body | escape }}{% endif %}</textarea>
+      </label>
+      <button type="submit">Send</button>
+
+      {% if form.posted_successfully? %}
+        <p class="contact-status" data-status="SUCCESS">Thank you!</p>
+      {% elsif form.errors %}
+        <div class="contact-status" data-status="ERROR">{{ form.errors | default_errors }}</div>
+      {% endif %}
+    {% endform %}
+  </div>
+</section>

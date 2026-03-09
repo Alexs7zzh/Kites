@@ -1,0 +1,72 @@
+{% liquid
+  assign images = block.images.value
+  if images == blank
+    assign images = block.images
+  endif
+
+  assign image_count = images.size
+  assign count_class = 'content-image-group--count-' | append: image_count
+  assign width_fill_factor = '1'
+
+  if image_count == 2
+    assign width_fill_factor = '0.96'
+  elsif image_count == 3
+    assign width_fill_factor = '0.93'
+  endif
+
+  assign caption_title = block.caption_title.value | default: block.caption_title
+  assign caption_body = block.caption_body.value | default: block.caption_body
+  assign has_caption = false
+
+  if layout == 'half'
+    if caption_title != blank or caption_body != blank
+      assign has_caption = true
+    endif
+  endif
+%}
+
+<div class="content-image-group content-image-group--{{ layout }} {{ count_class }}{% if has_caption %} content-image-group--has-caption{% endif %}">
+  {% if has_caption %}
+    <div class="content-image-group__caption">
+      {% if caption_title != blank %}
+        <p class="content-image-group__caption-title">{{ caption_title }}</p>
+      {% endif %}
+      {% if caption_body != blank %}
+        <p class="content-image-group__caption-body">{{ caption_body | newline_to_br }}</p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="content-image-group__media">
+    {% for image in images %}
+      {% liquid
+        assign image_object = image.preview_image | default: image
+        assign image_height = image_object.height | default: 1
+        assign image_width = image_object.width | default: image_height
+        assign image_ratio = image_width | times: 1000 | divided_by: image_height
+        assign sizes = '(max-width: 769px) calc(65vw - 40px), (max-width: 999px) calc((55vw - 160px) * 0.5), calc(((55vw + 236px) - (80px + (80px + 236px))) * 0.5)'
+
+        if layout == 'full'
+          assign sizes = '(max-width: 769px) calc(65vw - 40px), (max-width: 999px) calc(55vw - 160px), calc((55vw + 236px) - (80px + (80px + 236px)))'
+        endif
+      %}
+      <div
+        class="content-image-group__item"
+        data-image-count="{{ image_count }}"
+        data-image-index="{{ forloop.index0 }}"
+        style="--image-ratio: {{ image_ratio }}; --image-fill-factor: {{ width_fill_factor }};"
+      >
+        {{
+          image_object
+          | image_url: width: 1600
+          | image_tag:
+            class: 'content-image-group__img',
+            widths: '320, 480, 640, 768, 1024, 1440, 1600',
+            sizes: sizes,
+            loading: 'lazy',
+            alt: image.alt | default: ''
+        }}
+      </div>
+    {% endfor %}
+  </div>
+</div>

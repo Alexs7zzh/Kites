@@ -7,6 +7,12 @@
     "dev:studio": "pnpm -C studio dev",
     "build:web": "pnpm -C web build",
     "build:studio": "pnpm -C studio build",
-    "lint": "pnpm -C web lint"
+    "lint": "pnpm -C web lint",
+    "shopify:theme:check": "shopify theme check --path shopify",
+    "shopify:theme:dev": "shopify theme dev --path shopify",
+    "shopify:theme:push": "shopify theme push --path shopify",
+    "shopify:sync-definitions": "node scripts/shopify/sync-metaobject-definitions.mjs",
+    "shopify:migrate-content": "node scripts/shopify/migrate-sanity-to-shopify.mjs",
+    "shopify:migrate": "pnpm run shopify:sync-definitions && pnpm run shopify:migrate-content"
   }
 }

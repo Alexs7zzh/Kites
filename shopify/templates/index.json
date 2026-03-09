@@ -1,0 +1,11 @@
+{
+  "sections": {
+    "main": {
+      "type": "homepage-content",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

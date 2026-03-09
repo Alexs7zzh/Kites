@@ -32,6 +32,7 @@
 .env
 .env.*
 *.local
+!.env.example
 
 # Astro
 /web/.astro
@@ -44,3 +45,6 @@
 # Sanity Studio (workspace)
 /studio/dist
 /studio/.sanity
+
+# Shopify migration outputs
+/reports/shopify

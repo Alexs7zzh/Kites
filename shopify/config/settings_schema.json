@@ -1,0 +1,35 @@
+[
+  {
+    "name": "Theme settings",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "logo_image",
+        "label": "Logo image"
+      },
+      {
+        "type": "image_picker",
+        "id": "background_image",
+        "label": "Background image"
+      },
+      {
+        "type": "color",
+        "id": "background_placeholder_color",
+        "label": "Background placeholder color",
+        "default": "#e7e4df"
+      },
+      {
+        "type": "text",
+        "id": "social_x_handle",
+        "label": "X handle",
+        "info": "Use the handle only, without @."
+      },
+      {
+        "type": "text",
+        "id": "social_instagram_handle",
+        "label": "Instagram handle",
+        "info": "Use the handle only, without @."
+      }
+    ]
+  }
+]

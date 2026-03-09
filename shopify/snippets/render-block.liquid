@@ -1,0 +1,13 @@
+{% liquid
+  assign block_type = block.block_type.value | default: block.block_type
+  assign layout = block.layout.value | default: block.layout
+%}
+
+{% case block_type %}
+  {% when 'rich_text' %}
+    {% render 'portable-text-block', block: block %}
+  {% when 'spacer' %}
+    {% render 'spacer-block', block: block %}
+  {% when 'image_group' %}
+    {% render 'image-group-block', block: block, layout: layout | default: 'full' %}
+{% endcase %}
