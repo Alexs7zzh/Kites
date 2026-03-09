@@ -1,6 +1,6 @@
 # Kites Sanity Studio
 
-This Studio manages the `siteContent` singleton for the Kites site.
+This Studio manages the `siteSettings` singleton and `section` documents for the Kites site.
 
 ## Prerequisites
 

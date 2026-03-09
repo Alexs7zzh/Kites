@@ -1,23 +1,22 @@
 import type {getImage as astroGetImage} from 'astro:assets'
 import {
   createImagePayload,
-  prepareSiteContent,
   type PreparedImage,
-} from './siteContentImagePreparation'
+} from './imagePreparation'
 
 type GetImageFn = typeof astroGetImage
 
 type SlotConfig = Parameters<typeof createImagePayload>[1]
 
-export type PortableTextStyle = 'normal' | 'h2' | 'h3' | 'blockquote'
+type PortableTextStyle = 'normal' | 'h2' | 'h3' | 'blockquote'
 
-export type PreparedPortableTextMarkDef = {
+type PreparedPortableTextMarkDef = {
   _key: string
   _type: 'link'
   href: string
 }
 
-export type PreparedPortableTextSpan = {
+type PreparedPortableTextSpan = {
   _type: 'span'
   _key: string
   text: string
@@ -38,35 +37,34 @@ type PreparedPortableTextBlock = {
   body: PreparedPortableTextNode[]
 }
 
-type PreparedImageBlock = {
+type PreparedImageGroupCaption = {
+  title: string | null
+  description: string | null
+}
+
+type PreparedImageGroupBlock = {
   _key: string
-  _type: 'pageImageBlock'
+  _type: 'pageImageGroupBlock'
   layout: 'full' | 'half'
-  align: 'left' | 'center' | 'right'
-  image: PreparedImage
+  images: PreparedImage[]
+  caption: PreparedImageGroupCaption | null
 }
 
-type PreparedImagePairBlock = {
+type PreparedSpacerBlock = {
   _key: string
-  _type: 'pageImagePairBlock'
-  ratio: '50-50' | '60-40' | '40-60'
-  leftImage: PreparedImage
-  rightImage: PreparedImage
+  _type: 'pageSpacerBlock'
+  level: 1 | 2 | 3 | 4 | 5 | 6
 }
 
-type PreparedContactFormBlock = {
-  _key: string
-  _type: 'contactFormBlock'
+type PreparedContactForm = {
   heading: string
-  body: PreparedPortableTextNode[]
   formAction: string
 }
 
 export type PreparedPageContentBlock =
   | PreparedPortableTextBlock
-  | PreparedImageBlock
-  | PreparedImagePairBlock
-  | PreparedContactFormBlock
+  | PreparedImageGroupBlock
+  | PreparedSpacerBlock
 
 export type PreparedPageSection = {
   _id: string
@@ -77,8 +75,23 @@ export type PreparedPageSection = {
   content: PreparedPageContentBlock[]
 }
 
+export type PreparedContactSection = {
+  sectionId: string
+  navLabel: string
+  title: string | null
+  bioText: PreparedPortableTextBlock | null
+  bioImage: PreparedImage | null
+  form: PreparedContactForm | null
+}
+
+export type PreparedNavItem = {
+  sectionId: string
+  navLabel: string
+}
+
 export type PreparedPageContent = {
   sections: PreparedPageSection[]
+  contact: PreparedContactSection | null
 }
 
 function nonEmpty(value: unknown): string | null {
@@ -254,46 +267,6 @@ function portableTextBlockFromPlainText(value: unknown, blockKey: string): Prepa
   return portableTextBlockFromBody(plainTextToPortableTextNodes(text, blockKey), blockKey)
 }
 
-function buildPortableTextBlock(
-  options: {
-    heading?: string | null
-    paragraphs?: Array<string | null>
-  },
-  blockKey: string,
-): PreparedPortableTextBlock | null {
-  const body: PreparedPortableTextNode[] = []
-
-  const heading = nonEmpty(options.heading)
-  if (heading) {
-    body.push({
-      _type: 'block',
-      _key: `${blockKey}-node-heading`,
-      style: 'h3',
-      children: [
-        {
-          _type: 'span',
-          _key: `${blockKey}-span-heading-0`,
-          text: heading,
-          marks: [],
-        },
-      ],
-      markDefs: [],
-    })
-  }
-
-  for (const [index, paragraph] of (options.paragraphs ?? []).entries()) {
-    const text = nonEmpty(paragraph)
-    if (!text) {
-      continue
-    }
-
-    const paragraphNodes = plainTextToPortableTextNodes(text, `${blockKey}-paragraph-${index}`)
-    body.push(...paragraphNodes)
-  }
-
-  return portableTextBlockFromBody(body, blockKey)
-}
-
 const MOBILE_CONTENT_WIDTH = 'calc(65vw - 40px)'
 const DESKTOP_CONTENT_WIDTH_PRE_GUTTER = 'calc(55vw - 160px)'
 const DESKTOP_CONTENT_WIDTH_POST_GUTTER = 'calc((55vw + 236px) - (80px + (80px + 236px)))'
@@ -331,45 +304,41 @@ function createSlotConfig(
 const SLOT_CONFIGS = {
   full: createSlotConfig(FULL_WIDTH_SIZES, [480, 768, 1024]),
   half: createSlotConfig(HALF_WIDTH_SIZES, [320, 640, 768]),
-  pair50: createSlotConfig(
-    `(max-width: 769px) ${MOBILE_CONTENT_WIDTH}, ` +
-      `(max-width: 999px) ${scaleSize(DESKTOP_CONTENT_WIDTH_PRE_GUTTER, 0.5)}, ` +
-      `${scaleSize(DESKTOP_CONTENT_WIDTH_POST_GUTTER, 0.5)}`,
-    [320, 480, 640],
-  ),
-  pair60: createSlotConfig(
-    `(max-width: 769px) ${MOBILE_CONTENT_WIDTH}, ` +
-      `(max-width: 999px) ${scaleSize(DESKTOP_CONTENT_WIDTH_PRE_GUTTER, 0.6)}, ` +
-      `${scaleSize(DESKTOP_CONTENT_WIDTH_POST_GUTTER, 0.6)}`,
-    [360, 560, 720],
-  ),
-  pair40: createSlotConfig(
-    `(max-width: 769px) ${MOBILE_CONTENT_WIDTH}, ` +
-      `(max-width: 999px) ${scaleSize(DESKTOP_CONTENT_WIDTH_PRE_GUTTER, 0.4)}, ` +
-      `${scaleSize(DESKTOP_CONTENT_WIDTH_POST_GUTTER, 0.4)}`,
-    [280, 440, 600],
-  ),
 }
 
-function resolvePairSlots(ratio: '50-50' | '60-40' | '40-60') {
-  if (ratio === '60-40') {
-    return {
-      left: SLOT_CONFIGS.pair60,
-      right: SLOT_CONFIGS.pair40,
+function createFractionalSlotConfig(factor: number): SlotConfig {
+  return createSlotConfig(
+    `(max-width: 769px) ${MOBILE_CONTENT_WIDTH}, ` +
+      `(max-width: 999px) ${scaleSize(DESKTOP_CONTENT_WIDTH_PRE_GUTTER, factor)}, ` +
+      `${scaleSize(DESKTOP_CONTENT_WIDTH_POST_GUTTER, factor)}`,
+    factor >= 0.5 ? [320, 480, 640] : factor >= 0.33 ? [240, 360, 480] : [180, 280, 360],
+  )
+}
+
+function resolveImageGroupSlot(layout: 'full' | 'half', imageCount: number): SlotConfig {
+  if (layout === 'full') {
+    if (imageCount <= 1) {
+      return SLOT_CONFIGS.full
     }
+    if (imageCount === 2) {
+      return createFractionalSlotConfig(0.5)
+    }
+    if (imageCount === 3) {
+      return createFractionalSlotConfig(1 / 3)
+    }
+    return createFractionalSlotConfig(0.25)
   }
 
-  if (ratio === '40-60') {
-    return {
-      left: SLOT_CONFIGS.pair40,
-      right: SLOT_CONFIGS.pair60,
-    }
+  if (imageCount <= 1) {
+    return SLOT_CONFIGS.half
   }
-
-  return {
-    left: SLOT_CONFIGS.pair50,
-    right: SLOT_CONFIGS.pair50,
+  if (imageCount === 2) {
+    return createFractionalSlotConfig(0.25)
   }
+  if (imageCount === 3) {
+    return createFractionalSlotConfig(1 / 6)
+  }
+  return createFractionalSlotConfig(0.25)
 }
 
 async function prepareNonTextBlock(
@@ -381,69 +350,44 @@ async function prepareNonTextBlock(
   const blockType = nonEmpty(blockRecord._type)
   const blockKey = normalizeBlockKey(blockRecord._key, `block-${blockIndex}`)
 
-  if (blockType === 'pageImageBlock') {
-    const layout = blockRecord.layout === 'half' ? 'half' : 'full'
-    const align =
-      blockRecord.align === 'center' || blockRecord.align === 'right' ? blockRecord.align : 'left'
-
-    const image = await createImagePayload(
-      blockRecord.image,
-      layout === 'half' ? SLOT_CONFIGS.half : SLOT_CONFIGS.full,
-      getImage,
-    )
-
-    if (!image) {
-      return null
-    }
+  if (blockType === 'pageSpacerBlock') {
+    const level = Number(blockRecord.level)
+    const safeLevel = Number.isInteger(level) && level >= 1 && level <= 6 ? level : 1
 
     return {
       _key: blockKey,
-      _type: 'pageImageBlock',
+      _type: 'pageSpacerBlock',
+      level: safeLevel as PreparedSpacerBlock['level'],
+    }
+  }
+
+  if (blockType === 'pageFullImageGroupBlock' || blockType === 'pageHalfImageGroupBlock') {
+    const layout = blockType === 'pageHalfImageGroupBlock' ? 'half' : 'full'
+    const rawImages = Array.isArray(blockRecord.images) ? blockRecord.images.slice(0, 4) : []
+    const slotConfig = resolveImageGroupSlot(layout, rawImages.length)
+    const images = (
+      await Promise.all(rawImages.map((image) => createImagePayload(image, slotConfig, getImage)))
+    ).filter((image): image is PreparedImage => image !== null)
+
+    if (images.length === 0) {
+      return null
+    }
+
+    const captionTitle = nonEmpty(blockRecord.captionTitle)
+    const captionDescription = nonEmpty(blockRecord.captionDescription)
+
+    return {
+      _key: blockKey,
+      _type: 'pageImageGroupBlock',
       layout,
-      align,
-      image,
-    }
-  }
-
-  if (blockType === 'pageImagePairBlock') {
-    const ratio =
-      blockRecord.ratio === '60-40' || blockRecord.ratio === '40-60'
-        ? blockRecord.ratio
-        : '50-50'
-    const pairSlots = resolvePairSlots(ratio)
-
-    const [leftImage, rightImage] = await Promise.all([
-      createImagePayload(blockRecord.leftImage, pairSlots.left, getImage),
-      createImagePayload(blockRecord.rightImage, pairSlots.right, getImage),
-    ])
-
-    if (!leftImage || !rightImage) {
-      return null
-    }
-
-    return {
-      _key: blockKey,
-      _type: 'pageImagePairBlock',
-      ratio,
-      leftImage,
-      rightImage,
-    }
-  }
-
-  if (blockType === 'contactFormBlock') {
-    const formAction = nonEmpty(blockRecord.formAction)
-    if (!formAction) {
-      return null
-    }
-
-    const body = normalizePortableTextNodes(blockRecord.body, `${blockKey}-body`)
-
-    return {
-      _key: blockKey,
-      _type: 'contactFormBlock',
-      heading: nonEmpty(blockRecord.heading) ?? 'Request & Purchase',
-      body,
-      formAction,
+      images,
+      caption:
+        layout === 'half' && (captionTitle || captionDescription)
+          ? {
+              title: captionTitle,
+              description: captionDescription,
+            }
+          : null,
     }
   }
 
@@ -467,16 +411,39 @@ function mergePortableTextNodesIntoContent(
   })
 }
 
-export async function preparePageContent(
-  rawSitePage: unknown,
-  getImage: GetImageFn,
-): Promise<PreparedPageContent | null> {
-  if (!rawSitePage || typeof rawSitePage !== 'object') {
+function preparePortableTextObjectBlock(
+  rawBlock: unknown,
+  blockIndex: number,
+): PreparedPortableTextBlock | null {
+  const blockRecord = asRecord(rawBlock)
+  if (nonEmpty(blockRecord._type) !== 'pagePortableTextBlock') {
     return null
   }
 
-  const sitePageRecord = asRecord(rawSitePage)
-  const sectionRefs = Array.isArray(sitePageRecord.sections) ? sitePageRecord.sections : []
+  const blockKey = normalizeBlockKey(blockRecord._key, `block-${blockIndex}`)
+  const body = normalizePortableTextNodes(blockRecord.body, blockKey)
+
+  if (body.length === 0) {
+    return null
+  }
+
+  return {
+    _key: blockKey,
+    _type: 'portableTextBlock',
+    body,
+  }
+}
+
+export async function preparePageContent(
+  rawSiteSettings: unknown,
+  getImage: GetImageFn,
+): Promise<PreparedPageContent | null> {
+  if (!rawSiteSettings || typeof rawSiteSettings !== 'object') {
+    return null
+  }
+
+  const siteSettingsRecord = asRecord(rawSiteSettings)
+  const sectionRefs = Array.isArray(siteSettingsRecord.sections) ? siteSettingsRecord.sections : []
 
   const sections = await Promise.all(
     sectionRefs.map(async (rawSectionRef, sectionIndex) => {
@@ -503,9 +470,15 @@ export async function preparePageContent(
         }
 
         if (blockType === 'pagePortableTextBlock') {
-          const portableNodes = normalizePortableTextNodes(blockRecord.body, blockKey)
-          if (portableNodes.length > 0) {
-            pendingPortableTextNodes.push(...portableNodes)
+          mergePortableTextNodesIntoContent(
+            content,
+            pendingPortableTextNodes,
+            `portable-${sectionKey}-${blockIndex}`,
+          )
+
+          const portableTextBlock = preparePortableTextObjectBlock(rawBlock, blockIndex)
+          if (portableTextBlock) {
+            content.push(portableTextBlock)
           }
           continue
         }
@@ -541,230 +514,42 @@ export async function preparePageContent(
 
   return {
     sections,
+    contact: await prepareStandaloneContactSection(siteSettingsRecord.contact, getImage),
   }
 }
 
-function createPreparedSection(
-  navLabel: string,
-  title: string,
-  content: PreparedPageContentBlock[],
-  sectionIndex: number,
-): PreparedPageSection {
-  const normalizedLabel = nonEmpty(navLabel) ?? `SECTION ${sectionIndex + 1}`
-  const sectionKey = `legacy-${slugify(normalizedLabel) || sectionIndex}`
+async function prepareStandaloneContactSection(
+  rawContact: unknown,
+  getImage: GetImageFn,
+): Promise<PreparedContactSection | null> {
+  const contactRecord = asRecord(rawContact)
+  const bioText = toPortableTextBlock(contactRecord.bioText, 'site-settings-contact-text-0')
+
+  const bioImage = await createImagePayload(contactRecord.bioImage, SLOT_CONFIGS.half, getImage)
+
+  const formAction = nonEmpty(contactRecord.formAction)
+  const form =
+    formAction !== null
+      ? {
+          heading: nonEmpty(contactRecord.formTitle) ?? 'Request & Purchase',
+          formAction,
+        }
+      : null
+
+  if (bioText === null && bioImage === null && form === null) {
+    return null
+  }
+
   return {
-    _id: sectionKey,
-    _key: sectionKey,
-    sectionId: `section-${slugify(normalizedLabel) || 'section'}-${sectionKey}`,
-    navLabel: normalizedLabel,
-    title,
-    content,
+    sectionId: 'section-contact-site-settings-contact',
+    navLabel: 'CONTACT',
+    title: 'Contact',
+    bioText,
+    bioImage,
+    form,
   }
 }
 
 function toPortableTextBlock(value: unknown, key: string): PreparedPortableTextBlock | null {
   return portableTextBlockFromPlainText(value, key)
-}
-
-function toImageBlock(
-  image: unknown,
-  key: string,
-  layout: 'full' | 'half',
-  align: 'left' | 'center' | 'right',
-): PreparedImageBlock | null {
-  if (!image || typeof image !== 'object') {
-    return null
-  }
-
-  return {
-    _key: key,
-    _type: 'pageImageBlock',
-    layout,
-    align,
-    image: image as PreparedImage,
-  }
-}
-
-function toImagePairBlock(
-  leftImage: unknown,
-  rightImage: unknown,
-  key: string,
-  ratio: '50-50' | '60-40' | '40-60',
-): PreparedImagePairBlock | null {
-  if (!leftImage || typeof leftImage !== 'object' || !rightImage || typeof rightImage !== 'object') {
-    return null
-  }
-
-  return {
-    _key: key,
-    _type: 'pageImagePairBlock',
-    ratio,
-    leftImage: leftImage as PreparedImage,
-    rightImage: rightImage as PreparedImage,
-  }
-}
-
-function compactContent(content: Array<PreparedPageContentBlock | null>): PreparedPageContentBlock[] {
-  return content.filter((block): block is PreparedPageContentBlock => block !== null)
-}
-
-export async function prepareLegacySiteContentPage(
-  rawLegacySiteContent: unknown,
-  getImage: GetImageFn,
-): Promise<PreparedPageContent | null> {
-  const preparedLegacy = await prepareSiteContent(rawLegacySiteContent, getImage)
-  if (!preparedLegacy) {
-    return null
-  }
-
-  const preparedLegacyRecord = asRecord(preparedLegacy)
-  const aboutRecord = asRecord(preparedLegacyRecord.about)
-  const scentRecord = asRecord(preparedLegacyRecord.scent)
-  const processRecord = asRecord(preparedLegacyRecord.process)
-  const studioRecord = asRecord(preparedLegacyRecord.studio)
-  const contactRecord = asRecord(preparedLegacyRecord.contact)
-
-  const aboutContent = compactContent([
-    toImageBlock(aboutRecord.main_image, 'legacy-about-image-0', 'half', 'center'),
-    toPortableTextBlock(aboutRecord.text_1, 'legacy-about-text-1'),
-    toImageBlock(aboutRecord.notation_image, 'legacy-about-image-2', 'full', 'left'),
-    toPortableTextBlock(aboutRecord.text_2, 'legacy-about-text-3'),
-  ])
-
-  const scentComparisonImages = Array.isArray(scentRecord.comparison_images)
-    ? scentRecord.comparison_images
-    : []
-
-  const scentContent = compactContent([
-    toImageBlock(scentRecord.main_image, 'legacy-scent-image-0', 'full', 'left'),
-    buildPortableTextBlock(
-      {
-        heading: nonEmpty(scentRecord.title),
-        paragraphs: [nonEmpty(scentRecord.description), nonEmpty(scentRecord.details)],
-      },
-      'legacy-scent-text-1',
-    ),
-    toImagePairBlock(
-      scentComparisonImages[0],
-      scentComparisonImages[1],
-      'legacy-scent-pair-2',
-      '60-40',
-    ),
-  ])
-
-  const processGalleryImages = Array.isArray(processRecord.gallery_images) ? processRecord.gallery_images : []
-  const processContent: Array<PreparedPageContentBlock | null> = [
-    buildPortableTextBlock(
-      {
-        paragraphs: [
-          nonEmpty(processRecord.text_1),
-          nonEmpty(processRecord.text_2),
-          nonEmpty(processRecord.text_3),
-        ],
-      },
-      'legacy-process-text-0',
-    ),
-  ]
-  processGalleryImages.forEach((image, index) => {
-    processContent.push(toImageBlock(image, `legacy-process-image-${index + 1}`, 'full', 'left'))
-  })
-
-  const studioHeaderImages = Array.isArray(studioRecord.header_images) ? studioRecord.header_images : []
-  const studioProjects = Array.isArray(studioRecord.projects) ? studioRecord.projects : []
-  const studioContent: Array<PreparedPageContentBlock | null> = []
-  if (studioHeaderImages.length >= 2) {
-    studioContent.push(
-      toImagePairBlock(studioHeaderImages[0], studioHeaderImages[1], 'legacy-studio-pair-0', '50-50'),
-    )
-    for (let index = 2; index < studioHeaderImages.length; index += 1) {
-      studioContent.push(
-        toImageBlock(studioHeaderImages[index], `legacy-studio-image-header-${index}`, 'half', 'center'),
-      )
-    }
-  } else {
-    studioHeaderImages.forEach((image, index) => {
-      studioContent.push(toImageBlock(image, `legacy-studio-image-header-${index}`, 'half', 'center'))
-    })
-  }
-  studioContent.push(toPortableTextBlock(studioRecord.intro_text, 'legacy-studio-text-intro'))
-  studioProjects.forEach((project, projectIndex) => {
-    const projectRecord = asRecord(project)
-    studioContent.push(
-      toImageBlock(projectRecord.extra_image, `legacy-studio-project-extra-${projectIndex}`, 'full', 'left'),
-    )
-    studioContent.push(
-      buildPortableTextBlock(
-        {
-          heading: nonEmpty(projectRecord.title),
-          paragraphs: [
-            nonEmpty(projectRecord.materials),
-            nonEmpty(projectRecord.location),
-            nonEmpty(projectRecord.description),
-          ],
-        },
-        `legacy-studio-project-text-${projectIndex}`,
-      ),
-    )
-    studioContent.push(
-      toImageBlock(projectRecord.main_image, `legacy-studio-project-main-${projectIndex}`, 'full', 'left'),
-    )
-    const galleryImages = Array.isArray(projectRecord.gallery) ? projectRecord.gallery : []
-    galleryImages.forEach((image, galleryIndex) => {
-      studioContent.push(
-        toImageBlock(
-          image,
-          `legacy-studio-project-gallery-${projectIndex}-${galleryIndex}`,
-          'half',
-          'center',
-        ),
-      )
-    })
-    studioContent.push(
-      toImageBlock(
-        projectRecord.secondary_image,
-        `legacy-studio-project-secondary-${projectIndex}`,
-        'full',
-        'left',
-      ),
-    )
-    const verticalGallery = Array.isArray(projectRecord.gallery_vertical)
-      ? projectRecord.gallery_vertical
-      : []
-    verticalGallery.forEach((image, galleryIndex) => {
-      studioContent.push(
-        toImageBlock(
-          image,
-          `legacy-studio-project-vertical-${projectIndex}-${galleryIndex}`,
-          'full',
-          'left',
-        ),
-      )
-    })
-  })
-
-  const contactContent = compactContent([
-    toPortableTextBlock(contactRecord.bio_text, 'legacy-contact-text-0'),
-    toImageBlock(contactRecord.bio_image, 'legacy-contact-image-1', 'half', 'right'),
-    nonEmpty(contactRecord.form_action)
-      ? {
-          _key: 'legacy-contact-form-2',
-          _type: 'contactFormBlock',
-          heading: 'Request & Purchase',
-          body: [],
-          formAction: nonEmpty(contactRecord.form_action) as string,
-        }
-      : null,
-  ])
-
-  const sections: PreparedPageSection[] = [
-    createPreparedSection('ABOUT', 'About', aboutContent, 0),
-    createPreparedSection('SCENT', 'Scent', scentContent, 1),
-    createPreparedSection('PROCESS', 'Process', compactContent(processContent), 2),
-    createPreparedSection('STUDIO', 'Studio', compactContent(studioContent), 3),
-    createPreparedSection('CONTACT', 'Contact', contactContent, 4),
-  ]
-
-  return {
-    sections,
-  }
 }

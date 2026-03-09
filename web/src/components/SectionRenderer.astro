@@ -1,36 +1,28 @@
 ---
 import type {PreparedPageSection} from '../lib/pageContentPreparation'
-import ContactFormBlock from './blocks/ContactFormBlock.astro'
-import ImageBlock from './blocks/ImageBlock.astro'
-import ImagePairBlock from './blocks/ImagePairBlock.astro'
+import ImageGroupBlock from './blocks/ImageGroupBlock.astro'
 import PortableTextBlock from './blocks/PortableTextBlock.astro'
+import SpacerBlock from './blocks/SpacerBlock.astro'
 
 interface Props {
   section: PreparedPageSection
-  turnstileSiteKey: string
 }
 
-const {section, turnstileSiteKey} = Astro.props as Props
+const {section} = Astro.props as Props
 ---
 
 <section id={section.sectionId} class="content-section" data-section-id={section.sectionId}>
-  {section.title && <h2 class="section-title">{section.title}</h2>}
-
   {section.content.map((block) => {
     if (block._type === 'portableTextBlock') {
       return <PortableTextBlock block={block} />
     }
 
-    if (block._type === 'pageImageBlock') {
-      return <ImageBlock block={block} />
+    if (block._type === 'pageImageGroupBlock') {
+      return <ImageGroupBlock block={block} />
     }
 
-    if (block._type === 'pageImagePairBlock') {
-      return <ImagePairBlock block={block} />
-    }
-
-    if (block._type === 'contactFormBlock') {
-      return <ContactFormBlock block={block} turnstileSiteKey={turnstileSiteKey} />
+    if (block._type === 'pageSpacerBlock') {
+      return <SpacerBlock block={block} />
     }
 
     return null
@@ -48,11 +40,9 @@ const {section, turnstileSiteKey} = Astro.props as Props
     padding-top: 0;
   }
 
-  .section-title {
-    margin: 0 0 20px;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1.4;
-    letter-spacing: 0.04em;
+  .content-section > :global(.content-richtext),
+  .content-section > :global(.content-image-group) {
+    margin-top: 0;
+    margin-bottom: 0;
   }
 </style>

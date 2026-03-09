@@ -1,0 +1,213 @@
+---
+import type {PreparedPageContentBlock} from '../../lib/pageContentPreparation'
+import PictureAsset from './PictureAsset.astro'
+
+type ImageGroupBlockType = Extract<PreparedPageContentBlock, {_type: 'pageImageGroupBlock'}>
+
+interface Props {
+  block: ImageGroupBlockType
+}
+
+const {block} = Astro.props as Props
+const imageCount = block.images.length
+const countClass = `content-image-group--count-${Math.min(imageCount, 4)}`
+const imageRatios = block.images.map((image) => image.width / image.height)
+const totalImageRatio = imageRatios.reduce((sum, ratio) => sum + ratio, 0)
+const widthFillFactor = imageCount === 2 ? 0.96 : imageCount === 3 ? 0.93 : 1
+const hasCaption = block.layout === 'half' && !!block.caption && (!!block.caption.title || !!block.caption.description)
+const caption = hasCaption ? block.caption : null
+const groupClasses = [
+  'content-image-group',
+  `content-image-group--${block.layout}`,
+  countClass,
+  hasCaption ? 'content-image-group--has-caption' : '',
+]
+  .filter(Boolean)
+  .join(' ')
+---
+
+<div class={groupClasses}>
+  {caption && (
+    <div class="content-image-group__caption">
+      {caption.title && <p class="content-image-group__caption-title">{caption.title}</p>}
+      {caption.description && <p class="content-image-group__caption-body">{caption.description}</p>}
+    </div>
+  )}
+
+  <div class="content-image-group__media">
+    {block.images.map((image, index) => (
+      <div
+        class="content-image-group__item"
+        data-image-count={String(imageCount)}
+        data-image-index={String(index)}
+        style={`--image-share: ${imageRatios[index] / totalImageRatio}; --image-fill-factor: ${widthFillFactor};`}
+      >
+        <PictureAsset image={image} class="content-image-group__picture" />
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .content-image-group {
+    width: 100%;
+    margin: 20px 0;
+  }
+
+  .content-image-group--half {
+    width: 100%;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .content-image-group--half.content-image-group--has-caption {
+    position: relative;
+    overflow: visible;
+  }
+
+  .content-image-group--half.content-image-group--has-caption .content-image-group__media {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .content-image-group__media {
+    display: grid;
+    gap: 20px 2%;
+    align-items: start;
+  }
+
+  .content-image-group--count-2 .content-image-group__media,
+  .content-image-group--count-3 .content-image-group__media {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .content-image-group--count-1 .content-image-group__media {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .content-image-group--full.content-image-group--count-4 .content-image-group__media,
+  .content-image-group--half.content-image-group--count-4 .content-image-group__media {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px 0;
+  }
+
+  .content-image-group__item {
+    min-width: 0;
+  }
+
+  .content-image-group--count-2 .content-image-group__item,
+  .content-image-group--count-3 .content-image-group__item {
+    flex: 0 1 calc((100% - ((var(--image-count) - 1) * 2%)) * var(--image-share) * var(--image-fill-factor));
+    max-width: calc((100% - ((var(--image-count) - 1) * 2%)) * var(--image-share) * var(--image-fill-factor));
+  }
+
+  .content-image-group--count-2 {
+    --image-count: 2;
+  }
+
+  .content-image-group--count-3 {
+    --image-count: 3;
+  }
+
+  .content-image-group__picture,
+  .content-image-group__picture img {
+    display: block;
+    width: 100%;
+  }
+
+  .content-image-group__picture img {
+    height: auto;
+  }
+
+  .content-image-group--full.content-image-group--count-4 .content-image-group__item,
+  .content-image-group--half.content-image-group--count-4 .content-image-group__item {
+    flex: 0 0 48%;
+    max-width: 48%;
+  }
+
+  .content-image-group__caption {
+    width: 100%;
+    margin-top: 10px;
+    font-size: 9px;
+    line-height: 1.7;
+    text-align: left;
+  }
+
+  .content-image-group--half.content-image-group--has-caption .content-image-group__caption {
+    position: absolute;
+    right: calc(100% + 40px);
+    bottom: 0;
+    width: clamp(145px, calc(145px + (100vw - 1300px) * 0.28), 230px);
+    margin-top: 0;
+  }
+
+  .content-image-group__caption-title {
+    margin: 0 0 18px;
+    font-size: 9px;
+    line-height: 1.7;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .content-image-group__caption-body {
+    margin: 0;
+    white-space: pre-line;
+  }
+
+  @media (max-width: 1300px) {
+    .content-image-group--half.content-image-group--has-caption {
+      position: static;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .content-image-group--half.content-image-group--has-caption .content-image-group__media,
+    .content-image-group--half.content-image-group--has-caption .content-image-group__caption {
+      position: static;
+      width: 100%;
+      max-width: 100%;
+      margin-top: 0;
+    }
+
+    .content-image-group--half.content-image-group--has-caption .content-image-group__media {
+      order: 1;
+    }
+
+    .content-image-group--half.content-image-group--has-caption .content-image-group__caption {
+      order: 2;
+      margin-top: 10px;
+    }
+
+    .content-image-group--half:not(.content-image-group--count-1) {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .content-image-group__media,
+    .content-image-group--full.content-image-group--count-4 .content-image-group__media,
+    .content-image-group--half.content-image-group--count-4 .content-image-group__media {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .content-image-group__item {
+      aspect-ratio: auto !important;
+    }
+
+    .content-image-group__picture,
+    .content-image-group__picture img {
+      height: auto !important;
+    }
+  }
+
+  @media (max-width: 769px) {
+    .content-image-group--half {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+</style>

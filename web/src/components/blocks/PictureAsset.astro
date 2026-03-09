@@ -1,0 +1,29 @@
+---
+import type {PreparedImage} from '../../lib/imagePreparation'
+
+interface Props {
+  image: PreparedImage
+  class?: string
+}
+
+const {image, class: className = ''} = Astro.props as Props
+---
+
+<picture class={className}>
+  {image.sources.map((source) => (
+    <source
+      srcset={source.srcSet}
+      type={source.type}
+      sizes={image.sizes}
+    />
+  ))}
+  <img
+    src={image.fallbackSrc}
+    alt={image.alt}
+    width={image.width}
+    height={image.height}
+    loading={image.loading}
+    decoding={image.decoding}
+    fetchpriority={image.fetchPriority}
+  />
+</picture>

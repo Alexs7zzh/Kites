@@ -1,4 +1,4 @@
-import {defineField, defineType} from 'sanity'
+import {defineArrayMember, defineField, defineType} from 'sanity'
 import {imageAltFields} from './imageFields'
 
 const SITE_NAME_WARNING_MAX_LENGTH = 60
@@ -105,6 +105,31 @@ function validateCanonicalDomain(value: unknown): true | string {
   }
 
   return true
+}
+
+function validateContactFormAction(value: unknown): true | string {
+  if (typeof value !== 'string' || value.trim() === '') {
+    return true
+  }
+
+  const parsedUrl = parseAbsoluteUrl(value.trim())
+  if (!parsedUrl) {
+    return 'Enter a valid URL, for example https://formspree.io/f/your-form-id.'
+  }
+
+  if (parsedUrl.protocol === 'https:') {
+    return true
+  }
+
+  const isLocalDevHttpUrl =
+    parsedUrl.protocol === 'http:' &&
+    (parsedUrl.hostname === 'localhost' || parsedUrl.hostname === '127.0.0.1')
+
+  if (isLocalDevHttpUrl) {
+    return true
+  }
+
+  return 'Use an https URL. For local development only, http://localhost or http://127.0.0.1 is allowed.'
 }
 
 export const socialHandlesType = defineType({
@@ -217,6 +242,53 @@ export const siteSettingsType = defineType({
       name: 'social',
       title: 'Social',
       type: 'socialHandles',
+    }),
+    defineField({
+      name: 'sections',
+      title: 'Sections',
+      description: 'Add section references and drag to set final page order.',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{type: 'section'}],
+        }),
+      ],
+      validation: (rule) => [rule.required().min(1), rule.unique()],
+      options: {sortable: true},
+    }),
+    defineField({
+      name: 'contact',
+      title: 'Contact',
+      type: 'object',
+      fields: [
+        defineField({
+          name: 'bioText',
+          title: 'Text',
+          type: 'text',
+          rows: 12,
+        }),
+        defineField({
+          name: 'bioImage',
+          title: 'Image',
+          type: 'image',
+          options: {hotspot: true},
+          fields: imageAltFields(),
+        }),
+        defineField({
+          name: 'formTitle',
+          title: 'Form Title',
+          type: 'string',
+          initialValue: 'Request & Purchase',
+        }),
+        defineField({
+          name: 'formAction',
+          title: 'Form Action',
+          type: 'url',
+          validation: (rule) =>
+            rule.required().error('Add a form endpoint URL.').custom(validateContactFormAction),
+        }),
+      ],
     }),
   ],
   preview: {

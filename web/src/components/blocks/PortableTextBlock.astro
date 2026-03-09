@@ -20,35 +20,46 @@ const renderedHtml = renderPortableTextToHtml(block.body)
     text-align: left;
   }
 
-  .content-richtext :where(p, h2, h3, blockquote) {
+  .content-richtext :global(p),
+  .content-richtext :global(h2),
+  .content-richtext :global(h3),
+  .content-richtext :global(blockquote) {
     margin: 0 0 1.2em;
   }
 
-  .content-richtext :where(p, blockquote):last-child,
-  .content-richtext :where(h2, h3):last-child {
+  .content-richtext :global(p:last-child),
+  .content-richtext :global(blockquote:last-child),
+  .content-richtext :global(h2:last-child),
+  .content-richtext :global(h3:last-child) {
     margin-bottom: 0;
   }
 
-  .content-richtext h2,
-  .content-richtext h3 {
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 1.8;
-    letter-spacing: 0.04em;
+  .content-richtext :global(h2),
+  .content-richtext :global(h3) {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    letter-spacing: 0;
   }
 
-  .content-richtext blockquote {
+  .content-richtext :global(h2:first-child:not(:last-child)),
+  .content-richtext :global(h3:first-child:not(:last-child)) {
+    margin-top: -8px;
+    margin-bottom: calc(1.2em + 8px);
+  }
+
+  .content-richtext :global(blockquote) {
     padding-left: 0.8rem;
     border-left: 1px solid rgba(0, 0, 0, 0.35);
   }
 
-  .content-richtext a {
+  .content-richtext :global(a) {
     color: inherit;
     text-decoration: underline;
     text-underline-offset: 0.2em;
   }
 
-  .content-richtext code {
+  .content-richtext :global(code) {
     font-family: inherit;
     font-size: 0.95em;
     background: rgba(0, 0, 0, 0.08);

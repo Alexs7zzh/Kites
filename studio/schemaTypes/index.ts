@@ -1,9 +1,7 @@
-import {siteContentSchemaTypes} from './siteContent'
 import {siteSettingsSchemaTypes} from './siteSettings'
-import {sitePageSchemaTypes} from './sitePage'
+import {sectionSchemaTypes} from './sitePage'
 
 export const schemaTypes = [
-  ...siteContentSchemaTypes,
   ...siteSettingsSchemaTypes,
-  ...sitePageSchemaTypes,
+  ...sectionSchemaTypes,
 ]

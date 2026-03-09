@@ -1,0 +1,31 @@
+---
+import type {PreparedPageContentBlock} from '../../lib/pageContentPreparation'
+
+type SpacerBlockType = Extract<PreparedPageContentBlock, {_type: 'pageSpacerBlock'}>
+
+interface Props {
+  block: SpacerBlockType
+}
+
+const {block} = Astro.props as Props
+
+const SPACER_HEIGHTS: Record<SpacerBlockType['level'], string> = {
+  1: '29px',
+  2: '58px',
+  3: '72px',
+  4: '87px',
+  5: '104px',
+  6: '120px',
+}
+
+const height = SPACER_HEIGHTS[block.level] ?? SPACER_HEIGHTS[1]
+---
+
+<div class="content-spacer" style={`height: ${height};`} aria-hidden="true" />
+
+<style>
+  .content-spacer {
+    width: 100%;
+    flex: 0 0 auto;
+  }
+</style>

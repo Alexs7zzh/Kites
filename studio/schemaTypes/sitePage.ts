@@ -34,60 +34,72 @@ function validateContactFormAction(value: unknown): true | string {
   return 'Use an https URL. For local development only, http://localhost or http://127.0.0.1 is allowed.'
 }
 
-function imageFieldsWithCaption() {
-  return [
-    ...imageAltFields(),
-    defineField({
-      name: 'caption',
-      title: 'Caption',
-      type: 'string',
-    }),
-  ]
+function imageGroupArrayField(title: string) {
+  return defineField({
+    name: 'images',
+    title,
+    description: 'Add up to 4 images.',
+    type: 'array',
+    of: [
+      defineArrayMember({
+        type: 'image',
+        options: {hotspot: true},
+        fields: imageAltFields(),
+      }),
+    ],
+    validation: (rule) => rule.required().min(1).max(4),
+    options: {
+      sortable: true,
+      layout: 'grid',
+    },
+  })
+}
+
+function portableTextMember() {
+  return defineArrayMember({
+    type: 'block',
+    styles: [
+      {title: 'Normal', value: 'normal'},
+      {title: 'Heading', value: 'h2'},
+      {title: 'Subheading', value: 'h3'},
+      {title: 'Quote', value: 'blockquote'},
+    ],
+    lists: [],
+    marks: {
+      decorators: [
+        {title: 'Strong', value: 'strong'},
+        {title: 'Emphasis', value: 'em'},
+        {title: 'Code', value: 'code'},
+      ],
+      annotations: [
+        defineArrayMember({
+          name: 'link',
+          title: 'Link',
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'href',
+              title: 'URL',
+              type: 'url',
+              validation: (rule) => rule.required(),
+            }),
+          ],
+        }),
+      ],
+    },
+  })
 }
 
 export const pagePortableTextBlockType = defineType({
   name: 'pagePortableTextBlock',
-  title: 'Portable Text Block',
+  title: 'Portable Text Block (Legacy)',
   type: 'object',
   fields: [
     defineField({
       name: 'body',
       title: 'Body',
       type: 'array',
-      of: [
-        defineArrayMember({
-          type: 'block',
-          styles: [
-            {title: 'Normal', value: 'normal'},
-            {title: 'Heading', value: 'h2'},
-            {title: 'Subheading', value: 'h3'},
-            {title: 'Quote', value: 'blockquote'},
-          ],
-          lists: [],
-          marks: {
-            decorators: [
-              {title: 'Strong', value: 'strong'},
-              {title: 'Emphasis', value: 'em'},
-              {title: 'Code', value: 'code'},
-            ],
-            annotations: [
-              defineArrayMember({
-                name: 'link',
-                title: 'Link',
-                type: 'object',
-                fields: [
-                  defineField({
-                    name: 'href',
-                    title: 'URL',
-                    type: 'url',
-                    validation: (rule) => rule.required(),
-                  }),
-                ],
-              }),
-            ],
-          },
-        }),
-      ],
+      of: [portableTextMember()],
       validation: (rule) => rule.required().min(1),
     }),
   ],
@@ -105,15 +117,83 @@ export const pagePortableTextBlockType = defineType({
         : ''
       return {
         title: text ? text.slice(0, 80) : 'Portable Text Block',
-        subtitle: 'Portable Text Block',
+        subtitle: 'Legacy text block',
       }
     },
   },
 })
 
-export const pageImageBlockType = defineType({
-  name: 'pageImageBlock',
-  title: 'Image Block',
+export const pageSpacerBlockType = defineType({
+  name: 'pageSpacerBlock',
+  title: 'Spacer',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'level',
+      title: 'Spacer Size',
+      description: 'Choose a spacer height from 1 to 6.',
+      type: 'number',
+      initialValue: 1,
+      options: {
+        list: [
+          {title: '1', value: 1},
+          {title: '2', value: 2},
+          {title: '3', value: 3},
+          {title: '4', value: 4},
+          {title: '5', value: 5},
+          {title: '6', value: 6},
+        ],
+        layout: 'radio',
+      },
+      validation: (rule) => rule.required().integer().min(1).max(6),
+    }),
+  ],
+  preview: {
+    select: {
+      level: 'level',
+    },
+    prepare({level}) {
+      const safeLevel = Number.isInteger(level) && level >= 1 && level <= 6 ? level : 1
+      return {
+        title: `Spacer (${safeLevel})`,
+        subtitle: `Spacer level ${safeLevel}`,
+      }
+    },
+  },
+})
+
+export const pageFullImageGroupBlockType = defineType({
+  name: 'pageFullImageGroupBlock',
+  title: 'Full Width Image Group',
+  type: 'object',
+  options: {
+    modal: {
+      type: 'dialog',
+      width: 'auto',
+    },
+  },
+  fields: [imageGroupArrayField('Images')],
+  preview: {
+    select: {
+      image0: 'images.0',
+      image1: 'images.1',
+      image2: 'images.2',
+      image3: 'images.3',
+    },
+    prepare({image0, image1, image2, image3}) {
+      const imageCount = [image0, image1, image2, image3].filter(Boolean).length
+      return {
+        title: 'Full Width Image Group',
+        subtitle: `${imageCount ?? 0} image${imageCount === 1 ? '' : 's'}`,
+        media: image0,
+      }
+    },
+  },
+})
+
+export const pageHalfImageGroupBlockType = defineType({
+  name: 'pageHalfImageGroupBlock',
+  title: 'Half Width Image Group',
   type: 'object',
   options: {
     modal: {
@@ -122,192 +202,41 @@ export const pageImageBlockType = defineType({
     },
   },
   fields: [
+    imageGroupArrayField('Images'),
     defineField({
-      name: 'image',
-      title: 'Image',
-      type: 'image',
-      options: {hotspot: true},
-      fields: imageFieldsWithCaption(),
-      validation: (rule) => rule.required(),
+      name: 'captionTitle',
+      title: 'Caption Title',
+      type: 'string',
     }),
     defineField({
-      name: 'layout',
-      title: 'Layout',
-      type: 'string',
-      initialValue: 'full',
-      options: {
-        list: [
-          {title: 'Full Width', value: 'full'},
-          {title: 'Half Width', value: 'half'},
-        ],
-        layout: 'radio',
-      },
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'align',
-      title: 'Alignment',
-      type: 'string',
-      initialValue: 'left',
-      options: {
-        list: [
-          {title: 'Left', value: 'left'},
-          {title: 'Center', value: 'center'},
-          {title: 'Right', value: 'right'},
-        ],
-        layout: 'radio',
-      },
-      validation: (rule) => rule.required(),
+      name: 'captionDescription',
+      title: 'Caption Description',
+      type: 'text',
+      rows: 5,
     }),
   ],
   preview: {
     select: {
-      media: 'image',
-      layout: 'layout',
-      align: 'align',
+      image0: 'images.0',
+      image1: 'images.1',
+      image2: 'images.2',
+      image3: 'images.3',
+      captionTitle: 'captionTitle',
     },
-    prepare({layout, align, media}) {
+    prepare({image0, image1, image2, image3, captionTitle}) {
+      const imageCount = [image0, image1, image2, image3].filter(Boolean).length
       return {
-        title: `Image (${layout ?? 'full'})`,
-        subtitle: `Alignment: ${align ?? 'left'}`,
-        media,
+        title: captionTitle || 'Half Width Image Group',
+        subtitle: `${imageCount ?? 0} image${imageCount === 1 ? '' : 's'}`,
+        media: image0,
       }
     },
   },
 })
 
-export const pageImagePairBlockType = defineType({
-  name: 'pageImagePairBlock',
-  title: 'Image Pair Block',
-  type: 'object',
-  options: {
-    modal: {
-      type: 'dialog',
-      width: 'auto',
-    },
-  },
-  fields: [
-    defineField({
-      name: 'leftImage',
-      title: 'Left Image',
-      type: 'image',
-      options: {hotspot: true},
-      fields: imageFieldsWithCaption(),
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'rightImage',
-      title: 'Right Image',
-      type: 'image',
-      options: {hotspot: true},
-      fields: imageFieldsWithCaption(),
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'ratio',
-      title: 'Column Ratio',
-      type: 'string',
-      initialValue: '50-50',
-      options: {
-        list: [
-          {title: '50 / 50', value: '50-50'},
-          {title: '60 / 40', value: '60-40'},
-          {title: '40 / 60', value: '40-60'},
-        ],
-        layout: 'radio',
-      },
-      validation: (rule) => rule.required(),
-    }),
-  ],
-  preview: {
-    select: {
-      media: 'leftImage',
-      ratio: 'ratio',
-    },
-    prepare({ratio, media}) {
-      return {
-        title: `Image Pair (${ratio ?? '50-50'})`,
-        subtitle: 'Image Pair Block',
-        media,
-      }
-    },
-  },
-})
-
-export const contactFormBlockType = defineType({
-  name: 'contactFormBlock',
-  title: 'Contact Form Block',
-  type: 'object',
-  fields: [
-    defineField({
-      name: 'heading',
-      title: 'Heading',
-      type: 'string',
-      initialValue: 'Request & Purchase',
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'body',
-      title: 'Body',
-      type: 'array',
-      of: [
-        defineArrayMember({
-          type: 'block',
-          styles: [
-            {title: 'Normal', value: 'normal'},
-            {title: 'Heading', value: 'h3'},
-            {title: 'Quote', value: 'blockquote'},
-          ],
-          lists: [],
-          marks: {
-            decorators: [
-              {title: 'Strong', value: 'strong'},
-              {title: 'Emphasis', value: 'em'},
-              {title: 'Code', value: 'code'},
-            ],
-            annotations: [
-              defineArrayMember({
-                name: 'link',
-                title: 'Link',
-                type: 'object',
-                fields: [
-                  defineField({
-                    name: 'href',
-                    title: 'URL',
-                    type: 'url',
-                    validation: (rule) => rule.required(),
-                  }),
-                ],
-              }),
-            ],
-          },
-        }),
-      ],
-    }),
-    defineField({
-      name: 'formAction',
-      title: 'Form Action',
-      type: 'url',
-      validation: (rule) =>
-        rule.required().error('Add a form endpoint URL.').custom(validateContactFormAction),
-    }),
-  ],
-  preview: {
-    select: {
-      heading: 'heading',
-    },
-    prepare({heading}) {
-      return {
-        title: heading || 'Contact Form',
-        subtitle: 'Contact Form Block',
-      }
-    },
-  },
-})
-
-export const pageSectionType = defineType({
-  name: 'pageSection',
-  title: 'Page Section',
+export const sectionType = defineType({
+  name: 'section',
+  title: 'Section',
   type: 'document',
   fields: [
     defineField({
@@ -325,44 +254,14 @@ export const pageSectionType = defineType({
     defineField({
       name: 'content',
       title: 'Content',
-      description: 'Write text and insert media blocks in one rich text editor.',
+      description: 'Add text, spacer, and image blocks, then drag to set the order.',
       type: 'array',
       of: [
-        defineArrayMember({
-          type: 'block',
-          styles: [
-            {title: 'Normal', value: 'normal'},
-            {title: 'Heading', value: 'h2'},
-            {title: 'Subheading', value: 'h3'},
-            {title: 'Quote', value: 'blockquote'},
-          ],
-          lists: [],
-          marks: {
-            decorators: [
-              {title: 'Strong', value: 'strong'},
-              {title: 'Emphasis', value: 'em'},
-              {title: 'Code', value: 'code'},
-            ],
-            annotations: [
-              defineArrayMember({
-                name: 'link',
-                title: 'Link',
-                type: 'object',
-                fields: [
-                  defineField({
-                    name: 'href',
-                    title: 'URL',
-                    type: 'url',
-                    validation: (rule) => rule.required(),
-                  }),
-                ],
-              }),
-            ],
-          },
-        }),
-        defineArrayMember({type: 'pageImageBlock'}),
-        defineArrayMember({type: 'pageImagePairBlock'}),
-        defineArrayMember({type: 'contactFormBlock'}),
+        portableTextMember(),
+        defineArrayMember({type: 'pageSpacerBlock'}),
+        defineArrayMember({type: 'pagePortableTextBlock'}),
+        defineArrayMember({type: 'pageFullImageGroupBlock'}),
+        defineArrayMember({type: 'pageHalfImageGroupBlock'}),
       ],
       validation: (rule) => rule.required().min(1),
       options: {
@@ -389,47 +288,10 @@ export const pageSectionType = defineType({
   },
 })
 
-export const sitePageType = defineType({
-  name: 'sitePage',
-  title: 'Site Page',
-  type: 'document',
-  fields: [
-    defineField({
-      name: 'sections',
-      title: 'Sections',
-      description: 'Add section references and drag to set final page order.',
-      type: 'array',
-      of: [
-        defineArrayMember({
-          type: 'reference',
-          to: [{type: 'pageSection'}],
-        }),
-      ],
-      validation: (rule) => [rule.required().min(1), rule.unique()],
-      options: {sortable: true},
-    }),
-  ],
-  preview: {
-    select: {
-      sectionCount: 'sections.length',
-    },
-    prepare({sectionCount}) {
-      return {
-        title: 'Site Page',
-        subtitle:
-          typeof sectionCount === 'number'
-            ? `One page model • ${sectionCount} sections`
-            : 'One page model',
-      }
-    },
-  },
-})
-
-export const sitePageSchemaTypes = [
+export const sectionSchemaTypes = [
   pagePortableTextBlockType,
-  pageImageBlockType,
-  pageImagePairBlockType,
-  contactFormBlockType,
-  pageSectionType,
-  sitePageType,
+  pageSpacerBlockType,
+  pageFullImageGroupBlockType,
+  pageHalfImageGroupBlockType,
+  sectionType,
 ]

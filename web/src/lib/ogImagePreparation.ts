@@ -17,7 +17,7 @@ type OgImageRecord = {
   }
 }
 
-export type PreparedOgImage = {
+type PreparedOgImage = {
   src: string
   width: number
   height: number
