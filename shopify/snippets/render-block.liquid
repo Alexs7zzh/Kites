@@ -1,12 +1,50 @@
 {% liquid
   assign block_type = block.block_type.value | default: block.block_type
+  assign spacing_above = block.settings.spacing_above | default: '1'
+  assign spacing_below = block.settings.spacing_below | default: '1'
+  assign spacing_top = '18px'
+  assign spacing_bottom = '18px'
+
+  case spacing_above
+    when '2'
+      assign spacing_top = '29px'
+    when '3'
+      assign spacing_top = '58px'
+    when '4'
+      assign spacing_top = '72px'
+    when '5'
+      assign spacing_top = '87px'
+    when '6'
+      assign spacing_top = '104px'
+  endcase
+
+  case spacing_below
+    when '2'
+      assign spacing_bottom = '29px'
+    when '3'
+      assign spacing_bottom = '58px'
+    when '4'
+      assign spacing_bottom = '72px'
+    when '5'
+      assign spacing_bottom = '87px'
+    when '6'
+      assign spacing_bottom = '104px'
+  endcase
+
+  if block.settings != blank
+    assign block_type = block.type
+  endif
 %}
 
-{% case block_type %}
-  {% when 'rich_text' %}
-    {% render 'portable-text-block', block: block %}
-  {% when 'spacer' %}
-    {% render 'spacer-block', block: block %}
-  {% when 'image_group' %}
-    {% render 'image-group-block', block: block, layout: block.layout.value | default: block.layout | default: 'full' %}
-{% endcase %}
+<div class="content-block content-block--{{ block_type | handleize }}" style="--spacing-top: {{ spacing_top }}; --spacing-bottom: {{ spacing_bottom }};" {{ block.shopify_attributes }}>
+  {% case block_type %}
+    {% when 'rich_text' %}
+      {% render 'portable-text-block', block: block %}
+    {% when 'full_image_group' %}
+      {% render 'image-group-block', block: block, layout: 'full' %}
+    {% when 'half_image_group' %}
+      {% render 'image-group-block', block: block, layout: 'half' %}
+    {% when 'image_group' %}
+      {% render 'image-group-block', block: block, layout: block.layout.value | default: block.layout | default: 'full' %}
+  {% endcase %}
+</div>

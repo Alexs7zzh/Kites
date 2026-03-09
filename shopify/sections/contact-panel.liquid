@@ -1,0 +1,42 @@
+{% liquid
+  assign form_heading = section.settings.form_heading | default: 'Request & Purchase'
+%}
+
+<section
+  id="section-contact"
+  class="content-section content-section--contact"
+  data-section-id="section-contact"
+  data-nav-label="CONTACT"
+>
+  {% render 'contact-section', contact_heading: form_heading, contact_body: section.settings.contact_body, contact_body_from_setting: true, contact_image: section.settings.contact_image %}
+</section>
+
+{% schema %}
+{
+  "name": "Contact",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "contact_body",
+      "label": "Contact body"
+    },
+    {
+      "type": "image_picker",
+      "id": "contact_image",
+      "label": "Contact image"
+    },
+    {
+      "type": "text",
+      "id": "form_heading",
+      "label": "Form heading",
+      "default": "Request & Purchase"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Contact"
+    }
+  ]
+}
+{% endschema %}

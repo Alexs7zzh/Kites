@@ -1,3 +1,7 @@
 <div class="content-richtext">
-  {{ block.body | metafield_tag }}
+  {% if block.settings != blank %}
+    {{ block.settings.body }}
+  {% else %}
+    {{ block.body | metafield_tag }}
+  {% endif %}
 </div>

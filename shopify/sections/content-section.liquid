@@ -1,0 +1,196 @@
+{% liquid
+  assign nav_label = section.settings.section_label | strip | default: 'SECTION'
+  assign section_id = 'section-' | append: nav_label | handleize | append: '-' | append: section.id
+%}
+
+{% if section.blocks.size > 0 %}
+  <section
+    id="{{ section_id }}"
+    class="content-section"
+    data-section-id="{{ section_id }}"
+    data-nav-label="{{ nav_label | escape }}"
+  >
+    {% for block in section.blocks %}
+      {% render 'render-block', block: block %}
+    {% endfor %}
+  </section>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Content section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_label",
+      "label": "Section label",
+      "default": "SECTION"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "rich_text",
+      "name": "Rich text",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Text"
+        },
+        {
+          "type": "select",
+          "id": "spacing_above",
+          "label": "Spacing above",
+          "default": "1",
+          "options": [
+            {"value": "1", "label": "1"},
+            {"value": "2", "label": "2"},
+            {"value": "3", "label": "3"},
+            {"value": "4", "label": "4"},
+            {"value": "5", "label": "5"},
+            {"value": "6", "label": "6"}
+          ]
+        },
+        {
+          "type": "select",
+          "id": "spacing_below",
+          "label": "Spacing below",
+          "default": "1",
+          "options": [
+            {"value": "1", "label": "1"},
+            {"value": "2", "label": "2"},
+            {"value": "3", "label": "3"},
+            {"value": "4", "label": "4"},
+            {"value": "5", "label": "5"},
+            {"value": "6", "label": "6"}
+          ]
+        }
+      ]
+    },
+    {
+      "type": "full_image_group",
+      "name": "Full image group",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image_1",
+          "label": "Image 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_2",
+          "label": "Image 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_3",
+          "label": "Image 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_4",
+          "label": "Image 4"
+        },
+        {
+          "type": "select",
+          "id": "spacing_above",
+          "label": "Spacing above",
+          "default": "1",
+          "options": [
+            {"value": "1", "label": "1"},
+            {"value": "2", "label": "2"},
+            {"value": "3", "label": "3"},
+            {"value": "4", "label": "4"},
+            {"value": "5", "label": "5"},
+            {"value": "6", "label": "6"}
+          ]
+        },
+        {
+          "type": "select",
+          "id": "spacing_below",
+          "label": "Spacing below",
+          "default": "1",
+          "options": [
+            {"value": "1", "label": "1"},
+            {"value": "2", "label": "2"},
+            {"value": "3", "label": "3"},
+            {"value": "4", "label": "4"},
+            {"value": "5", "label": "5"},
+            {"value": "6", "label": "6"}
+          ]
+        }
+      ]
+    },
+    {
+      "type": "half_image_group",
+      "name": "Half image group",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image_1",
+          "label": "Image 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_2",
+          "label": "Image 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_3",
+          "label": "Image 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_4",
+          "label": "Image 4"
+        },
+        {
+          "type": "text",
+          "id": "caption_title",
+          "label": "Caption title"
+        },
+        {
+          "type": "textarea",
+          "id": "caption_body",
+          "label": "Caption body"
+        },
+        {
+          "type": "select",
+          "id": "spacing_above",
+          "label": "Spacing above",
+          "default": "1",
+          "options": [
+            {"value": "1", "label": "1"},
+            {"value": "2", "label": "2"},
+            {"value": "3", "label": "3"},
+            {"value": "4", "label": "4"},
+            {"value": "5", "label": "5"},
+            {"value": "6", "label": "6"}
+          ]
+        },
+        {
+          "type": "select",
+          "id": "spacing_below",
+          "label": "Spacing below",
+          "default": "1",
+          "options": [
+            {"value": "1", "label": "1"},
+            {"value": "2", "label": "2"},
+            {"value": "3", "label": "3"},
+            {"value": "4", "label": "4"},
+            {"value": "5", "label": "5"},
+            {"value": "6", "label": "6"}
+          ]
+        }
+      ]
+    }
+  ],
+  "max_blocks": 50,
+  "presets": [
+    {
+      "name": "Content section"
+    }
+  ]
+}
+{% endschema %}

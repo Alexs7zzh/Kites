@@ -29,6 +29,13 @@ Automation scripts for content/model sync live in `/Users/alex/dev/kites/scripts
 - `PUBLIC_SANITY_PROJECT_ID`
 - `PUBLIC_SANITY_DATASET`
 
+The homepage storefront now uses Shopify theme sections directly:
+
+- repeatable top-level `Content section` sections
+- one top-level `Contact` section
+- section block editing in the Shopify theme editor
+- no Shopify metaobjects required for homepage rendering
+
 ## Web Sanity Environment
 
 The web app requires these environment variables:

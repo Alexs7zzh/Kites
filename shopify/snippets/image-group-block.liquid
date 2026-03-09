@@ -1,10 +1,42 @@
 {% liquid
-  assign images = block.images.value
-  if images == blank
-    assign images = block.images
+  assign images = blank
+  assign caption_title = block.caption_title.value | default: block.caption_title
+  assign caption_body = block.caption_body.value | default: block.caption_body
+  assign first_image = blank
+  assign second_image = blank
+  assign third_image = blank
+  assign fourth_image = blank
+  assign image_count = 0
+
+  if block.settings != blank
+    assign first_image = block.settings.image_1
+    assign second_image = block.settings.image_2
+    assign third_image = block.settings.image_3
+    assign fourth_image = block.settings.image_4
+
+    assign caption_title = block.settings.caption_title
+    assign caption_body = block.settings.caption_body
+
+    if first_image != blank
+      assign image_count = image_count | plus: 1
+    endif
+    if second_image != blank
+      assign image_count = image_count | plus: 1
+    endif
+    if third_image != blank
+      assign image_count = image_count | plus: 1
+    endif
+    if fourth_image != blank
+      assign image_count = image_count | plus: 1
+    endif
+  else
+    assign images = block.images.value
+    if images == blank
+      assign images = block.images
+    endif
+    assign image_count = images.size
   endif
 
-  assign image_count = images.size
   assign count_class = 'content-image-group--count-' | append: image_count
   assign width_fill_factor = '1'
 
@@ -14,8 +46,6 @@
     assign width_fill_factor = '0.93'
   endif
 
-  assign caption_title = block.caption_title.value | default: block.caption_title
-  assign caption_body = block.caption_body.value | default: block.caption_body
   assign has_caption = false
 
   if layout == 'half'
@@ -38,35 +68,27 @@
   {% endif %}
 
   <div class="content-image-group__media">
-    {% for image in images %}
-      {% liquid
-        assign image_object = image.preview_image | default: image
-        assign image_height = image_object.height | default: 1
-        assign image_width = image_object.width | default: image_height
-        assign image_ratio = image_width | times: 1000 | divided_by: image_height
-        assign sizes = '(max-width: 769px) calc(65vw - 40px), (max-width: 999px) calc((55vw - 160px) * 0.5), calc(((55vw + 236px) - (80px + (80px + 236px))) * 0.5)'
-
-        if layout == 'full'
-          assign sizes = '(max-width: 769px) calc(65vw - 40px), (max-width: 999px) calc(55vw - 160px), calc((55vw + 236px) - (80px + (80px + 236px)))'
-        endif
-      %}
-      <div
-        class="content-image-group__item"
-        data-image-count="{{ image_count }}"
-        data-image-index="{{ forloop.index0 }}"
-        style="--image-ratio: {{ image_ratio }}; --image-fill-factor: {{ width_fill_factor }};"
-      >
-        {{
-          image_object
-          | image_url: width: 1600
-          | image_tag:
-            class: 'content-image-group__img',
-            widths: '320, 480, 640, 768, 1024, 1440, 1600',
-            sizes: sizes,
-            loading: 'lazy',
-            alt: image.alt | default: ''
-        }}
-      </div>
-    {% endfor %}
+    {% if block.settings != blank %}
+      {% assign image_index = 0 %}
+      {% if first_image != blank %}
+        {% render 'render-image-group-item', image: first_image, image_count: image_count, image_index: image_index, layout: layout, width_fill_factor: width_fill_factor %}
+        {% assign image_index = image_index | plus: 1 %}
+      {% endif %}
+      {% if second_image != blank %}
+        {% render 'render-image-group-item', image: second_image, image_count: image_count, image_index: image_index, layout: layout, width_fill_factor: width_fill_factor %}
+        {% assign image_index = image_index | plus: 1 %}
+      {% endif %}
+      {% if third_image != blank %}
+        {% render 'render-image-group-item', image: third_image, image_count: image_count, image_index: image_index, layout: layout, width_fill_factor: width_fill_factor %}
+        {% assign image_index = image_index | plus: 1 %}
+      {% endif %}
+      {% if fourth_image != blank %}
+        {% render 'render-image-group-item', image: fourth_image, image_count: image_count, image_index: image_index, layout: layout, width_fill_factor: width_fill_factor %}
+      {% endif %}
+    {% else %}
+      {% for image in images %}
+        {% render 'render-image-group-item', image: image, image_count: image_count, image_index: forloop.index0, layout: layout, width_fill_factor: width_fill_factor %}
+      {% endfor %}
+    {% endif %}
   </div>
 </div>

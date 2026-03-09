@@ -1,57 +1,16 @@
+import {writeFile} from 'node:fs/promises'
+import path from 'node:path'
+
 import {normalizeSiteContent, SANITY_PAGE_QUERY} from './lib/normalize-content.mjs'
 import {
   assertNoUserErrors,
-  buildHandle,
   dedupeBy,
   fetchSanity,
   fetchShopifyAdmin,
-  jsonFieldValue,
   nonEmpty,
   slugify,
   writeReport,
 } from './lib/shared.mjs'
-
-const METAOBJECT_BY_HANDLE_QUERY = `
-  query MetaobjectByHandle($type: String!, $handle: String!) {
-    metaobjectByHandle(handle: {type: $type, handle: $handle}) {
-      id
-      handle
-      type
-    }
-  }
-`
-
-const METAOBJECT_CREATE_MUTATION = `
-  mutation CreateMetaobject($metaobject: MetaobjectCreateInput!) {
-    metaobjectCreate(metaobject: $metaobject) {
-      metaobject {
-        id
-        handle
-        type
-      }
-      userErrors {
-        field
-        message
-      }
-    }
-  }
-`
-
-const METAOBJECT_UPDATE_MUTATION = `
-  mutation UpdateMetaobject($id: ID!, $metaobject: MetaobjectUpdateInput!) {
-    metaobjectUpdate(id: $id, metaobject: $metaobject) {
-      metaobject {
-        id
-        handle
-        type
-      }
-      userErrors {
-        field
-        message
-      }
-    }
-  }
-`
 
 const FILE_CREATE_MUTATION = `
   mutation FileCreate($files: [FileCreateInput!]!) {
@@ -97,42 +56,10 @@ const NODES_QUERY = `
   }
 `
 
+const INDEX_TEMPLATE_PATH = path.resolve('/Users/alex/dev/kites/shopify/templates/index.json')
+
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-async function ensureMetaobject(type, handle, fields, report) {
-  const existingPayload = await fetchShopifyAdmin(METAOBJECT_BY_HANDLE_QUERY, {type, handle})
-  const existingMetaobject = existingPayload.metaobjectByHandle
-  const input = {
-    handle,
-    fields,
-    capabilities: {
-      publishable: {
-        status: 'ACTIVE',
-      },
-    },
-  }
-
-  if (!existingMetaobject) {
-    const createdPayload = await fetchShopifyAdmin(METAOBJECT_CREATE_MUTATION, {
-      metaobject: {
-        type,
-        ...input,
-      },
-    })
-    assertNoUserErrors('metaobjectCreate', createdPayload.metaobjectCreate)
-    report.metaobjects.created.push(`${type}:${handle}`)
-    return createdPayload.metaobjectCreate.metaobject
-  }
-
-  const updatedPayload = await fetchShopifyAdmin(METAOBJECT_UPDATE_MUTATION, {
-    id: existingMetaobject.id,
-    metaobject: input,
-  })
-  assertNoUserErrors('metaobjectUpdate', updatedPayload.metaobjectUpdate)
-  report.metaobjects.updated.push(`${type}:${handle}`)
-  return updatedPayload.metaobjectUpdate.metaobject
 }
 
 async function createFiles(assetBatch) {
@@ -209,14 +136,23 @@ async function uploadAssets(assets, report) {
   createdFiles.forEach((file, index) => {
     const seed = assetSeed[index]
     if (seed && file?.id) {
-      fileMap.set(seed.url, file.id)
+      fileMap.set(seed.url, {
+        id: file.id,
+        filename: seed.filename,
+        settingValue: `shopify://shop_images/${seed.filename}`,
+      })
       report.files.created.push(seed.url)
     }
   })
 
-  const readyFiles = await waitForFiles(createdFiles.map((file) => file.id).filter(Boolean))
-  for (const [url, id] of fileMap.entries()) {
-    if (!readyFiles.has(id)) {
+  const readyFiles = await waitForFiles(
+    createdFiles
+      .map((file) => file?.id)
+      .filter(Boolean),
+  )
+
+  for (const [url, fileRecord] of fileMap.entries()) {
+    if (!readyFiles.has(fileRecord.id)) {
       throw new Error(`File upload did not finish for ${url}`)
     }
   }
@@ -224,48 +160,150 @@ async function uploadAssets(assets, report) {
   return fileMap
 }
 
-function toField(key, value) {
-  if (value === null || value === undefined) {
-    return null
+function clampSpacingLevel(value) {
+  const numericValue = Number.parseInt(String(value || '1'), 10)
+  if (!Number.isFinite(numericValue)) {
+    return '1'
   }
 
-  return {key, value}
+  return String(Math.min(6, Math.max(1, numericValue)))
 }
 
-function createBlockFieldPayload(block, fileIdsByUrl, blockReferenceIds) {
-  if (block.type === 'content_block') {
-    const imageIds = (block.fields.images || [])
-      .map((image) => fileIdsByUrl.get(image.url))
-      .filter(Boolean)
+function buildImageSettings(images, fileRefsByUrl) {
+  const uploadedImages = images
+    .map((image) => fileRefsByUrl.get(image.url)?.settingValue)
+    .filter(Boolean)
+    .slice(0, 4)
 
-    return [
-      toField('admin_label', nonEmpty(block.fields.admin_label)),
-      toField('block_type', block.fields.block_type),
-      toField('body', block.fields.body ? jsonFieldValue(block.fields.body) : null),
-      toField('level', block.fields.level ? String(block.fields.level) : null),
-      toField('layout', nonEmpty(block.fields.layout)),
-      toField('images', imageIds.length > 0 ? jsonFieldValue(imageIds) : null),
-      toField('caption_title', nonEmpty(block.fields.caption_title)),
-      toField('caption_body', nonEmpty(block.fields.caption_body)),
-    ].filter(Boolean)
+  return {
+    image_1: uploadedImages[0] || '',
+    image_2: uploadedImages[1] || '',
+    image_3: uploadedImages[2] || '',
+    image_4: uploadedImages[3] || '',
+  }
+}
+
+function mapContentBlockToThemeBlock(block, fileRefsByUrl) {
+  const blockType = block.fields?.block_type
+
+  if (blockType === 'rich_text') {
+    return {
+      type: 'rich_text',
+      settings: {
+        body: block.fields.body_html || '',
+        spacing_above: '1',
+        spacing_below: '1',
+      },
+    }
   }
 
-  if (Array.isArray(block.blocks) && typeof block.navLabel === 'string') {
-    return [
-      toField('nav_label', block.navLabel),
-      toField('admin_title', block.adminTitle),
-      toField(
-        'blocks',
-        jsonFieldValue(
-          block.blocks
-            .map((childBlock) => blockReferenceIds.get(childBlock.handle))
-            .filter(Boolean),
-        ),
-      ),
-    ].filter(Boolean)
+  if (blockType === 'image_group') {
+    const layout = block.fields.layout === 'half' ? 'half_image_group' : 'full_image_group'
+
+    return {
+      type: layout,
+      settings: {
+        ...buildImageSettings(block.fields.images || [], fileRefsByUrl),
+        caption_title: layout === 'half_image_group' ? nonEmpty(block.fields.caption_title) || '' : '',
+        caption_body: layout === 'half_image_group' ? nonEmpty(block.fields.caption_body) || '' : '',
+        spacing_above: '1',
+        spacing_below: '1',
+      },
+    }
   }
 
-  return []
+  return null
+}
+
+function applySpacerSettings(blocks, fileRefsByUrl) {
+  const themeBlocks = []
+  let pendingTopSpacing = '1'
+
+  for (const block of blocks) {
+    if (block.fields?.block_type === 'spacer') {
+      const level = clampSpacingLevel(block.fields.level)
+
+      if (themeBlocks.length === 0) {
+        pendingTopSpacing = level
+        continue
+      }
+
+      themeBlocks[themeBlocks.length - 1].settings.spacing_below = level
+      continue
+    }
+
+    const themeBlock = mapContentBlockToThemeBlock(block, fileRefsByUrl)
+    if (!themeBlock) {
+      continue
+    }
+
+    themeBlock.settings.spacing_above = pendingTopSpacing
+    pendingTopSpacing = '1'
+    themeBlocks.push(themeBlock)
+  }
+
+  return themeBlocks
+}
+
+function buildTemplateBlockId(sectionLabel, blockIndex, blockType) {
+  const safeLabel = slugify(sectionLabel) || 'section'
+  const safeType = slugify(blockType) || 'block'
+  return `${safeLabel}-${safeType}-${String(blockIndex + 1).padStart(2, '0')}`
+}
+
+function buildContentSection(section, sectionIndex, fileRefsByUrl) {
+  const themeBlocks = applySpacerSettings(section.blocks, fileRefsByUrl)
+  const blocks = {}
+  const blockOrder = []
+
+  themeBlocks.forEach((themeBlock, blockIndex) => {
+    const blockId = buildTemplateBlockId(section.navLabel, blockIndex, themeBlock.type)
+    blocks[blockId] = themeBlock
+    blockOrder.push(blockId)
+  })
+
+  return {
+    type: 'content-section',
+    settings: {
+      section_label: section.navLabel,
+    },
+    blocks,
+    block_order: blockOrder,
+  }
+}
+
+function buildContactSection(contact, fileRefsByUrl) {
+  return {
+    type: 'contact-panel',
+    settings: {
+      contact_body: contact.body_html || '',
+      contact_image: contact.image ? fileRefsByUrl.get(contact.image.url)?.settingValue || '' : '',
+      form_heading: contact.heading || 'Request & Purchase',
+    },
+  }
+}
+
+function buildIndexTemplate(normalized, fileRefsByUrl) {
+  const sections = {}
+  const order = []
+
+  normalized.sections.forEach((section, sectionIndex) => {
+    const sectionKey = `content_section_${String(sectionIndex + 1).padStart(2, '0')}`
+    sections[sectionKey] = buildContentSection(section, sectionIndex, fileRefsByUrl)
+    order.push(sectionKey)
+  })
+
+  sections.contact = buildContactSection(normalized.contact, fileRefsByUrl)
+  order.push('contact')
+
+  return {
+    sections,
+    order,
+  }
+}
+
+async function writeIndexTemplate(indexTemplate) {
+  await writeFile(INDEX_TEMPLATE_PATH, `${JSON.stringify(indexTemplate, null, 2)}\n`, 'utf8')
 }
 
 async function main() {
@@ -273,9 +311,9 @@ async function main() {
     files: {
       created: [],
     },
-    metaobjects: {
-      created: [],
-      updated: [],
+    template: {
+      written: INDEX_TEMPLATE_PATH,
+      sectionKeys: [],
     },
     summary: {},
   }
@@ -291,52 +329,19 @@ async function main() {
         return sum + content.length
       }, 0)
     : 0
-  const fileIdsByUrl = await uploadAssets(normalized.assets, report)
-  const blockReferenceIds = new Map()
 
-  for (const section of normalized.sections) {
-    for (const [blockIndex, block] of section.blocks.entries()) {
-      const blockHandle = buildHandle(block.handle, blockIndex)
-      const metaobject = await ensureMetaobject(
-        block.type,
-        blockHandle,
-        createBlockFieldPayload(block, fileIdsByUrl, blockReferenceIds),
-        report,
-      )
-      blockReferenceIds.set(block.handle, metaobject.id)
-    }
-  }
+  const fileRefsByUrl = await uploadAssets(normalized.assets, report)
+  const indexTemplate = buildIndexTemplate(normalized, fileRefsByUrl)
+  await writeIndexTemplate(indexTemplate)
 
-  const sectionReferenceIds = []
-  for (const [sectionIndex, section] of normalized.sections.entries()) {
-    const sectionHandle = buildHandle(section.handle, sectionIndex)
-    const sectionMetaobject = await ensureMetaobject(
-      'page_section',
-      sectionHandle,
-      createBlockFieldPayload(section, fileIdsByUrl, blockReferenceIds),
-      report,
-    )
-    sectionReferenceIds.push(sectionMetaobject.id)
-  }
-
-  await ensureMetaobject(
-    'homepage_content',
-    'default',
-    [
-      toField('sections', jsonFieldValue(sectionReferenceIds)),
-      toField('contact_body', jsonFieldValue(normalized.contact.body)),
-      toField('contact_image', normalized.contact.image ? fileIdsByUrl.get(normalized.contact.image.url) : null),
-      toField('contact_form_heading', normalized.contact.heading),
-    ].filter(Boolean),
-    report,
-  )
-
+  report.template.sectionKeys = indexTemplate.order
   report.summary = {
     rawSectionCount,
     rawContentBlockCount,
     migratedSectionCount: normalized.sections.length,
     migratedBlockCount: normalized.sections.reduce((sum, section) => sum + section.blocks.length, 0),
     contactIncluded: true,
+    storefrontModel: 'theme-sections',
     storeFieldsToConfigureManually: [
       'Online Store > Preferences > homepage title',
       'Online Store > Preferences > homepage meta description',
@@ -347,7 +352,7 @@ async function main() {
   }
 
   const reportPath = await writeReport('sanity-to-shopify-report.json', report)
-  console.log(`Sanity content migration complete. Report: ${reportPath}`)
+  console.log(`Sanity content migration complete. Template updated at ${INDEX_TEMPLATE_PATH}. Report: ${reportPath}`)
 }
 
 main().catch((error) => {

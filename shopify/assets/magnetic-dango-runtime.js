@@ -178,8 +178,8 @@ function initMagneticShell(root) {
     const scrollContainerNode = root.querySelector('[data-scroll-container]');
     const contentWrapperNode = root.querySelector('[data-content-wrapper]');
     const logoNode = root.querySelector('[data-site-logo]');
-    const navButtons = Array.from(root.querySelectorAll('[data-nav-button]'));
-    if (!svgNode || !metaballPathNode || !scrollContainerNode || !contentWrapperNode || !logoNode) {
+    const leftNavNode = root.querySelector('[data-left-nav]');
+    if (!svgNode || !metaballPathNode || !scrollContainerNode || !contentWrapperNode || !logoNode || !leftNavNode) {
         return;
     }
     const svgElement = svgNode;
@@ -187,13 +187,34 @@ function initMagneticShell(root) {
     const scrollContainerElement = scrollContainerNode;
     const contentWrapperElement = contentWrapperNode;
     const logoElementNode = logoNode;
+    const leftNavElement = leftNavNode;
     const sectionById = new Map();
     const sections = Array.from(root.querySelectorAll('[data-section-id]'));
+    let navButtons = [];
     for (const section of sections) {
         const id = section.dataset.sectionId;
         if (id) {
             sectionById.set(id, section);
         }
+    }
+    function buildNavButtons() {
+        leftNavElement.innerHTML = '';
+        navButtons = sections
+            .filter((section) => section.dataset.navLabel && section.dataset.sectionId)
+            .map((section) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'left-nav-button';
+            button.dataset.navButton = '';
+            button.dataset.sectionTarget = section.dataset.sectionId || '';
+            button.textContent = section.dataset.navLabel || 'SECTION';
+            leftNavElement.appendChild(button);
+            return button;
+        });
+    }
+    buildNavButtons();
+    if (navButtons.length === 0) {
+        return;
     }
     const labels = navButtons.map((button) => button.textContent?.trim() || 'SECTION');
     let activeSection = labels[0] || '';

@@ -129,6 +129,32 @@ function createRichTextTextNode(text, marks = []) {
   })
 }
 
+function escapeHtml(value) {
+  return String(value || '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
+}
+
+function applyInlineMarks(text, marks, href) {
+  let html = escapeHtml(text).replaceAll('\n', '<br>')
+
+  if (marks.includes('strong')) {
+    html = `<strong>${html}</strong>`
+  }
+  if (marks.includes('em')) {
+    html = `<em>${html}</em>`
+  }
+  if (href) {
+    const target = href.startsWith('http') ? ' target="_blank" rel="noopener noreferrer"' : ''
+    html = `<a href="${escapeHtml(href)}"${target}>${html}</a>`
+  }
+
+  return html
+}
+
 function mapPortableTextNodeToShopify(node) {
   const style = nonEmpty(node?.style) || 'normal'
   const textChildren = ensureArray(node?.children).flatMap((child) => {
@@ -178,6 +204,30 @@ export function portableTextNodesToShopifyRichText(nodes) {
   }
 }
 
+export function portableTextNodesToHtml(nodes) {
+  return ensureArray(nodes)
+    .map((node) => {
+      const style = nonEmpty(node?.style) || 'normal'
+      const children = ensureArray(node?.children)
+      const innerHtml = children
+        .map((child) => {
+          const text = typeof child?.text === 'string' ? child.text : ''
+          const marks = normalizeMarks(child?.marks)
+          const linkMark = marks.find((mark) => extractLinkHref(node, mark))
+          const href = linkMark ? extractLinkHref(node, linkMark) : null
+          return applyInlineMarks(text, marks, href)
+        })
+        .join('')
+
+      if (style === 'h2' || style === 'h3') {
+        return `<${style}>${innerHtml}</${style}>`
+      }
+
+      return `<p>${innerHtml}</p>`
+    })
+    .join('\n')
+}
+
 function plainTextToPortableTextNodes(value, keyPrefix) {
   const normalized = String(value || '').replace(/\r\n/g, '\n').trim()
   if (!normalized) {
@@ -209,14 +259,16 @@ function flushPendingPortableNodes(blocks, pendingPortableNodes, key) {
     return
   }
 
-  const adminLabel = pendingPortableNodes[0]?.__adminLabel ?? `Block ${blocks.length + 1}`
+  const nodes = pendingPortableNodes.splice(0)
+  const adminLabel = nodes[0]?.__adminLabel ?? `Block ${blocks.length + 1}`
   blocks.push({
     handle: key,
     type: 'content_block',
     fields: {
       admin_label: adminLabel,
       block_type: 'rich_text',
-      body: portableTextNodesToShopifyRichText(pendingPortableNodes.splice(0)),
+      body: portableTextNodesToShopifyRichText(nodes),
+      body_html: portableTextNodesToHtml(nodes),
     },
   })
 }
@@ -270,6 +322,7 @@ export function normalizeSiteContent(siteSettings) {
             admin_label: `${navLabel} ${String(blocks.length + 1).padStart(2, '0')} Rich text`,
             block_type: 'rich_text',
             body: portableTextNodesToShopifyRichText(ensureArray(block.body)),
+            body_html: portableTextNodesToHtml(ensureArray(block.body)),
           },
         })
         return
@@ -347,6 +400,9 @@ export function normalizeSiteContent(siteSettings) {
     contact: {
       heading: nonEmpty(siteSettingsRecord.contact?.formTitle) || 'Request & Purchase',
       body: portableTextNodesToShopifyRichText(
+        plainTextToPortableTextNodes(siteSettingsRecord.contact?.bioText, 'contact-body'),
+      ),
+      body_html: portableTextNodesToHtml(
         plainTextToPortableTextNodes(siteSettingsRecord.contact?.bioText, 'contact-body'),
       ),
       image: contactImage.url ? contactImage : null,

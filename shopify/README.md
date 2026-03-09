@@ -9,7 +9,6 @@ Run from `/Users/alex/dev/kites`:
 - `pnpm shopify:theme:check`
 - `pnpm shopify:theme:dev`
 - `pnpm shopify:theme:push`
-- `pnpm shopify:sync-definitions`
 - `pnpm shopify:migrate-content`
 - `pnpm shopify:migrate`
 
@@ -27,6 +26,8 @@ Use `/Users/alex/dev/kites/.env.example` as the template for:
 
 ## Theme assumptions
 
-- Homepage content is read from `shop.metaobjects.homepage_content.default`.
+- Homepage content lives in top-level theme sections and section blocks, not metaobjects.
+- Each content section has a `Section label` and free-form blocks in the theme editor.
+- The contact area is a separate top-level `Contact` section with `contact_body`, `contact_image`, and `form_heading`.
 - Global visuals come from theme settings, with local fallback assets for development.
 - Contact submission uses Shopify's native `{% form 'contact' %}` flow.
