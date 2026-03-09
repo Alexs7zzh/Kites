@@ -1,14 +1,8 @@
 {% liquid
   assign homepage_content = shop.metaobjects.homepage_content.default
   assign homepage_sections = blank
-  assign about_blocks = section.settings.about_blocks
-  assign scent_blocks = section.settings.scent_blocks
-  assign process_blocks = section.settings.process_blocks
-  assign studio_blocks = section.settings.studio_blocks
-  assign about_fallback = blank
-  assign scent_fallback = blank
-  assign process_fallback = blank
-  assign studio_fallback = blank
+  assign configured_sections = section.blocks
+  assign has_configured_sections = false
 
   if homepage_content
     assign homepage_sections = homepage_content.sections.value
@@ -17,46 +11,18 @@
     endif
   endif
 
-  for page_section in homepage_sections
-    assign nav_label = page_section.nav_label.value | default: page_section.nav_label
-    assign blocks = page_section.blocks.value
-    if blocks == blank
-      assign blocks = page_section.blocks
-    endif
-
-    case nav_label
-      when 'ABOUT'
-        assign about_fallback = blocks
-      when 'SCENT'
-        assign scent_fallback = blocks
-      when 'PROCESS'
-        assign process_fallback = blocks
-      when 'STUDIO'
-        assign studio_fallback = blocks
-    endcase
-  endfor
-
-  if about_blocks == blank
-    assign about_blocks = about_fallback
-  endif
-  if scent_blocks == blank
-    assign scent_blocks = scent_fallback
-  endif
-  if process_blocks == blank
-    assign process_blocks = process_fallback
-  endif
-  if studio_blocks == blank
-    assign studio_blocks = studio_fallback
+  if configured_sections.size > 0
+    assign has_configured_sections = true
   endif
 
   assign background_placeholder = settings.background_placeholder_color | default: '#e7e4df'
 %}
 
-{% if about_blocks == blank and scent_blocks == blank and process_blocks == blank and studio_blocks == blank and homepage_content == blank %}
+{% if has_configured_sections == false and homepage_content == blank %}
   <main class="shopify-onboarding">
     <div class="shopify-onboarding__inner">
       <h1>Homepage content is not set up yet.</h1>
-      <p>Select content blocks in the theme editor or create the <code>homepage_content</code> metaobject entry with handle <code>default</code>.</p>
+      <p>Add section blocks in the theme editor or create the <code>homepage_content</code> metaobject entry with handle <code>default</code>.</p>
     </div>
   </main>
 {% else %}
@@ -117,26 +83,41 @@
       </div>
 
       <div class="left-nav" data-left-nav>
-        <button type="button" class="left-nav-button" data-nav-button data-section-target="section-about">ABOUT</button>
-        <button type="button" class="left-nav-button" data-nav-button data-section-target="section-scent">SCENT</button>
-        <button type="button" class="left-nav-button" data-nav-button data-section-target="section-process">PROCESS</button>
-        <button type="button" class="left-nav-button" data-nav-button data-section-target="section-studio">STUDIO</button>
-        <button
-          type="button"
-          class="left-nav-button"
-          data-nav-button
-          data-section-target="section-contact"
-        >
-          CONTACT
-        </button>
+        {% if has_configured_sections %}
+          {% for block in section.blocks %}
+            {% assign nav_label = block.settings.nav_label | strip | default: 'SECTION' %}
+            {% assign section_id = 'section-' | append: nav_label | handleize | append: '-' | append: forloop.index %}
+            <button type="button" class="left-nav-button" data-nav-button data-section-target="{{ section_id }}">{{ nav_label | escape }}</button>
+          {% endfor %}
+        {% else %}
+          {% for page_section in homepage_sections %}
+            {% assign nav_label = page_section.nav_label.value | default: page_section.nav_label | default: 'SECTION' %}
+            {% assign section_id = 'section-' | append: nav_label | handleize | append: '-' | append: forloop.index %}
+            <button type="button" class="left-nav-button" data-nav-button data-section-target="{{ section_id }}">{{ nav_label | escape }}</button>
+          {% endfor %}
+        {% endif %}
+        <button type="button" class="left-nav-button" data-nav-button data-section-target="section-contact">CONTACT</button>
       </div>
 
       <div class="scrollable-text-container" data-scroll-container>
         <div class="page-content-wrapper" data-content-wrapper>
-          {% render 'render-page-section', section_id: 'section-about', blocks: about_blocks %}
-          {% render 'render-page-section', section_id: 'section-scent', blocks: scent_blocks %}
-          {% render 'render-page-section', section_id: 'section-process', blocks: process_blocks %}
-          {% render 'render-page-section', section_id: 'section-studio', blocks: studio_blocks %}
+          {% if has_configured_sections %}
+            {% for block in section.blocks %}
+              {% assign nav_label = block.settings.nav_label | strip | default: 'SECTION' %}
+              {% assign section_id = 'section-' | append: nav_label | handleize | append: '-' | append: forloop.index %}
+              {% render 'render-page-section', section_id: section_id, blocks: block.settings.content_blocks %}
+            {% endfor %}
+          {% else %}
+            {% for page_section in homepage_sections %}
+              {% assign nav_label = page_section.nav_label.value | default: page_section.nav_label | default: 'SECTION' %}
+              {% assign section_id = 'section-' | append: nav_label | handleize | append: '-' | append: forloop.index %}
+              {% assign page_blocks = page_section.blocks.value %}
+              {% if page_blocks == blank %}
+                {% assign page_blocks = page_section.blocks %}
+              {% endif %}
+              {% render 'render-page-section', section_id: section_id, blocks: page_blocks %}
+            {% endfor %}
+          {% endif %}
 
           {% liquid
             assign contact_heading = section.settings.contact_heading | default: homepage_content.contact_form_heading.value | default: homepage_content.contact_form_heading | default: 'Request & Purchase'
@@ -165,34 +146,6 @@
   "name": "Homepage Content",
   "settings": [
     {
-      "type": "metaobject_list",
-      "id": "about_blocks",
-      "label": "About blocks",
-      "metaobject_type": "content_block",
-      "limit": 50
-    },
-    {
-      "type": "metaobject_list",
-      "id": "scent_blocks",
-      "label": "Scent blocks",
-      "metaobject_type": "content_block",
-      "limit": 50
-    },
-    {
-      "type": "metaobject_list",
-      "id": "process_blocks",
-      "label": "Process blocks",
-      "metaobject_type": "content_block",
-      "limit": 50
-    },
-    {
-      "type": "metaobject_list",
-      "id": "studio_blocks",
-      "label": "Studio blocks",
-      "metaobject_type": "content_block",
-      "limit": 50
-    },
-    {
       "type": "text",
       "id": "contact_heading",
       "label": "Contact heading",
@@ -207,6 +160,27 @@
       "type": "image_picker",
       "id": "contact_image",
       "label": "Contact image"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "content_section",
+      "name": "Section",
+      "settings": [
+        {
+          "type": "text",
+          "id": "nav_label",
+          "label": "Section label",
+          "default": "SECTION"
+        },
+        {
+          "type": "metaobject_list",
+          "id": "content_blocks",
+          "label": "Section blocks",
+          "metaobject_type": "content_block",
+          "limit": 50
+        }
+      ]
     }
   ],
   "presets": [
