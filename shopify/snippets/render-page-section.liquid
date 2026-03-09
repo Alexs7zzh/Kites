@@ -1,0 +1,7 @@
+{% if blocks != blank %}
+  <section id="{{ section_id }}" class="content-section" data-section-id="{{ section_id }}">
+    {% for block in blocks %}
+      {% render 'render-block', block: block %}
+    {% endfor %}
+  </section>
+{% endif %}

@@ -1,6 +1,14 @@
 {% liquid
   assign homepage_content = shop.metaobjects.homepage_content.default
   assign homepage_sections = blank
+  assign about_blocks = section.settings.about_blocks
+  assign scent_blocks = section.settings.scent_blocks
+  assign process_blocks = section.settings.process_blocks
+  assign studio_blocks = section.settings.studio_blocks
+  assign about_fallback = blank
+  assign scent_fallback = blank
+  assign process_fallback = blank
+  assign studio_fallback = blank
 
   if homepage_content
     assign homepage_sections = homepage_content.sections.value
@@ -9,14 +17,46 @@
     endif
   endif
 
+  for page_section in homepage_sections
+    assign nav_label = page_section.nav_label.value | default: page_section.nav_label
+    assign blocks = page_section.blocks.value
+    if blocks == blank
+      assign blocks = page_section.blocks
+    endif
+
+    case nav_label
+      when 'ABOUT'
+        assign about_fallback = blocks
+      when 'SCENT'
+        assign scent_fallback = blocks
+      when 'PROCESS'
+        assign process_fallback = blocks
+      when 'STUDIO'
+        assign studio_fallback = blocks
+    endcase
+  endfor
+
+  if about_blocks == blank
+    assign about_blocks = about_fallback
+  endif
+  if scent_blocks == blank
+    assign scent_blocks = scent_fallback
+  endif
+  if process_blocks == blank
+    assign process_blocks = process_fallback
+  endif
+  if studio_blocks == blank
+    assign studio_blocks = studio_fallback
+  endif
+
   assign background_placeholder = settings.background_placeholder_color | default: '#e7e4df'
 %}
 
-{% if homepage_content == blank %}
+{% if about_blocks == blank and scent_blocks == blank and process_blocks == blank and studio_blocks == blank and homepage_content == blank %}
   <main class="shopify-onboarding">
     <div class="shopify-onboarding__inner">
       <h1>Homepage content is not set up yet.</h1>
-      <p>Create the <code>homepage_content</code> metaobject entry with handle <code>default</code>, then run the migration scripts or fill the content manually in Shopify Admin.</p>
+      <p>Select content blocks in the theme editor or create the <code>homepage_content</code> metaobject entry with handle <code>default</code>.</p>
     </div>
   </main>
 {% else %}
@@ -77,20 +117,10 @@
       </div>
 
       <div class="left-nav" data-left-nav>
-        {% for page_section in homepage_sections %}
-          {% liquid
-            assign nav_label = page_section.nav_label.value | default: page_section.nav_label
-            assign section_id = 'section-' | append: page_section.handle
-          %}
-          <button
-            type="button"
-            class="left-nav-button"
-            data-nav-button
-            data-section-target="{{ section_id }}"
-          >
-            {{ nav_label }}
-          </button>
-        {% endfor %}
+        <button type="button" class="left-nav-button" data-nav-button data-section-target="section-about">ABOUT</button>
+        <button type="button" class="left-nav-button" data-nav-button data-section-target="section-scent">SCENT</button>
+        <button type="button" class="left-nav-button" data-nav-button data-section-target="section-process">PROCESS</button>
+        <button type="button" class="left-nav-button" data-nav-button data-section-target="section-studio">STUDIO</button>
         <button
           type="button"
           class="left-nav-button"
@@ -103,23 +133,27 @@
 
       <div class="scrollable-text-container" data-scroll-container>
         <div class="page-content-wrapper" data-content-wrapper>
-          {% for page_section in homepage_sections %}
-            {% liquid
-              assign nav_label = page_section.nav_label.value | default: page_section.nav_label
-              assign section_id = 'section-' | append: page_section.handle
-              assign blocks = page_section.blocks.value
-              if blocks == blank
-                assign blocks = page_section.blocks
-              endif
-            %}
-            <section id="{{ section_id }}" class="content-section" data-section-id="{{ section_id }}">
-              {% for block in blocks %}
-                {% render 'render-block', block: block %}
-              {% endfor %}
-            </section>
-          {% endfor %}
+          {% render 'render-page-section', section_id: 'section-about', blocks: about_blocks %}
+          {% render 'render-page-section', section_id: 'section-scent', blocks: scent_blocks %}
+          {% render 'render-page-section', section_id: 'section-process', blocks: process_blocks %}
+          {% render 'render-page-section', section_id: 'section-studio', blocks: studio_blocks %}
 
-          {% render 'contact-section', homepage_content: homepage_content %}
+          {% liquid
+            assign contact_heading = section.settings.contact_heading | default: homepage_content.contact_form_heading.value | default: homepage_content.contact_form_heading | default: 'Request & Purchase'
+            assign contact_body = section.settings.contact_body
+            assign contact_body_from_setting = false
+            if contact_body != blank
+              assign contact_body_from_setting = true
+            endif
+            if contact_body == blank
+              assign contact_body = homepage_content.contact_body
+            endif
+            assign contact_image = section.settings.contact_image
+            if contact_image == blank
+              assign contact_image = homepage_content.contact_image.value | default: homepage_content.contact_image
+            endif
+          %}
+          {% render 'contact-section', contact_heading: contact_heading, contact_body: contact_body, contact_body_from_setting: contact_body_from_setting, contact_image: contact_image %}
         </div>
       </div>
     </div>
@@ -129,7 +163,52 @@
 {% schema %}
 {
   "name": "Homepage Content",
-  "settings": [],
+  "settings": [
+    {
+      "type": "metaobject_list",
+      "id": "about_blocks",
+      "label": "About blocks",
+      "metaobject_type": "content_block",
+      "limit": 50
+    },
+    {
+      "type": "metaobject_list",
+      "id": "scent_blocks",
+      "label": "Scent blocks",
+      "metaobject_type": "content_block",
+      "limit": 50
+    },
+    {
+      "type": "metaobject_list",
+      "id": "process_blocks",
+      "label": "Process blocks",
+      "metaobject_type": "content_block",
+      "limit": 50
+    },
+    {
+      "type": "metaobject_list",
+      "id": "studio_blocks",
+      "label": "Studio blocks",
+      "metaobject_type": "content_block",
+      "limit": 50
+    },
+    {
+      "type": "text",
+      "id": "contact_heading",
+      "label": "Contact heading",
+      "default": "Request & Purchase"
+    },
+    {
+      "type": "richtext",
+      "id": "contact_body",
+      "label": "Contact body"
+    },
+    {
+      "type": "image_picker",
+      "id": "contact_image",
+      "label": "Contact image"
+    }
+  ],
   "presets": [
     {
       "name": "Homepage Content"

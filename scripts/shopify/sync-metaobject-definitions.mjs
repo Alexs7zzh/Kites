@@ -1,6 +1,7 @@
 import {
   assertNoUserErrors,
   fetchShopifyAdmin,
+  jsonFieldValue,
   SHOPIFY_METAOBJECT_ACCESS,
   writeReport,
 } from './lib/shared.mjs'
@@ -63,7 +64,9 @@ const BASE_DEFINITIONS = [
   {
     name: 'Content block',
     type: 'content_block',
+    displayNameKey: 'admin_label',
     fieldDefinitions: [
+      {name: 'Admin label', key: 'admin_label', type: 'single_line_text_field', required: true},
       {name: 'Block type', key: 'block_type', type: 'single_line_text_field', required: true},
       {name: 'Body', key: 'body', type: 'rich_text_field', required: false},
       {
@@ -183,6 +186,7 @@ async function upsertDefinition(definition, report) {
       definition: {
         name: definition.name,
         type: definition.type,
+        ...(definition.displayNameKey ? {displayNameKey: definition.displayNameKey} : {}),
         access: SHOPIFY_METAOBJECT_ACCESS,
         capabilities: {publishable: {enabled: true}},
         fieldDefinitions: definition.fieldDefinitions,
@@ -205,6 +209,7 @@ async function upsertDefinition(definition, report) {
     id: existingDefinition.id,
     definition: {
       name: definition.name,
+      ...(definition.displayNameKey ? {displayNameKey: definition.displayNameKey} : {}),
       fieldDefinitions: operations,
     },
   })

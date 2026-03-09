@@ -1,7 +1,5 @@
 {% liquid
-  assign contact_heading = homepage_content.contact_form_heading.value | default: homepage_content.contact_form_heading | default: 'Request & Purchase'
-  assign contact_body = homepage_content.contact_body
-  assign contact_image = homepage_content.contact_image.value | default: homepage_content.contact_image
+  assign contact_heading = contact_heading | default: 'Request & Purchase'
 %}
 
 <section
@@ -13,7 +11,11 @@
     <div class="contact-bio">
       {% if contact_body != blank %}
         <div class="contact-bio-text content-richtext">
-          {{ contact_body | metafield_tag }}
+          {% if contact_body_from_setting %}
+            {{ contact_body }}
+          {% else %}
+            {{ contact_body | metafield_tag }}
+          {% endif %}
         </div>
       {% endif %}
 

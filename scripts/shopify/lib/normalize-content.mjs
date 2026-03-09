@@ -209,10 +209,12 @@ function flushPendingPortableNodes(blocks, pendingPortableNodes, key) {
     return
   }
 
+  const adminLabel = pendingPortableNodes[0]?.__adminLabel ?? `Block ${blocks.length + 1}`
   blocks.push({
     handle: key,
     type: 'content_block',
     fields: {
+      admin_label: adminLabel,
       block_type: 'rich_text',
       body: portableTextNodesToShopifyRichText(pendingPortableNodes.splice(0)),
     },
@@ -249,9 +251,13 @@ export function normalizeSiteContent(siteSettings) {
       const block = asRecord(rawBlock)
       const blockType = nonEmpty(block._type)
       const blockKey = normalizeBlockKey(block._key, `${sectionHandle}-block-${blockIndex + 1}`)
+      const editorIndex = blocks.length + 1
 
       if (blockType === 'block') {
-        pendingPortableNodes.push(block)
+        pendingPortableNodes.push({
+          ...block,
+          __adminLabel: `${navLabel} ${String(editorIndex).padStart(2, '0')} Rich text`,
+        })
         return
       }
 
@@ -261,6 +267,7 @@ export function normalizeSiteContent(siteSettings) {
           handle: `${sectionHandle}-${blockKey}-portable-object`,
           type: 'content_block',
           fields: {
+            admin_label: `${navLabel} ${String(blocks.length + 1).padStart(2, '0')} Rich text`,
             block_type: 'rich_text',
             body: portableTextNodesToShopifyRichText(ensureArray(block.body)),
           },
@@ -275,6 +282,7 @@ export function normalizeSiteContent(siteSettings) {
           handle: `${sectionHandle}-${blockKey}-spacer`,
           type: 'content_block',
           fields: {
+            admin_label: `${navLabel} ${String(blocks.length + 1).padStart(2, '0')} Spacer`,
             block_type: 'spacer',
             level: String(block.level ?? 1),
           },
@@ -293,6 +301,7 @@ export function normalizeSiteContent(siteSettings) {
           handle: `${sectionHandle}-${blockKey}-${blockType === 'pageHalfImageGroupBlock' ? 'half' : 'full'}`,
           type: 'content_block',
           fields: {
+            admin_label: `${navLabel} ${String(blocks.length + 1).padStart(2, '0')} ${blockType === 'pageHalfImageGroupBlock' ? 'Half image group' : 'Full image group'}`,
             block_type: 'image_group',
             layout: blockType === 'pageHalfImageGroupBlock' ? 'half' : 'full',
             images,

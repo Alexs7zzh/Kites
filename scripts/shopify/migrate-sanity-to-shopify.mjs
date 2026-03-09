@@ -239,6 +239,7 @@ function createBlockFieldPayload(block, fileIdsByUrl, blockReferenceIds) {
       .filter(Boolean)
 
     return [
+      toField('admin_label', nonEmpty(block.fields.admin_label)),
       toField('block_type', block.fields.block_type),
       toField('body', block.fields.body ? jsonFieldValue(block.fields.body) : null),
       toField('level', block.fields.level ? String(block.fields.level) : null),
