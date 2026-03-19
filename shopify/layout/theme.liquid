@@ -4,7 +4,42 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>{{ page_title | escape }}</title>
-    <link rel="icon" href="{{ 'favicon.ico' | asset_url }}">
+    {% liquid
+      assign favicon_light_svg_url = ''
+      assign favicon_dark_svg_url = ''
+      assign favicon_png_url = ''
+      assign apple_touch_icon_url = ''
+
+      if settings.favicon_light_svg != blank
+        assign favicon_light_svg_url = settings.favicon_light_svg | image_url: width: 64
+      else
+        assign favicon_light_svg_url = 'favicon-light.svg' | asset_url
+      endif
+
+      if settings.favicon_dark_svg != blank
+        assign favicon_dark_svg_url = settings.favicon_dark_svg | image_url: width: 64
+      else
+        assign favicon_dark_svg_url = favicon_light_svg_url
+      endif
+
+      if settings.favicon_png != blank
+        assign favicon_png_url = settings.favicon_png | image_url: width: 32, height: 32
+      else
+        assign favicon_png_url = 'favicon.ico' | asset_url
+      endif
+
+      if settings.apple_touch_icon != blank
+        assign apple_touch_icon_url = settings.apple_touch_icon | image_url: width: 180, height: 180
+      endif
+    %}
+    <link rel="icon" type="image/svg+xml" sizes="any" href="{{ favicon_light_svg_url }}">
+    <link rel="icon" type="image/svg+xml" sizes="any" media="(prefers-color-scheme: light)" href="{{ favicon_light_svg_url }}">
+    <link rel="icon" type="image/svg+xml" sizes="any" media="(prefers-color-scheme: dark)" href="{{ favicon_dark_svg_url }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ favicon_png_url }}">
+    <link rel="shortcut icon" href="{{ favicon_png_url }}">
+    {% if apple_touch_icon_url != blank %}
+      <link rel="apple-touch-icon" sizes="180x180" href="{{ apple_touch_icon_url }}">
+    {% endif %}
     {{ 'VictorMono-Regular.c6ba95eb.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
     <link rel="stylesheet" href="{{ 'theme.css' | asset_url }}">
 
@@ -131,6 +166,7 @@
           </div>
 
           <div class="left-nav" data-left-nav></div>
+          {% render 'cart-link' %}
 
           <div class="scrollable-text-container" data-scroll-container>
             <div class="page-content-wrapper" data-content-wrapper>
@@ -143,5 +179,7 @@
       {{ content_for_layout }}
     {% endif %}
     <script src="{{ 'magnetic-dango-runtime.js' | asset_url }}" defer></script>
+    <script src="{{ 'add-to-cart-block.js' | asset_url }}" defer></script>
+    <script src="{{ 'cart-link-runtime.js' | asset_url }}" defer></script>
   </body>
 </html>

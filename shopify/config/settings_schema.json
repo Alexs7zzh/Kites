@@ -8,6 +8,38 @@
         "label": "Logo image"
       },
       {
+        "type": "header",
+        "content": "Favicon"
+      },
+      {
+        "type": "paragraph",
+        "content": "Upload separate SVG favicons for light and dark mode. SVGs should be square, include a viewBox, and are typically designed on a 64 x 64 or 512 x 512 artboard."
+      },
+      {
+        "type": "image_picker",
+        "id": "favicon_light_svg",
+        "label": "Light mode SVG favicon",
+        "info": "Upload a square SVG for light mode. If left blank, the theme falls back to assets/favicon-light.svg."
+      },
+      {
+        "type": "image_picker",
+        "id": "favicon_dark_svg",
+        "label": "Dark mode SVG favicon",
+        "info": "Upload a square SVG for dark mode. If left blank, the theme reuses the light mode SVG."
+      },
+      {
+        "type": "image_picker",
+        "id": "favicon_png",
+        "label": "Favicon PNG fallback",
+        "info": "Recommended: square PNG at 32 x 32 px or 48 x 48 px."
+      },
+      {
+        "type": "image_picker",
+        "id": "apple_touch_icon",
+        "label": "Apple touch icon",
+        "info": "Recommended: square PNG at 180 x 180 px."
+      },
+      {
         "type": "image_picker",
         "id": "background_image",
         "label": "Background image"
@@ -29,6 +61,48 @@
         "id": "social_instagram_handle",
         "label": "Instagram handle",
         "info": "Use the handle only, without @."
+      },
+      {
+        "type": "header",
+        "content": "Cart"
+      },
+      {
+        "type": "text",
+        "id": "cart_text_template",
+        "label": "Cart text",
+        "default": "Cart ({count})",
+        "info": "Use {count} where the live cart item count should appear."
+      },
+      {
+        "type": "text",
+        "id": "cart_empty_text",
+        "label": "Empty cart text",
+        "default": "Your cart is empty.",
+        "info": "Leave blank to hide the empty-state text."
+      },
+      {
+        "type": "text",
+        "id": "cart_remove_text",
+        "label": "Remove text",
+        "default": "Remove",
+        "info": "Leave blank to hide the remove action text."
+      },
+      {
+        "type": "text",
+        "id": "cart_checkout_text",
+        "label": "Checkout text",
+        "default": "Checkout",
+        "info": "Leave blank to hide the checkout button."
+      },
+      {
+        "type": "range",
+        "id": "cart_backdrop_blur",
+        "label": "Cart backdrop blur",
+        "min": 0,
+        "max": 24,
+        "step": 1,
+        "unit": "px",
+        "default": 10
       }
     ]
   }

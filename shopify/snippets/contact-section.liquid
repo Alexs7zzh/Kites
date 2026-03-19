@@ -59,7 +59,7 @@
         Message
         <textarea name="contact[body]" rows="4" required>{% if form.body %}{{ form.body | escape }}{% endif %}</textarea>
       </label>
-      <button type="submit">Send</button>
+      <button type="submit" class="theme-button">Send</button>
 
       {% if form.posted_successfully? %}
         <p class="contact-status" data-status="SUCCESS">Thank you!</p>

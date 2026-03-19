@@ -1,0 +1,69 @@
+{% liquid
+  assign selected_product = block.settings.product
+  assign button_label = block.settings.text | strip | default: 'Add to cart'
+  assign alignment = block.settings.alignment | default: 'left'
+%}
+
+{% if selected_product == blank %}
+  {% if request.design_mode %}
+    <div class="content-add-to-cart content-add-to-cart--align-{{ alignment }}">
+      <p class="content-add-to-cart__placeholder">Select a product to enable this add-to-cart button.</p>
+    </div>
+  {% endif %}
+{% else %}
+  {% liquid
+    assign selected_variant = selected_product.first_available_variant | default: selected_product.variants.first
+    assign has_variant_selector = false
+
+    if selected_product.has_only_default_variant != true
+      assign has_variant_selector = true
+    endif
+  %}
+
+  <div class="content-add-to-cart content-add-to-cart--align-{{ alignment }}">
+    <div class="content-add-to-cart__inner" data-add-to-cart-block{% if request.design_mode %} data-theme-editor="true"{% endif %}>
+      {% if has_variant_selector %}
+        <select class="content-add-to-cart__select" data-add-to-cart-variant aria-label="Choose variant">
+          {% for variant in selected_product.variants %}
+            <option
+              value="{{ variant.id }}"
+              {% if variant.id == selected_variant.id %}
+                selected
+              {% endif %}
+            >
+              {{ variant.title }}{% unless variant.available %} - Sold out{% endunless %}
+            </option>
+          {% endfor %}
+        </select>
+      {% elsif selected_variant != blank %}
+        <input type="hidden" value="{{ selected_variant.id }}" data-add-to-cart-variant>
+      {% endif %}
+
+      <button
+        type="button"
+        class="theme-button"
+        data-add-to-cart-submit
+        {% if selected_variant == blank %}
+          disabled
+        {% endif %}
+      >
+        {{ button_label }}
+      </button>
+
+      {% if request.design_mode %}
+        <p
+          class="contact-status"
+          data-add-to-cart-status
+          data-status="ERROR"
+          {% if selected_variant != blank %}
+            hidden
+          {% endif %}
+        >
+          {% if selected_variant == blank %}
+            The selected product does not currently expose a purchasable variant.
+          {% endif %}
+        </p>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}

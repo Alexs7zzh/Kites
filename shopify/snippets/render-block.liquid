@@ -4,6 +4,7 @@
   assign spacing_below = block.settings.spacing_below | default: '1'
   assign spacing_top = '18px'
   assign spacing_bottom = '18px'
+  assign skip_block = false
 
   case spacing_above
     when '2'
@@ -34,17 +35,25 @@
   if block.settings != blank
     assign block_type = block.type
   endif
+
+  if block_type == 'add_to_cart_button' and block.settings.product == blank and request.design_mode != true
+    assign skip_block = true
+  endif
 %}
 
-<div class="content-block content-block--{{ block_type | handleize }}" style="--spacing-top: {{ spacing_top }}; --spacing-bottom: {{ spacing_bottom }};" {{ block.shopify_attributes }}>
-  {% case block_type %}
-    {% when 'rich_text' %}
-      {% render 'portable-text-block', block: block %}
-    {% when 'full_image_group' %}
-      {% render 'image-group-block', block: block, layout: 'full' %}
-    {% when 'half_image_group' %}
-      {% render 'image-group-block', block: block, layout: 'half' %}
-    {% when 'image_group' %}
-      {% render 'image-group-block', block: block, layout: block.layout.value | default: block.layout | default: 'full' %}
-  {% endcase %}
-</div>
+{% unless skip_block %}
+  <div class="content-block content-block--{{ block_type | handleize }}" style="--spacing-top: {{ spacing_top }}; --spacing-bottom: {{ spacing_bottom }};" {{ block.shopify_attributes }}>
+    {% case block_type %}
+      {% when 'rich_text' %}
+        {% render 'portable-text-block', block: block %}
+      {% when 'full_image_group' %}
+        {% render 'image-group-block', block: block, layout: 'full' %}
+      {% when 'half_image_group' %}
+        {% render 'image-group-block', block: block, layout: 'half' %}
+      {% when 'image_group' %}
+        {% render 'image-group-block', block: block, layout: block.layout.value | default: block.layout | default: 'full' %}
+      {% when 'add_to_cart_button' %}
+        {% render 'add-to-cart-block', block: block %}
+    {% endcase %}
+  </div>
+{% endunless %}

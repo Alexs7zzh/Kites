@@ -12,6 +12,8 @@ Run from `/Users/alex/dev/kites`:
 - `pnpm shopify:migrate-content`
 - `pnpm shopify:migrate`
 
+`pnpm shopify:theme:push` ignores `config/settings_data.json` so normal code deploys do not overwrite or delete live theme-editor state.
+
 ## Required environment
 
 Use `/Users/alex/dev/kites/.env.example` as the template for:

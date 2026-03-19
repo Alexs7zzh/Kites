@@ -1,0 +1,46 @@
+{% liquid
+  assign cart_text_template = settings.cart_text_template | strip | default: 'Cart ({count})'
+  assign initial_cart_count = cart.item_count | default: 0
+  assign initial_cart_text = cart_text_template | replace: '{count}', initial_cart_count
+  assign cart_empty_text = settings.cart_empty_text | strip
+  assign cart_remove_text = settings.cart_remove_text | strip
+  assign cart_checkout_text = settings.cart_checkout_text | strip
+  assign cart_backdrop_blur = settings.cart_backdrop_blur | default: 10
+%}
+
+<button
+  type="button"
+  class="floating-cart-link"
+  data-cart-link
+  data-cart-text-template="{{ cart_text_template | escape }}"
+  data-cart-empty-text="{{ cart_empty_text | escape }}"
+  data-cart-remove-text="{{ cart_remove_text | escape }}"
+  data-cart-checkout-text="{{ cart_checkout_text | escape }}"
+  aria-label="{{ initial_cart_text | escape }}"
+>
+  <span data-cart-link-text>{{ initial_cart_text }}</span>
+</button>
+
+<aside class="cart-drawer" data-cart-drawer aria-hidden="true" style="--cart-backdrop-blur: {{ cart_backdrop_blur }}px;">
+  <button type="button" class="cart-drawer__overlay" data-cart-drawer-overlay aria-label="Close cart"></button>
+
+  <div class="cart-drawer__panel" role="dialog" aria-modal="true" aria-labelledby="cart-drawer-title">
+    <div class="cart-drawer__inner">
+      <div class="cart-drawer__header">
+        <p id="cart-drawer-title" class="cart-drawer__title" data-cart-drawer-title>{{ initial_cart_text }}</p>
+        <button type="button" class="cart-drawer__close" data-cart-drawer-close aria-label="Close cart">+</button>
+      </div>
+
+      <div class="cart-drawer__body">
+        <div class="cart-drawer__items" data-cart-drawer-items></div>
+        <p class="cart-drawer__empty" data-cart-drawer-empty hidden>{{ cart_empty_text }}</p>
+      </div>
+
+      {% if cart_checkout_text != blank %}
+        <div class="cart-drawer__footer">
+          <a href="{{ routes.root_url }}checkout" class="cart-drawer__checkout" data-cart-drawer-checkout>{{ cart_checkout_text }}</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</aside>

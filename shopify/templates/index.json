@@ -1,22 +1,35 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "content_section_01": {
       "type": "content-section",
-      "settings": {
-        "section_label": "ABOUT"
-      },
       "blocks": {
         "about-half-image-group-01": {
           "type": "half_image_group",
           "settings": {
             "image_1": "shopify://shop_images/001-asset.png",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
             "spacing_below": "2"
+          }
+        },
+        "add_to_cart_button_zrYBTG": {
+          "type": "add_to_cart_button",
+          "settings": {
+            "product": "test-product-1",
+            "text": "Add to cart",
+            "alignment": "right",
+            "spacing_above": "1",
+            "spacing_below": "1"
           }
         },
         "about-rich-text-02": {
@@ -31,11 +44,6 @@
           "type": "full_image_group",
           "settings": {
             "image_1": "shopify://shop_images/002-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
-            "caption_title": "",
-            "caption_body": "",
             "spacing_above": "1",
             "spacing_below": "2"
           }
@@ -51,26 +59,22 @@
       },
       "block_order": [
         "about-half-image-group-01",
+        "add_to_cart_button_zrYBTG",
         "about-rich-text-02",
         "about-full-image-group-03",
         "about-rich-text-04"
-      ]
+      ],
+      "settings": {
+        "section_label": "ABOUT"
+      }
     },
     "content_section_02": {
       "type": "content-section",
-      "settings": {
-        "section_label": "SCENT"
-      },
       "blocks": {
         "scent-full-image-group-01": {
           "type": "full_image_group",
           "settings": {
             "image_1": "shopify://shop_images/003-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
-            "caption_title": "",
-            "caption_body": "",
             "spacing_above": "1",
             "spacing_below": "2"
           }
@@ -88,10 +92,6 @@
           "settings": {
             "image_1": "shopify://shop_images/004-asset.jpg",
             "image_2": "shopify://shop_images/005-asset.jpg",
-            "image_3": "",
-            "image_4": "",
-            "caption_title": "",
-            "caption_body": "",
             "spacing_above": "1",
             "spacing_below": "1"
           }
@@ -101,13 +101,13 @@
         "scent-full-image-group-01",
         "scent-rich-text-02",
         "scent-full-image-group-03"
-      ]
+      ],
+      "settings": {
+        "section_label": "SCENT"
+      }
     },
     "content_section_03": {
       "type": "content-section",
-      "settings": {
-        "section_label": "PROCESS"
-      },
       "blocks": {
         "process-rich-text-01": {
           "type": "rich_text",
@@ -121,9 +121,6 @@
           "type": "half_image_group",
           "settings": {
             "image_1": "shopify://shop_images/006-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
@@ -134,9 +131,6 @@
           "type": "half_image_group",
           "settings": {
             "image_1": "shopify://shop_images/007-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
@@ -147,9 +141,6 @@
           "type": "half_image_group",
           "settings": {
             "image_1": "shopify://shop_images/008-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
@@ -162,13 +153,13 @@
         "process-half-image-group-02",
         "process-half-image-group-03",
         "process-half-image-group-04"
-      ]
+      ],
+      "settings": {
+        "section_label": "PROCESS"
+      }
     },
     "content_section_04": {
       "type": "content-section",
-      "settings": {
-        "section_label": "STUDIO"
-      },
       "blocks": {
         "studio-full-image-group-01": {
           "type": "full_image_group",
@@ -176,9 +167,6 @@
             "image_1": "shopify://shop_images/009-asset.jpg",
             "image_2": "shopify://shop_images/010-asset.jpg",
             "image_3": "shopify://shop_images/011-asset.jpg",
-            "image_4": "",
-            "caption_title": "",
-            "caption_body": "",
             "spacing_above": "1",
             "spacing_below": "1"
           }
@@ -195,9 +183,6 @@
           "type": "half_image_group",
           "settings": {
             "image_1": "shopify://shop_images/012-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
@@ -208,9 +193,6 @@
           "type": "half_image_group",
           "settings": {
             "image_1": "shopify://shop_images/013-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
             "caption_title": "Helium Burning, 2023",
             "caption_body": "glass, helium, krypton, metal, scent\n\nMuseum of Modern Art Warsaw & Pulchri Studio, The Hague",
             "spacing_above": "1",
@@ -221,9 +203,6 @@
           "type": "half_image_group",
           "settings": {
             "image_1": "shopify://shop_images/014-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
             "caption_title": "",
             "caption_body": "Museum of Modern Art Warsaw & Pulchri Studio, The Hague",
             "spacing_above": "1",
@@ -242,9 +221,6 @@
           "type": "half_image_group",
           "settings": {
             "image_1": "shopify://shop_images/015-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
             "caption_title": "Grass Render, 2023",
             "caption_body": "Glass, krypton, argon, PLA, scent. with Clara Schweers\n\nDutch Design Week, Eindhoven & Die Frappant gallery, Hamburg",
             "spacing_above": "1",
@@ -263,9 +239,6 @@
           "type": "half_image_group",
           "settings": {
             "image_1": "shopify://shop_images/016-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
             "caption_title": "Subsurface, 2025",
             "caption_body": "glass, xenon, neon, argon, electrodes. with Clara Schweers\n\nGallery “apiece”, Vilnius & Klaipeda Biennial, KCCC",
             "spacing_above": "1",
@@ -284,9 +257,6 @@
           "type": "half_image_group",
           "settings": {
             "image_1": "shopify://shop_images/017-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
             "caption_title": "Satellites, 2025",
             "caption_body": "with Jake Scott NOAA 19. weather satellite data direct downlink at 137.100 MHz",
             "spacing_above": "1",
@@ -368,9 +338,6 @@
           "type": "half_image_group",
           "settings": {
             "image_1": "shopify://shop_images/029-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
             "caption_title": "Sun’s surface, 2023",
             "caption_body": "3D video, LCD screen, convex glass lens, stainless steel. with Jurgis Lietunovas\n\nMilan Design Week & Observatory of Ideas, Vilnius",
             "spacing_above": "1",
@@ -381,9 +348,6 @@
           "type": "half_image_group",
           "settings": {
             "image_1": "shopify://shop_images/030-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
@@ -394,9 +358,6 @@
           "type": "half_image_group",
           "settings": {
             "image_1": "shopify://shop_images/031-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
@@ -407,9 +368,6 @@
           "type": "half_image_group",
           "settings": {
             "image_1": "shopify://shop_images/032-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
@@ -420,9 +378,6 @@
           "type": "half_image_group",
           "settings": {
             "image_1": "shopify://shop_images/033-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
@@ -433,9 +388,6 @@
           "type": "half_image_group",
           "settings": {
             "image_1": "shopify://shop_images/034-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
@@ -446,9 +398,6 @@
           "type": "half_image_group",
           "settings": {
             "image_1": "shopify://shop_images/035-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
@@ -459,9 +408,6 @@
           "type": "half_image_group",
           "settings": {
             "image_1": "shopify://shop_images/036-asset.jpg",
-            "image_2": "",
-            "image_3": "",
-            "image_4": "",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
@@ -496,7 +442,10 @@
         "studio-half-image-group-24",
         "studio-half-image-group-25",
         "studio-half-image-group-26"
-      ]
+      ],
+      "settings": {
+        "section_label": "STUDIO"
+      }
     },
     "contact": {
       "type": "contact-panel",
