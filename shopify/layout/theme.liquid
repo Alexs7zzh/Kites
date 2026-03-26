@@ -104,6 +104,15 @@
       }
     </script>
   </head>
+  {% liquid
+    assign cart_feature_expiry_ts = '2026-04-15 00:00:00 +0900' | date: '%s' | plus: 0
+    assign now_ts = 'now' | date: '%s' | plus: 0
+    assign cart_feature_enabled = false
+
+    if now_ts < cart_feature_expiry_ts
+      assign cart_feature_enabled = true
+    endif
+  %}
   <body class="template-{{ template.name | handle }}">
     {% if template.name == 'index' %}
       {% liquid
@@ -166,7 +175,9 @@
           </div>
 
           <div class="left-nav" data-left-nav></div>
-          {% render 'cart-link' %}
+          {% if cart_feature_enabled %}
+            {% render 'cart-link' %}
+          {% endif %}
 
           <div class="scrollable-text-container" data-scroll-container>
             <div class="page-content-wrapper" data-content-wrapper>
@@ -179,7 +190,9 @@
       {{ content_for_layout }}
     {% endif %}
     <script src="{{ 'magnetic-dango-runtime.js' | asset_url }}" defer></script>
-    <script src="{{ 'add-to-cart-block.js' | asset_url }}" defer></script>
-    <script src="{{ 'cart-link-runtime.js' | asset_url }}" defer></script>
+    {% if cart_feature_enabled %}
+      <script src="{{ 'add-to-cart-block.js' | asset_url }}" defer></script>
+      <script src="{{ 'cart-link-runtime.js' | asset_url }}" defer></script>
+    {% endif %}
   </body>
 </html>

@@ -14,19 +14,34 @@
   {% liquid
     assign selected_variant = selected_product.first_available_variant | default: selected_product.variants.first
     assign has_variant_selector = false
+    assign available_variant_count = 0
 
     if selected_product.has_only_default_variant != true
       assign has_variant_selector = true
     endif
+
+    for variant in selected_product.variants
+      if variant.available
+        assign available_variant_count = available_variant_count | plus: 1
+      endif
+    endfor
   %}
 
   <div class="content-add-to-cart content-add-to-cart--align-{{ alignment }}">
-    <div class="content-add-to-cart__inner" data-add-to-cart-block{% if request.design_mode %} data-theme-editor="true"{% endif %}>
+    <div
+      class="content-add-to-cart__inner"
+      data-add-to-cart-block
+      data-add-to-cart-product-handle="{{ selected_product.handle | escape }}"
+      {% if request.design_mode %}
+        data-theme-editor="true"
+      {% endif %}
+    >
       {% if has_variant_selector %}
         <select class="content-add-to-cart__select" data-add-to-cart-variant aria-label="Choose variant">
           {% for variant in selected_product.variants %}
             <option
               value="{{ variant.id }}"
+              data-available="{{ variant.available }}"
               {% if variant.id == selected_variant.id %}
                 selected
               {% endif %}
@@ -36,14 +51,14 @@
           {% endfor %}
         </select>
       {% elsif selected_variant != blank %}
-        <input type="hidden" value="{{ selected_variant.id }}" data-add-to-cart-variant>
+        <input type="hidden" value="{{ selected_variant.id }}" data-add-to-cart-variant data-available="{{ selected_variant.available }}">
       {% endif %}
 
       <button
         type="button"
         class="theme-button"
         data-add-to-cart-submit
-        {% if selected_variant == blank %}
+        {% if selected_variant == blank or selected_variant.available != true %}
           disabled
         {% endif %}
       >
@@ -55,12 +70,14 @@
           class="contact-status"
           data-add-to-cart-status
           data-status="ERROR"
-          {% if selected_variant != blank %}
+          {% if selected_variant != blank and selected_variant.available == true %}
             hidden
           {% endif %}
         >
           {% if selected_variant == blank %}
             The selected product does not currently expose a purchasable variant.
+          {% elsif selected_variant.available != true %}
+            Product "{{ selected_product.title | default: selected_product.handle }}" currently has no purchasable Online Store variant. Check product status, Online Store publication, inventory, and "Continue selling when out of stock". Available variants detected: {{ available_variant_count }}.
           {% endif %}
         </p>
       {% endif %}

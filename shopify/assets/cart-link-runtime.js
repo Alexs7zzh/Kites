@@ -1,4 +1,21 @@
 (function () {
+  const debugEnabled = window.location.search.indexOf('cartDebug=1') !== -1;
+  const refreshDelays = [0, 250, 750, 1500];
+  let pendingRefreshTimers = [];
+
+  function logDebug(message, payload) {
+    if (!debugEnabled || !window.console) {
+      return;
+    }
+
+    if (typeof payload === 'undefined') {
+      console.log('[Kites cart] ' + message);
+      return;
+    }
+
+    console.log('[Kites cart] ' + message, payload);
+  }
+
   function renderCartText(template, count) {
     const normalizedTemplate = template && template.length > 0 ? template : 'Cart ({count})';
 
@@ -171,34 +188,61 @@
     });
 
     if (!response.ok) {
+      logDebug('cart.js request failed', { status: response.status, statusText: response.statusText });
       throw new Error('Failed to load cart state.');
     }
 
-    return response.json();
+    const cart = await response.json();
+    logDebug('cart.js payload received', {
+      itemCount: cart && cart.item_count,
+      itemKeys: cart && Array.isArray(cart.items) ? cart.items.map(function (item) {
+        return item.key;
+      }) : []
+    });
+    return cart;
   }
 
   async function refreshCart() {
     try {
       const cart = await fetchCart();
+      window.KitesCart = window.KitesCart || {};
+      window.KitesCart.lastState = cart;
       renderCart(cart);
+      document.dispatchEvent(new CustomEvent('cart:state-changed', { detail: cart }));
     } catch (error) {
+      logDebug('cart refresh failed', error instanceof Error ? error.message : error);
       // Keep the current UI if cart refresh fails.
     }
   }
 
-  let pendingTimeout = null;
+  function clearScheduledRefreshes() {
+    pendingRefreshTimers.forEach(function (timerId) {
+      window.clearTimeout(timerId);
+    });
+    pendingRefreshTimers = [];
+  }
 
-  function scheduleRefresh() {
-    refreshCart();
+  function scheduleRefresh(options) {
+    const source = options && options.source ? options.source : 'unknown';
 
-    if (pendingTimeout !== null) {
-      window.clearTimeout(pendingTimeout);
-    }
+    clearScheduledRefreshes();
+    logDebug('scheduling cart refreshes', { source: source, delays: refreshDelays });
 
-    pendingTimeout = window.setTimeout(function () {
-      refreshCart();
-      pendingTimeout = null;
-    }, 300);
+    refreshDelays.forEach(function (delay) {
+      if (delay === 0) {
+        refreshCart();
+        return;
+      }
+
+      const timerId = window.setTimeout(function () {
+        refreshCart();
+        pendingRefreshTimers = pendingRefreshTimers.filter(function (activeTimerId) {
+          return activeTimerId !== timerId;
+        });
+      }, delay);
+
+      pendingRefreshTimers.push(timerId);
+    });
   }
 
   async function changeCartItemQuantity(key, quantity) {
@@ -277,7 +321,7 @@
     const drawer = getDrawer();
 
     if (!link || !drawer || link.dataset.cartReady === 'true') {
-      refreshCart();
+      scheduleRefresh({ source: 'init-repeat' });
       return;
     }
 
@@ -291,7 +335,7 @@
       setDrawerOpen(nextOpenState);
 
       if (nextOpenState) {
-        refreshCart();
+        scheduleRefresh({ source: 'drawer-open' });
       }
     });
 
@@ -326,11 +370,19 @@
     });
 
     link.dataset.cartReady = 'true';
-    refreshCart();
+    scheduleRefresh({ source: 'init' });
   }
 
-  document.addEventListener('cart:refresh-request', scheduleRefresh);
-  window.addEventListener('pageshow', refreshCart);
+  window.KitesCart = window.KitesCart || {};
+  window.KitesCart.refresh = scheduleRefresh;
+  window.KitesCart.refreshNow = refreshCart;
+
+  document.addEventListener('cart:refresh-request', function () {
+    scheduleRefresh({ source: 'event' });
+  });
+  window.addEventListener('pageshow', function () {
+    scheduleRefresh({ source: 'pageshow' });
+  });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initCartDrawer);
