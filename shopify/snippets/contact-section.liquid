@@ -1,11 +1,14 @@
 {% liquid
   assign contact_heading = contact_heading | default: 'Request & Purchase'
+  assign desktop_image_offset_right = desktop_image_offset_right | default: 24
+  assign desktop_text_max_width = desktop_text_max_width | default: 320
 %}
 
 <section
   id="section-contact"
   class="content-section content-section--contact"
   data-section-id="section-contact"
+  style="--contact-desktop-image-offset-right: {{ desktop_image_offset_right }}px; --contact-desktop-text-width: {{ desktop_text_max_width }}px;"
 >
   {% if contact_body != blank or contact_image != blank %}
     <div class="contact-bio">

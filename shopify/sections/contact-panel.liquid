@@ -1,5 +1,7 @@
 {% liquid
   assign form_heading = section.settings.form_heading | default: 'Request & Purchase'
+  assign desktop_image_offset_right = section.settings.desktop_image_offset_right | default: 24
+  assign desktop_text_max_width = section.settings.desktop_text_max_width | default: 320
 %}
 
 <section
@@ -8,7 +10,14 @@
   data-section-id="section-contact"
   data-nav-label="CONTACT"
 >
-  {% render 'contact-section', contact_heading: form_heading, contact_body: section.settings.contact_body, contact_body_from_setting: true, contact_image: section.settings.contact_image %}
+  {% render 'contact-section',
+    contact_heading: form_heading,
+    contact_body: section.settings.contact_body,
+    contact_body_from_setting: true,
+    contact_image: section.settings.contact_image,
+    desktop_image_offset_right: desktop_image_offset_right,
+    desktop_text_max_width: desktop_text_max_width
+  %}
 </section>
 
 {% schema %}
@@ -25,6 +34,26 @@
       "type": "image_picker",
       "id": "contact_image",
       "label": "Contact image"
+    },
+    {
+      "type": "range",
+      "id": "desktop_image_offset_right",
+      "label": "Desktop image offset right",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "desktop_text_max_width",
+      "label": "Desktop text max width",
+      "min": 280,
+      "max": 340,
+      "step": 4,
+      "unit": "px",
+      "default": 320
     },
     {
       "type": "text",

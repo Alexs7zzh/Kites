@@ -942,3 +942,25 @@ img {
     max-width: 100%;
   }
 }
+
+@media (min-width: 1000px) {
+  .contact-bio {
+    transform: translateX(var(--contact-desktop-image-offset-right, 0px));
+    transform-origin: right center;
+  }
+
+  .contact-bio-image {
+    flex: 0 0 300px;
+    width: 300px;
+    min-width: 300px;
+    max-width: 300px;
+    margin-right: calc((100% - 400px) / 2);
+  }
+
+  .contact-bio-text {
+    flex-basis: var(--contact-desktop-text-width, 320px);
+    width: var(--contact-desktop-text-width, 320px);
+    min-width: var(--contact-desktop-text-width, 320px);
+    max-width: var(--contact-desktop-text-width, 320px);
+  }
+}
