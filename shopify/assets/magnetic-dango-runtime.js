@@ -28,7 +28,7 @@ const RIGHT_DECORATIVE_LINE_X_START_PERCENT = 0.9;
 const DECORATIVE_LINE_OFFSET_Y = -10;
 const DECORATIVE_LINE_OFFSET_START_PERCENT = 0;
 const DECORATIVE_MIN_DOT_SPACING = 6.0;
-const MOBILE_LOGO_Y_START = 20;
+const MOBILE_LOGO_Y_START = 44;
 const LEFT_ELEMENT_Y_POSITIONS_PERCENT = [0.75, 0.7, 0.8, 0.96, 0.85, 0.72, 0.9, 0.95];
 const LEFT_BUTTON_INDICES = [0, 2, 4, 6, 7];
 const LOGO_Y_OFFSET = 250;
@@ -175,16 +175,14 @@ function createDotPath(svg, key, x, y, index) {
 function initMagneticShell(root) {
     const svgNode = root.querySelector('[data-magnetic-svg]');
     const metaballPathNode = root.querySelector('[data-metaball-path]');
-    const scrollContainerNode = root.querySelector('[data-scroll-container]');
     const contentWrapperNode = root.querySelector('[data-content-wrapper]');
     const logoNode = root.querySelector('[data-site-logo]');
     const leftNavNode = root.querySelector('[data-left-nav]');
-    if (!svgNode || !metaballPathNode || !scrollContainerNode || !contentWrapperNode || !logoNode || !leftNavNode) {
+    if (!svgNode || !metaballPathNode || !contentWrapperNode || !logoNode || !leftNavNode) {
         return;
     }
     const svgElement = svgNode;
     const metaballPathElement = metaballPathNode;
-    const scrollContainerElement = scrollContainerNode;
     const contentWrapperElement = contentWrapperNode;
     const logoElementNode = logoNode;
     const leftNavElement = leftNavNode;
@@ -252,7 +250,8 @@ function initMagneticShell(root) {
         }
     }
     function calculateAnimationMaxScroll() {
-        const maxScroll = Math.max(0, contentWrapperElement.scrollHeight - scrollContainerElement.clientHeight);
+        const documentHeight = document.documentElement.scrollHeight;
+        const maxScroll = Math.max(0, documentHeight - windowHeight);
         animationMaxScroll = maxScroll;
     }
     function resetDots() {
@@ -394,7 +393,7 @@ function initMagneticShell(root) {
         calculateAnimationMaxScroll();
     }
     function updateActiveSection(scrollTopValue) {
-        const scrollOffset = scrollTopValue + scrollContainerElement.clientHeight * 0.3;
+        const scrollOffset = scrollTopValue + windowHeight * 0.3;
         let currentLabel = labels[0] || '';
         for (const button of navButtons) {
             const sectionTarget = button.dataset.sectionTarget;
@@ -402,7 +401,8 @@ function initMagneticShell(root) {
                 continue;
             }
             const section = sectionById.get(sectionTarget);
-            if (section && section.offsetTop <= scrollOffset) {
+            const sectionTop = section ? section.getBoundingClientRect().top + scrollTopValue : Number.POSITIVE_INFINITY;
+            if (sectionTop <= scrollOffset) {
                 currentLabel = button.textContent?.trim() || currentLabel;
             }
         }
@@ -547,9 +547,8 @@ function initMagneticShell(root) {
         metaballPathElement.setAttribute('d', allMetaballsPath);
         frameHandle = window.requestAnimationFrame(onFrame);
     }
-    function handleScroll(event) {
-        const target = event.target;
-        scrollTop = target.scrollTop;
+    function handleScroll() {
+        scrollTop = window.scrollY || window.pageYOffset || 0;
         updateActiveSection(scrollTop);
     }
     navButtons.forEach((button) => {
@@ -565,12 +564,12 @@ function initMagneticShell(root) {
             section.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
     });
-    scrollContainerElement.addEventListener('scroll', handleScroll);
     const resizeObserver = new ResizeObserver(calculateAnimationMaxScroll);
     resizeObserver.observe(contentWrapperElement);
     calculateLayout();
     setActiveNav(activeSection);
-    updateActiveSection(scrollContainerElement.scrollTop);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', calculateLayout);
     frameHandle = window.requestAnimationFrame(onFrame);
     root.dataset.magneticInitialized = 'true';
@@ -579,7 +578,7 @@ function initMagneticShell(root) {
             window.cancelAnimationFrame(frameHandle);
         }
         resizeObserver.disconnect();
-        scrollContainerElement.removeEventListener('scroll', handleScroll);
+        window.removeEventListener('scroll', handleScroll);
         window.removeEventListener('resize', calculateLayout);
     });
 }

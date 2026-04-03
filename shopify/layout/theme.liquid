@@ -2,7 +2,7 @@
 <html lang="{{ request.locale.iso_code | default: 'en' }}">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <title>{{ page_title | escape }}</title>
     {% liquid
       assign favicon_light_svg_url = ''
@@ -179,10 +179,8 @@
             {% render 'cart-link' %}
           {% endif %}
 
-          <div class="scrollable-text-container" data-scroll-container>
-            <div class="page-content-wrapper" data-content-wrapper>
-              {{ content_for_layout }}
-            </div>
+          <div class="page-content-wrapper" data-content-wrapper>
+            {{ content_for_layout }}
           </div>
         </div>
       </div>
