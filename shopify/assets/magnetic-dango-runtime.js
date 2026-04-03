@@ -30,6 +30,7 @@ const DECORATIVE_LINE_OFFSET_START_PERCENT = 0;
 const DECORATIVE_MIN_DOT_SPACING = 6.0;
 const MOBILE_LOGO_Y_START = 44;
 const LEFT_ELEMENT_Y_POSITIONS_PERCENT = [0.75, 0.7, 0.8, 0.96, 0.85, 0.72, 0.9, 0.95];
+const MOBILE_LEFT_ELEMENT_BOTTOM_OFFSETS = [210, 252, 168, 34, 126, 236, 84, 42];
 const LEFT_BUTTON_INDICES = [0, 2, 4, 6, 7];
 const LOGO_Y_OFFSET = 250;
 const DECORATIVE_LINE_Y_POSITIONS_PERCENT = [
@@ -242,6 +243,31 @@ function initMagneticShell(root) {
     let dotYPositions = [];
     let draggedYPositions = [];
     let frameHandle = null;
+    let viewportOffsetTop = 0;
+    let viewportOffsetLeft = 0;
+    let viewportLayoutFrame = null;
+    const visualViewport = window.visualViewport;
+    function getViewportMetrics() {
+        if (!visualViewport) {
+            return {
+                width: window.innerWidth,
+                height: window.innerHeight,
+                offsetTop: 0,
+                offsetLeft: 0,
+            };
+        }
+        return {
+            width: Math.round(visualViewport.width),
+            height: Math.round(visualViewport.height),
+            offsetTop: Math.round(visualViewport.offsetTop),
+            offsetLeft: Math.round(visualViewport.offsetLeft),
+        };
+    }
+    function updateViewportChrome() {
+        leftNavElement.style.top = `${viewportOffsetTop}px`;
+        leftNavElement.style.left = `${viewportOffsetLeft}px`;
+        leftNavElement.style.height = `${windowHeight}px`;
+    }
     function setActiveNav(label) {
         activeSection = label;
         for (const button of navButtons) {
@@ -297,7 +323,9 @@ function initMagneticShell(root) {
         const leftElementXStart = navXPosition;
         const leftDecoLineEndX = navXPosition + 120;
         LEFT_ELEMENT_Y_POSITIONS_PERCENT.forEach((percent, index) => {
-            const y = windowHeight * percent;
+            const y = isMobile
+                ? windowHeight - (MOBILE_LEFT_ELEMENT_BOTTOM_OFFSETS[index] ?? 0)
+                : windowHeight * percent;
             const buttonIndex = LEFT_BUTTON_INDICES.indexOf(index);
             if (buttonIndex !== -1 && buttonIndex < navButtons.length) {
                 const underlineStartX = 0;
@@ -321,10 +349,16 @@ function initMagneticShell(root) {
             });
         });
         if (navButtons.length > LEFT_BUTTON_INDICES.length) {
-            const extraStart = windowHeight * 0.6;
-            const extraStep = Math.max(24, (windowHeight * 0.35) / navButtons.length);
+            const extraStart = isMobile
+                ? windowHeight - MOBILE_LEFT_ELEMENT_BOTTOM_OFFSETS[MOBILE_LEFT_ELEMENT_BOTTOM_OFFSETS.length - 1]
+                : windowHeight * 0.6;
+            const extraStep = isMobile
+                ? 42
+                : Math.max(24, (windowHeight * 0.35) / navButtons.length);
             for (let index = LEFT_BUTTON_INDICES.length; index < navButtons.length; index += 1) {
-                const y = extraStart + extraStep * (index - LEFT_BUTTON_INDICES.length);
+                const y = isMobile
+                    ? extraStart - extraStep * (index - LEFT_BUTTON_INDICES.length + 1)
+                    : extraStart + extraStep * (index - LEFT_BUTTON_INDICES.length);
                 elements.push({
                     key: `left-button-extra-${index}`,
                     type: 'button',
@@ -338,6 +372,7 @@ function initMagneticShell(root) {
         return elements;
     }
     function updateNavLayout() {
+        logoElementNode.classList.toggle('is-mobile', isMobile);
         let buttonCounter = 0;
         leftElements.forEach((element) => {
             if (element.type !== 'button') {
@@ -353,8 +388,8 @@ function initMagneticShell(root) {
             button.style.transform = 'translateY(-50%)';
         });
         if (isMobile) {
-            logoElementNode.style.top = `${MOBILE_LOGO_Y_START}px`;
-            logoElementNode.style.left = `${MOBILE_NAV_LOGO_X_POSITION}px`;
+            logoElementNode.style.top = `${viewportOffsetTop + MOBILE_LOGO_Y_START}px`;
+            logoElementNode.style.left = `${viewportOffsetLeft + MOBILE_NAV_LOGO_X_POSITION}px`;
             logoElementNode.style.width = '80px';
             logoElementNode.style.opacity = '1';
             return;
@@ -369,9 +404,13 @@ function initMagneticShell(root) {
         logoElementNode.style.opacity = '1';
     }
     function calculateLayout() {
-        windowWidth = window.innerWidth;
-        windowHeight = window.innerHeight;
+        const viewportMetrics = getViewportMetrics();
+        windowWidth = viewportMetrics.width;
+        windowHeight = viewportMetrics.height;
+        viewportOffsetTop = viewportMetrics.offsetTop;
+        viewportOffsetLeft = viewportMetrics.offsetLeft;
         isMobile = windowWidth < 770;
+        updateViewportChrome();
         svgElement.setAttribute('viewBox', `0 0 ${windowWidth} ${windowHeight}`);
         anchorYPositions = DECORATIVE_LINE_Y_POSITIONS_PERCENT.slice(0, LINE_COUNT).map((percent) => windowHeight * percent);
         decorativeLineYPixels = DECORATIVE_LINE_Y_POSITIONS_PERCENT.map((percent) => windowHeight * percent);
@@ -391,6 +430,15 @@ function initMagneticShell(root) {
         resetDots();
         renderDecorativeDots();
         calculateAnimationMaxScroll();
+    }
+    function scheduleViewportLayout() {
+        if (viewportLayoutFrame !== null) {
+            return;
+        }
+        viewportLayoutFrame = window.requestAnimationFrame(() => {
+            viewportLayoutFrame = null;
+            calculateLayout();
+        });
     }
     function updateActiveSection(scrollTopValue) {
         const scrollOffset = scrollTopValue + windowHeight * 0.3;
@@ -571,15 +619,24 @@ function initMagneticShell(root) {
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', calculateLayout);
+    if (visualViewport) {
+        visualViewport.addEventListener('resize', scheduleViewportLayout);
+    }
     frameHandle = window.requestAnimationFrame(onFrame);
     root.dataset.magneticInitialized = 'true';
     window.addEventListener('beforeunload', () => {
         if (frameHandle !== null) {
             window.cancelAnimationFrame(frameHandle);
         }
+        if (viewportLayoutFrame !== null) {
+            window.cancelAnimationFrame(viewportLayoutFrame);
+        }
         resizeObserver.disconnect();
         window.removeEventListener('scroll', handleScroll);
         window.removeEventListener('resize', calculateLayout);
+        if (visualViewport) {
+            visualViewport.removeEventListener('resize', scheduleViewportLayout);
+        }
     });
 }
 function bootMagneticRuntime() {
