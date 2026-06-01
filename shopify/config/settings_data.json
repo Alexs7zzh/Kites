@@ -1,0 +1,20 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "current": {
+    "logo_image": "shopify://shop_images/Kites-Logo.svg",
+    "favicon_light_svg": "shopify://shop_images/favicon_black.svg",
+    "favicon_dark_svg": "shopify://shop_images/favicon_white.svg",
+    "favicon_png": "shopify://shop_images/favicon-32x32.png",
+    "apple_touch_icon": "shopify://shop_images/favicon-180x180.png",
+    "background_image": "shopify://shop_images/2025-08-05-Background.jpg",
+    "content_for_index": []
+  }
+}

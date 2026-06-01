@@ -22,28 +22,18 @@
             "spacing_below": "2"
           }
         },
-        "add_to_cart_button_zrYBTG": {
-          "type": "add_to_cart_button",
-          "settings": {
-            "product": "test-product-1",
-            "text": "Add to cart",
-            "alignment": "right",
-            "spacing_above": "1",
-            "spacing_below": "1"
-          }
-        },
         "about-rich-text-02": {
           "type": "rich_text",
           "settings": {
             "body": "<p>Kites began as a constellation of tools, using scent as both compass and archive, a way of entering atmospheres through fragrance. Among all our senses, scent remains one of the last signifiers of reality, cutting through mental abstractions to bring us back to presence. The process feels like a ritual: you give meaning to a fragrance, place it on your skin, and it becomes an embodied memory.</p>",
             "spacing_above": "1",
-            "spacing_below": "6"
+            "spacing_below": "4"
           }
         },
         "about-full-image-group-03": {
           "type": "full_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/002-asset.jpg",
+            "image_1": "shopify://shop_images/NOTATION-3.jpg",
             "spacing_above": "1",
             "spacing_below": "2"
           }
@@ -52,14 +42,13 @@
           "type": "rich_text",
           "settings": {
             "body": "<p>For me, scent became an anchor - a way to distill the essence of a story and re-enter its exact creative terrain. I think of each piece in terms of mood and sensory correspondence. Even elusive ideas reveal themselves through association. When writing a script set in a dance school, I build scents from a memory: dusty floors laced with resin and iris, sharp tang of hairspray in a changing room, metallic bite of barre railings, charged static of synthetic bodysuits. As the work deepened, so did the tools - scents for scenes, for characters, for the shifting undercurrents that shaped the artworks. Over time, an intricate library took shape: each fragrance preserving a world in suspension. What began as a private compass now feels like something to be shared - a map for others to wander, explore, and be caught by feeling they can’t quite name.</p>",
-            "spacing_above": "1",
+            "spacing_above": "3",
             "spacing_below": "1"
           }
         }
       },
       "block_order": [
         "about-half-image-group-01",
-        "add_to_cart_button_zrYBTG",
         "about-rich-text-02",
         "about-full-image-group-03",
         "about-rich-text-04"
@@ -71,36 +60,100 @@
     "content_section_02": {
       "type": "content-section",
       "blocks": {
-        "scent-full-image-group-01": {
+        "full_image_group_4ppUn4": {
           "type": "full_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/003-asset.jpg",
-            "spacing_above": "1",
+            "image_1": "shopify://shop_images/Screenshot_2026-03-24_at_11.39.17.png",
+            "spacing_above": "3",
             "spacing_below": "2"
+          }
+        },
+        "full_image_group_YRjKaX": {
+          "type": "full_image_group",
+          "disabled": true,
+          "settings": {
+            "image_1": "shopify://shop_images/IMG_3594.jpg",
+            "spacing_above": "1",
+            "spacing_below": "1"
+          }
+        },
+        "full_image_group_wEpLWN": {
+          "type": "full_image_group",
+          "disabled": true,
+          "settings": {
+            "image_1": "shopify://shop_images/IMG_3595.jpg",
+            "spacing_above": "1",
+            "spacing_below": "1"
           }
         },
         "scent-rich-text-02": {
           "type": "rich_text",
           "settings": {
-            "body": "<h3>STATIC ELECTRICITY</h3>\n<p>Static Electricity is a moment caught mid-charge - the air just before lightning touches glass. In the split second before lightning strikes, the air changes - ions leap, and the sky tastes faintly metallic. Static Electricity captures the charged atmosphere: the crisp clarity of ionised air, softened by the grounding warmth of musk. Born from the same forces that arc through my high-voltage glass sculptures, it carries the sensation of energy held in suspension.</p>\n<p>wearable sculpture and unique polaroid, limited edition of 20</p>",
+            "body": "<h3><strong>STATIC ELECTRICITY 30ml</strong></h3><p>Static Electricity is a moment caught mid-charge - the air just before lightning touches glass. In the split second before lightning strikes, the air changes - ions leap, and the sky tastes faintly metallic. Static Electricity captures the charged atmosphere: the crisp clarity of ionised air, softened by the grounding warmth of musk. </p><p>Born from the same forces that arc through my high-voltage glass sculptures, it carries the sensation of energy held in suspension.</p><p></p>",
             "spacing_above": "1",
             "spacing_below": "1"
           }
         },
-        "scent-full-image-group-03": {
-          "type": "full_image_group",
+        "rich_text_PrCkbk": {
+          "type": "rich_text",
           "settings": {
-            "image_1": "shopify://shop_images/004-asset.jpg",
-            "image_2": "shopify://shop_images/005-asset.jpg",
+            "body": "<p><em>shipped in a wooden packing crate with a unique embossed polaroid</em>,  <strong>£289</strong></p><p><em>made to order, lead time 2 weeks</em></p>",
+            "spacing_above": "1",
+            "spacing_below": "1"
+          }
+        },
+        "add_to_cart_button_g9PTKr": {
+          "type": "add_to_cart_button",
+          "settings": {
+            "product": "static-electricity",
+            "text": "add to cart",
+            "alignment": "right",
+            "spacing_above": "1",
+            "spacing_below": "3"
+          }
+        },
+        "half_image_group_YHHfjc": {
+          "type": "half_image_group",
+          "settings": {
+            "image_1": "shopify://shop_images/Screenshot_2026-03-24_at_12.01.03.png",
+            "image_2": "shopify://shop_images/IMG_3570.heic",
+            "caption_title": "",
+            "caption_body": "",
+            "spacing_above": "1",
+            "spacing_below": "1"
+          }
+        },
+        "half_image_group_KAzxmh": {
+          "type": "half_image_group",
+          "settings": {
+            "image_1": "shopify://shop_images/raw_unsync.jpg",
+            "caption_title": "",
+            "caption_body": "",
+            "spacing_above": "1",
+            "spacing_below": "1"
+          }
+        },
+        "half_image_group_dkgqX8": {
+          "type": "half_image_group",
+          "settings": {
+            "image_1": "shopify://shop_images/Screenshot_2026-03-24_at_13.02.36.png",
+            "caption_title": "",
+            "caption_body": "",
             "spacing_above": "1",
             "spacing_below": "1"
           }
         }
       },
       "block_order": [
-        "scent-full-image-group-01",
+        "full_image_group_4ppUn4",
+        "full_image_group_YRjKaX",
+        "full_image_group_wEpLWN",
         "scent-rich-text-02",
-        "scent-full-image-group-03"
+        "rich_text_PrCkbk",
+        "add_to_cart_button_g9PTKr",
+        "half_image_group_YHHfjc",
+        "half_image_group_KAzxmh",
+        "half_image_group_dkgqX8"
       ],
       "settings": {
         "section_label": "SCENT"
@@ -109,10 +162,96 @@
     "content_section_03": {
       "type": "content-section",
       "blocks": {
+        "half_image_group_Eri6fR": {
+          "type": "half_image_group",
+          "disabled": true,
+          "settings": {
+            "image_1": "shopify://shop_images/Box_Transparent_5.png",
+            "caption_title": "",
+            "caption_body": "",
+            "spacing_above": "1",
+            "spacing_below": "1"
+          }
+        },
+        "full_image_group_q6cF4t": {
+          "type": "full_image_group",
+          "settings": {
+            "spacing_above": "1",
+            "spacing_below": "1"
+          }
+        },
         "process-rich-text-01": {
           "type": "rich_text",
           "settings": {
-            "body": "<p>Each Kites vessel begins as a hand-drawn relief sketch, which is cast in molten glass. The pieces are produced in small batches, then carefully cooled, hand-engraved, and individually numbered.</p>\n<p>No two are ever identical — each bottle carries its own subtle variations in texture and light, making it a wearable sculpture as much as a fragrance vessel. Once filled, every bottle is sealed by hand with wax, completing the process.</p>\n<p>No two are alike - every piece is a wearable sculpture with its own play of light. Inside, I compose the fragrance from the finest raw materials, blended and bottled in-house.</p>",
+            "body": "<p>Every Kites vessel begins as a hand-drawn relief sketch, which is cast in molten glass. No two are alike - every piece is a wearable sculpture with its own play of light. The pieces are produced in small batches, then carefully cooled, hand-engraved.</p><p>Inside, I compose the fragrance from the finest raw materials, blended and bottled in-house.</p>",
+            "spacing_above": "1",
+            "spacing_below": "3"
+          }
+        },
+        "half_image_group_BfYT93": {
+          "type": "half_image_group",
+          "settings": {
+            "image_2": "shopify://shop_images/Screenshot_2026-04-03_at_13.17.25.webp",
+            "caption_title": "",
+            "caption_body": "",
+            "spacing_above": "1",
+            "spacing_below": "2"
+          }
+        },
+        "full_image_group_AYmDGt": {
+          "type": "full_image_group",
+          "disabled": true,
+          "settings": {
+            "image_2": "shopify://shop_images/Screenshot_2026-04-03_at_13.17.25.png",
+            "spacing_above": "1",
+            "spacing_below": "2"
+          }
+        },
+        "process-half-image-group-04": {
+          "type": "half_image_group",
+          "disabled": true,
+          "settings": {
+            "image_1": "shopify://shop_images/Bottle-Composite-Dark-Flash.jpg",
+            "caption_title": "",
+            "caption_body": "",
+            "spacing_above": "6",
+            "spacing_below": "1"
+          }
+        },
+        "rich_text_Jcy6DE": {
+          "type": "rich_text",
+          "settings": {
+            "body": "<p><strong>KITES WEARABLE SCULPTURE 60ml</strong></p><p>Handmade cast glass wearable sculpture with internal relief. Includes dropper and refillable STATIC ELECTRICITY scent.</p><p>Each hand-cast bottle carries a relief inspired by airflow patterns and corrupted weather satellite scans, turning atmospheric motion into a tactile form. The internal relief echoes storm systems, signal noise, and shifting currents - an object of scent shaped by weather, data, and distortion.</p><p><em>limited edition of 20, </em><strong>£3,700</strong></p><p><em>made to order, lead time 2 weeks</em></p>",
+            "spacing_above": "1",
+            "spacing_below": "1"
+          }
+        },
+        "add_to_cart_button_rDwMJW": {
+          "type": "add_to_cart_button",
+          "settings": {
+            "product": "kites-signature-sculpture",
+            "text": "add to cart",
+            "alignment": "right",
+            "spacing_above": "1",
+            "spacing_below": "3"
+          }
+        },
+        "full_image_group_HBiJij": {
+          "type": "full_image_group",
+          "settings": {
+            "image_1": "shopify://shop_images/Kites_Bottle_Scan_-_Components.jpg",
+            "image_2": "shopify://shop_images/Bottle-Composite-Dark-X_RAY-LARGE.jpg",
+            "spacing_above": "1",
+            "spacing_below": "1"
+          }
+        },
+        "half_image_group_nmXqje": {
+          "type": "half_image_group",
+          "disabled": true,
+          "settings": {
+            "image_1": "shopify://shop_images/Kites_Bottle_Scan_3_e08eb438-feac-422c-abe2-873c3f040ba3.jpg",
+            "caption_title": "",
+            "caption_body": "",
             "spacing_above": "1",
             "spacing_below": "1"
           }
@@ -120,42 +259,64 @@
         "process-half-image-group-02": {
           "type": "half_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/006-asset.jpg",
+            "image_1": "shopify://shop_images/Weather-Scan-1.jpg",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
             "spacing_below": "1"
           }
         },
-        "process-half-image-group-03": {
-          "type": "half_image_group",
+        "full_image_group_hnhVby": {
+          "type": "full_image_group",
+          "disabled": true,
           "settings": {
-            "image_1": "shopify://shop_images/007-asset.jpg",
-            "caption_title": "",
-            "caption_body": "",
+            "image_1": "shopify://shop_images/Full_Moon_30_-_WIDE.jpg",
+            "spacing_above": "4",
+            "spacing_below": "1"
+          }
+        },
+        "rich_text_TEHtyR": {
+          "type": "rich_text",
+          "disabled": true,
+          "settings": {
+            "body": "<p>MOONLIGHT circular 30cm, linear 30cm, linear 45cm</p><p>Krypton phosphor luminaire, twin electrode.</p><p>twenty five thousand volt plasma sculpture.</p><p><em>supplied with transformer. But without ht leads, supply and fit required by a qualified electrician inline with local code.</em></p>",
             "spacing_above": "1",
             "spacing_below": "1"
           }
         },
-        "process-half-image-group-04": {
+        "half_image_group_RyF9Qp": {
           "type": "half_image_group",
+          "disabled": true,
           "settings": {
-            "image_1": "shopify://shop_images/008-asset.jpg",
+            "image_1": "shopify://shop_images/Full_Moon_30_-_SIDE.jpg",
+            "image_2": "shopify://shop_images/Linear_Short.jpg",
+            "image_3": "shopify://shop_images/Linear_Long.jpg",
+            "image_4": "shopify://shop_images/Linear_Long_Side.jpg",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
-            "spacing_below": "1"
+            "spacing_below": "6"
           }
         }
       },
       "block_order": [
+        "half_image_group_Eri6fR",
+        "full_image_group_q6cF4t",
         "process-rich-text-01",
+        "half_image_group_BfYT93",
+        "full_image_group_AYmDGt",
+        "process-half-image-group-04",
+        "rich_text_Jcy6DE",
+        "add_to_cart_button_rDwMJW",
+        "full_image_group_HBiJij",
+        "half_image_group_nmXqje",
         "process-half-image-group-02",
-        "process-half-image-group-03",
-        "process-half-image-group-04"
+        "full_image_group_hnhVby",
+        "rich_text_TEHtyR",
+        "half_image_group_RyF9Qp"
       ],
       "settings": {
-        "section_label": "PROCESS"
+        "section_label": "SCULPTURE"
       }
     },
     "content_section_04": {
@@ -163,10 +324,11 @@
       "blocks": {
         "studio-full-image-group-01": {
           "type": "full_image_group",
+          "disabled": true,
           "settings": {
-            "image_1": "shopify://shop_images/009-asset.jpg",
-            "image_2": "shopify://shop_images/010-asset.jpg",
-            "image_3": "shopify://shop_images/011-asset.jpg",
+            "image_1": "shopify://shop_images/Web_Pola_Scan_3X_3.jpg",
+            "image_2": "shopify://shop_images/Web_Pola_Scan_3X_2.jpg",
+            "image_3": "shopify://shop_images/Web_Pola_Scan_3X_1.jpg",
             "spacing_above": "1",
             "spacing_below": "1"
           }
@@ -174,15 +336,16 @@
         "studio-rich-text-02": {
           "type": "rich_text",
           "settings": {
-            "body": "<p>In each of my installations, scent is a hidden circuitry running through the work, binding glass, gas, metal and light into a single, charged atmosphere. Each piece holds its own microclimate: ozone sharpening the air around a rose, vegetal traces of grass and moss suspended in glass, notes that suggest downed power lines or the distant heat of a star.</p>",
-            "spacing_above": "1",
-            "spacing_below": "1"
+            "body": "<p>______________________________________</p><p></p><p><em>In each of my installations, scent is a hidden circuitry running through the work, binding glass, gas, metal and light into a single, charged atmosphere. Each piece holds its own microclimate: ozone sharpening the air around a rose, vegetal traces of grass and moss suspended in glass, notes that suggest downed power lines or the distant heat of a star.</em></p>",
+            "spacing_above": "6",
+            "spacing_below": "6"
           }
         },
         "studio-half-image-group-03": {
           "type": "half_image_group",
+          "disabled": true,
           "settings": {
-            "image_1": "shopify://shop_images/012-asset.jpg",
+            "image_1": "shopify://shop_images/Kites_Draft_Bottle_1.jpg",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
@@ -192,21 +355,21 @@
         "studio-half-image-group-04": {
           "type": "half_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/013-asset.jpg",
+            "image_1": "shopify://shop_images/Web-Print_15.jpg",
             "caption_title": "Helium Burning, 2023",
             "caption_body": "glass, helium, krypton, metal, scent\n\nMuseum of Modern Art Warsaw & Pulchri Studio, The Hague",
-            "spacing_above": "1",
+            "spacing_above": "6",
             "spacing_below": "1"
           }
         },
         "studio-half-image-group-05": {
           "type": "half_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/014-asset.jpg",
+            "image_1": "shopify://shop_images/Pola_Print_3.jpg",
             "caption_title": "",
             "caption_body": "Museum of Modern Art Warsaw & Pulchri Studio, The Hague",
             "spacing_above": "1",
-            "spacing_below": "2"
+            "spacing_below": "3"
           }
         },
         "studio-rich-text-06": {
@@ -214,17 +377,17 @@
           "settings": {
             "body": "<p>“Helium Burning” is a cinematic-sensory story, experienced through scent - as the Sun loses its Gravity (fire, smoke, ashes) and the Earth leaves its Orbit (soil, rain, atmosphere). Helium burning (glass, krypton, helium, metal) is the fusion of helium in the contracted core of a giant star at extremely high temperatures. The Sun is a humongous thermonuclear bomb in a continuous fusion explosion. Its immense gravity contains it as a sphere. Molecular bonds by shared electrons are impossible. They are pressed together due to the pressure exerted upon them, but unable to join together other than on an atomic level.</p>",
             "spacing_above": "1",
-            "spacing_below": "1"
+            "spacing_below": "3"
           }
         },
         "studio-half-image-group-07": {
           "type": "half_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/015-asset.jpg",
+            "image_1": "shopify://shop_images/Glass_Render.jpg",
             "caption_title": "Grass Render, 2023",
             "caption_body": "Glass, krypton, argon, PLA, scent. with Clara Schweers\n\nDutch Design Week, Eindhoven & Die Frappant gallery, Hamburg",
             "spacing_above": "1",
-            "spacing_below": "2"
+            "spacing_below": "3"
           }
         },
         "studio-rich-text-08": {
@@ -232,13 +395,13 @@
           "settings": {
             "body": "<p>“Grass Render” (scent, lass, krypton, argon) uses sensory narrative to explore our entangled relationship with plants. The work suspends fragrances of grass, moss, wood and soil in glass vessels filled with krypton and argon, tracing the quiet magic of natural elements as they move into air.</p>",
             "spacing_above": "1",
-            "spacing_below": "1"
+            "spacing_below": "3"
           }
         },
         "studio-half-image-group-09": {
           "type": "half_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/016-asset.jpg",
+            "image_1": "shopify://shop_images/Web-Print_13.jpg",
             "caption_title": "Subsurface, 2025",
             "caption_body": "glass, xenon, neon, argon, electrodes. with Clara Schweers\n\nGallery “apiece”, Vilnius & Klaipeda Biennial, KCCC",
             "spacing_above": "1",
@@ -250,17 +413,17 @@
           "settings": {
             "body": "<p>“Subsurface” (glass, neon, xenon, argon), operates as a living system, mirroring embryonic development, geological pressure and electrical circulation, and invites reflection on containment and exposure on the unseen forces that both nurture and protect.</p>",
             "spacing_above": "1",
-            "spacing_below": "1"
+            "spacing_below": "3"
           }
         },
         "studio-half-image-group-11": {
           "type": "half_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/017-asset.jpg",
+            "image_1": "shopify://shop_images/raw_sync_2.jpg",
             "caption_title": "Satellites, 2025",
             "caption_body": "with Jake Scott NOAA 19. weather satellite data direct downlink at 137.100 MHz",
             "spacing_above": "1",
-            "spacing_below": "1"
+            "spacing_below": "3"
           }
         },
         "studio-rich-text-12": {
@@ -268,20 +431,20 @@
           "settings": {
             "body": "<p>Over the summer of 2025, final captures were made from the National Aeronautics Association’s three weather satellites NOAA-14, NOAA-15, and NOAA-19. Among their onboard instruments were total column ozone mappers and high-altitude radiometers, built to observe clouds, aerosols, and ice. Having long outlived their original missions and been superseded by newer generations, they still drifted faithfully in orbit — transmitting, patiently, in case anyone was curious enough to build an antenna and listen. We connected directly to the satellite to receive these images with a home made antenna and software. Not long after these final scans were received, the satellites’ instruments began to fail. They were formally decommissioned, their signals fading before their eventual annihilation on re-entry.</p>",
             "spacing_above": "1",
-            "spacing_below": "1"
+            "spacing_below": "3"
           }
         },
         "studio-half-image-group-13": {
           "type": "half_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/018-asset.jpg",
-            "image_2": "shopify://shop_images/019-asset.jpg",
-            "image_3": "shopify://shop_images/019-asset.jpg",
-            "image_4": "shopify://shop_images/020-asset.jpg",
+            "image_1": "shopify://shop_images/Lightning_Rose_1.jpg",
+            "image_2": "shopify://shop_images/Lightning_Rose_2.jpg",
+            "image_3": "shopify://shop_images/Lightning_Rose_3.jpg",
+            "image_4": "shopify://shop_images/Lightning_Rose_4.jpg",
             "caption_title": "O3, 2021",
             "caption_body": "Electrical transformer, glass, real rose, Ozone scent\n\nwinner of the Jury Special Prize and Public Choice Award. Contemporary Art Center, CAC - Vilnius",
             "spacing_above": "1",
-            "spacing_below": "2"
+            "spacing_below": "3"
           }
         },
         "studio-rich-text-14": {
@@ -289,20 +452,20 @@
           "settings": {
             "body": "<p>“O3” is a molecule that eliminates other odours around, often used for air purification. However, when employed at a strong enough concentration, it can exterminate living organisms.This installation invites visitors to experience a perceptible olfactory change: a bolt of lightning strikes the rose encased within the glass box, and the crisp floral scent gives way to hints of copper—as one would smell when nasal blood vessels are damaged. Extremely sweet notes appear, and signals are sent to the brain, warning of the smell of blood. Despite the work’s mesmerising quality and sheer beauty, the electric discharge and the release of O3 can act as dangerous tool for destroying fragile life. Part mise-en-scene, part reality, this installation instills both intrigue and discomfort in viewers. While the chemical and electrical reactions happen safely within the glass box, an artificial (and harmless) scent is diffused into the room, awakening a sense of innate panic in the viewer, therefore toying with the idea of the institution as a safe space.</p>",
             "spacing_above": "1",
-            "spacing_below": "1"
+            "spacing_below": "3"
           }
         },
         "studio-half-image-group-15": {
           "type": "half_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/021-asset.jpg",
-            "image_2": "shopify://shop_images/022-asset.jpg",
-            "image_3": "shopify://shop_images/023-asset.jpg",
-            "image_4": "shopify://shop_images/024-asset.jpg",
+            "image_1": "shopify://shop_images/Ibbur_17.jpg",
+            "image_2": "shopify://shop_images/Ibbur_18.jpg",
+            "image_3": "shopify://shop_images/Ibbur_21.jpg",
+            "image_4": "shopify://shop_images/Ibbur_24.jpg",
             "caption_title": "Ibbur, 2025",
             "caption_body": "glass, helium, argon, metal. with Yuma Burgess\n\nSaatchi Gallery",
             "spacing_above": "1",
-            "spacing_below": "2"
+            "spacing_below": "3"
           }
         },
         "studio-rich-text-16": {
@@ -310,20 +473,20 @@
           "settings": {
             "body": "<p>“Ibbur”, draws from Kabbalistic tradition, where ibbur - “impregnation” - names a benevolent possession in which an ancestor’s soul temporarily inhabits the living to offer guidance, suggesting that identity is shaped not only by personal experience but by the spirits and intelligences we invite in. As we open ourselves to external forces, both spiritual and artificial, it gently wonders whether we remain agents of our own becoming or are slowly becoming vessels for futures that script our consciousness.</p>",
             "spacing_above": "1",
-            "spacing_below": "1"
+            "spacing_below": "3"
           }
         },
         "studio-half-image-group-17": {
           "type": "half_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/025-asset.jpg",
-            "image_2": "shopify://shop_images/026-asset.jpg",
-            "image_3": "shopify://shop_images/027-asset.jpg",
-            "image_4": "shopify://shop_images/028-asset.jpg",
+            "image_1": "shopify://shop_images/web-scented_trip_1.jpg",
+            "image_2": "shopify://shop_images/web-scented_trip_2.jpg",
+            "image_3": "shopify://shop_images/Scented_Trip.jpg",
+            "image_4": "shopify://shop_images/Brugmancia_RE.jpg",
             "caption_title": "Scented Trip, book & absolute 2019-2022",
             "caption_body": "book and brugmansia absolute, 3ml",
             "spacing_above": "1",
-            "spacing_below": "2"
+            "spacing_below": "3"
           }
         },
         "studio-rich-text-18": {
@@ -331,23 +494,23 @@
           "settings": {
             "body": "<p>This book and accompanying scent broach the topics of perception of authenticity and collective hallucinations. Comprising photographic material and documentation taken during travels to Kilimanjaro and the Himalayas, Scented Trip explores phenomena of loss of self, for example during carnivals, folkloric events, and rituals involving mask-wearing and meditative “chams” and similar dances. In one defining moment of the work, whilst traveling at the foothills of Kilimanjaro, I met a local man who invited her to smell a giant, hypnotic white flower. This inhalation led to intense hallucinations involving ants, as she stood in the middle of the rainforest. The flower in question, officially named Brugmansia, is used locally for its hallucinogenic, and seemingly unpleasant, effect. However it must be noted that, while sinister at first glance, the hallucinations are reported to be controllable by the user—with time and practice, frightening insects from “the underworld” can even be revisited and tamed by those who conjure them. Alongside visual documentation, Scented Trip exists as a scent: a 3 ml droplet is extracted using the enfleurage method, making Brugmansia absolute the main note in the perfume. This work therefore also comprises a wearable but hypnotic, poisonous, and literally narcotic, perfume.</p>",
             "spacing_above": "1",
-            "spacing_below": "1"
+            "spacing_below": "3"
           }
         },
         "studio-half-image-group-19": {
           "type": "half_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/029-asset.jpg",
+            "image_1": "shopify://shop_images/SunsSurface-min.jpg",
             "caption_title": "Sun’s surface, 2023",
             "caption_body": "3D video, LCD screen, convex glass lens, stainless steel. with Jurgis Lietunovas\n\nMilan Design Week & Observatory of Ideas, Vilnius",
-            "spacing_above": "1",
+            "spacing_above": "2",
             "spacing_below": "1"
           }
         },
         "studio-half-image-group-20": {
           "type": "half_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/030-asset.jpg",
+            "image_1": "shopify://shop_images/Web-Pola-Scan-22.jpg",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
@@ -357,7 +520,6 @@
         "studio-half-image-group-21": {
           "type": "half_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/031-asset.jpg",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
@@ -367,7 +529,7 @@
         "studio-half-image-group-22": {
           "type": "half_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/032-asset.jpg",
+            "image_1": "shopify://shop_images/Web-Print_4.jpg",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
@@ -377,7 +539,7 @@
         "studio-half-image-group-23": {
           "type": "half_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/033-asset.jpg",
+            "image_1": "shopify://shop_images/Web-Print_12.jpg",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
@@ -387,7 +549,7 @@
         "studio-half-image-group-24": {
           "type": "half_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/034-asset.jpg",
+            "image_1": "shopify://shop_images/web-conductive_1.jpg",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
@@ -397,7 +559,7 @@
         "studio-half-image-group-25": {
           "type": "half_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/035-asset.jpg",
+            "image_1": "shopify://shop_images/Lightning_Rose_RE.jpg",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
@@ -407,11 +569,11 @@
         "studio-half-image-group-26": {
           "type": "half_image_group",
           "settings": {
-            "image_1": "shopify://shop_images/036-asset.jpg",
+            "image_1": "shopify://shop_images/Helium_Burning_CU_RE.jpg",
             "caption_title": "",
             "caption_body": "",
             "spacing_above": "1",
-            "spacing_below": "1"
+            "spacing_below": "6"
           }
         }
       },
@@ -450,9 +612,11 @@
     "contact": {
       "type": "contact-panel",
       "settings": {
-        "contact_body": "<p>Emilija Povilanskaite is a visual artist and film director. Her work - rooted in storytelling - is multifaceted, connecting technology, science, research and olfactory design, exploring how digital worlds reshape human perception through sensory experiences. Her work channels ancient folklore and myth-making into contemporary technological spaces. By architecting fictional worlds that engage multiple senses, she develops innovative interfaces between technology, imagination, and embodied human experience.</p>",
-        "contact_image": "shopify://shop_images/037-asset.jpg",
-        "form_heading": "Request & Purchase"
+        "contact_body": "<p>Kites is the fragrance project from Emilija Povilanskaite, a visual artist and film director. Her work - rooted in storytelling - is multifaceted, connecting technology, science, research and olfactory design, exploring how digital worlds reshape human perception through sensory experiences. Her work channels ancient folklore and myth-making into contemporary technological spaces. By architecting fictional worlds that engage multiple senses, she develops innovative interfaces between technology, imagination, and embodied human experience.</p>",
+        "contact_image": "shopify://shop_images/Ibbur_31.jpg",
+        "desktop_image_offset_right": 24,
+        "desktop_text_max_width": 320,
+        "form_heading": "*"
       }
     }
   },

@@ -243,8 +243,6 @@ function initMagneticShell(root) {
     let dotYPositions = [];
     let draggedYPositions = [];
     let frameHandle = null;
-    let viewportOffsetTop = 0;
-    let viewportOffsetLeft = 0;
     let viewportLayoutFrame = null;
     const visualViewport = window.visualViewport;
     function getViewportMetrics() {
@@ -252,20 +250,16 @@ function initMagneticShell(root) {
             return {
                 width: window.innerWidth,
                 height: window.innerHeight,
-                offsetTop: 0,
-                offsetLeft: 0,
             };
         }
         return {
             width: Math.round(visualViewport.width),
             height: Math.round(visualViewport.height),
-            offsetTop: Math.round(visualViewport.offsetTop),
-            offsetLeft: Math.round(visualViewport.offsetLeft),
         };
     }
     function updateViewportChrome() {
-        leftNavElement.style.top = `${viewportOffsetTop}px`;
-        leftNavElement.style.left = `${viewportOffsetLeft}px`;
+        leftNavElement.style.top = '0px';
+        leftNavElement.style.left = '0px';
         leftNavElement.style.height = `${windowHeight}px`;
     }
     function setActiveNav(label) {
@@ -388,8 +382,8 @@ function initMagneticShell(root) {
             button.style.transform = 'translateY(-50%)';
         });
         if (isMobile) {
-            logoElementNode.style.top = `${viewportOffsetTop + MOBILE_LOGO_Y_START}px`;
-            logoElementNode.style.left = `${viewportOffsetLeft + MOBILE_NAV_LOGO_X_POSITION}px`;
+            logoElementNode.style.top = `${MOBILE_LOGO_Y_START}px`;
+            logoElementNode.style.left = `${MOBILE_NAV_LOGO_X_POSITION}px`;
             logoElementNode.style.width = '80px';
             logoElementNode.style.opacity = '1';
             return;
@@ -407,8 +401,6 @@ function initMagneticShell(root) {
         const viewportMetrics = getViewportMetrics();
         windowWidth = viewportMetrics.width;
         windowHeight = viewportMetrics.height;
-        viewportOffsetTop = viewportMetrics.offsetTop;
-        viewportOffsetLeft = viewportMetrics.offsetLeft;
         isMobile = windowWidth < 770;
         updateViewportChrome();
         svgElement.setAttribute('viewBox', `0 0 ${windowWidth} ${windowHeight}`);

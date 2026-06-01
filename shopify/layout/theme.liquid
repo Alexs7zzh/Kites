@@ -62,8 +62,22 @@
     {% endif %}
 
     {% if page_image %}
-      <meta property="og:image" content="{{ page_image | image_url: width: 1200 }}">
-      <meta name="twitter:image" content="{{ page_image | image_url: width: 1200 }}">
+      {% liquid
+        assign social_image_width = 1200
+        if page_image.width < social_image_width
+          assign social_image_width = page_image.width
+        endif
+        assign social_image_height = social_image_width | divided_by: page_image.aspect_ratio | round
+        assign social_image_url = page_image | image_url: width: social_image_width, format: 'pjpg' | prepend: 'https:'
+        assign social_image_alt = page_image.alt | default: shop.name
+      %}
+      <meta property="og:image" content="{{ social_image_url }}">
+      <meta property="og:image:secure_url" content="{{ social_image_url }}">
+      <meta property="og:image:width" content="{{ social_image_width }}">
+      <meta property="og:image:height" content="{{ social_image_height }}">
+      <meta property="og:image:alt" content="{{ social_image_alt | escape }}">
+      <meta name="twitter:image" content="{{ social_image_url }}">
+      <meta name="twitter:image:alt" content="{{ social_image_alt | escape }}">
     {% endif %}
 
     {{ content_for_header }}
@@ -105,19 +119,21 @@
     </script>
   </head>
   {% liquid
-    assign cart_feature_expiry_ts = '2026-04-15 00:00:00 +0900' | date: '%s' | plus: 0
-    assign now_ts = 'now' | date: '%s' | plus: 0
-    assign cart_feature_enabled = false
+    assign background_placeholder = ''
+    assign background_image_url = ''
 
-    if now_ts < cart_feature_expiry_ts
-      assign cart_feature_enabled = true
+    if template.name == 'index'
+      assign background_placeholder = settings.background_placeholder_color | default: '#e7e4df'
+
+      if settings.background_image != blank
+        assign background_image_url = settings.background_image | image_url: width: 1920
+      else
+        assign background_image_url = 'background-default.jpg' | asset_url
+      endif
     endif
   %}
-  <body class="template-{{ template.name | handle }}">
+  <body class="template-{{ template.name | handle }}"{% if template.name == 'index' %} style="--background-placeholder: {{ background_placeholder }}; --background-image-url: url('{{ background_image_url }}');"{% endif %}>
     {% if template.name == 'index' %}
-      {% liquid
-        assign background_placeholder = settings.background_placeholder_color | default: '#e7e4df'
-      %}
       <div class="magnetic-dango-root" data-page-shell style="--background-placeholder: {{ background_placeholder }};">
         <div class="magnetic-dango-background-layer" aria-hidden="true">
           {% if settings.background_image != blank %}
@@ -157,6 +173,8 @@
             ></path>
           </svg>
 
+          <h1 class="visually-hidden">{{ page_title | default: shop.name | escape }}</h1>
+
           <div class="site-logo" data-site-logo role="img" aria-label="{{ shop.name | escape }}">
             {% if settings.logo_image != blank %}
               {{
@@ -175,9 +193,7 @@
           </div>
 
           <div class="left-nav" data-left-nav></div>
-          {% if cart_feature_enabled %}
-            {% render 'cart-link' %}
-          {% endif %}
+          {% render 'cart-link' %}
 
           <div class="page-content-wrapper" data-content-wrapper>
             {{ content_for_layout }}
@@ -188,9 +204,7 @@
       {{ content_for_layout }}
     {% endif %}
     <script src="{{ 'magnetic-dango-runtime.js' | asset_url }}" defer></script>
-    {% if cart_feature_enabled %}
-      <script src="{{ 'add-to-cart-block.js' | asset_url }}" defer></script>
-      <script src="{{ 'cart-link-runtime.js' | asset_url }}" defer></script>
-    {% endif %}
+    <script src="{{ 'add-to-cart-block.js' | asset_url }}" defer></script>
+    <script src="{{ 'cart-link-runtime.js' | asset_url }}" defer></script>
   </body>
 </html>

@@ -38,6 +38,10 @@ body {
   background: var(--background-placeholder, #e7e4df);
 }
 
+body.template-index {
+  background-color: var(--background-placeholder, #e7e4df);
+}
+
 .template-index .shopify-section {
   display: contents;
 }
@@ -62,6 +66,18 @@ img {
   line-height: 1.8;
 }
 
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .magnetic-dango-root {
   position: relative;
   min-height: 100dvh;
@@ -71,7 +87,12 @@ img {
 
 .magnetic-dango-background-layer {
   position: fixed;
-  inset: 0;
+  top: calc(env(safe-area-inset-top) * -1);
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom) * -1);
+  left: 0;
+  width: 100vw;
+  height: calc(100lvh + env(safe-area-inset-top) + env(safe-area-inset-bottom));
   pointer-events: none;
   z-index: 0;
 }
@@ -79,8 +100,15 @@ img {
 .magnetic-dango-background-image {
   width: 100%;
   height: 100%;
+  min-height: 100%;
   object-fit: cover;
   object-position: center;
+}
+
+@supports not (height: 100lvh) {
+  .magnetic-dango-background-layer {
+    height: calc(100vh + env(safe-area-inset-top) + env(safe-area-inset-bottom));
+  }
 }
 
 .magnetic-dango-foreground-layer {

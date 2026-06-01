@@ -5,9 +5,6 @@
   assign spacing_top = '18px'
   assign spacing_bottom = '18px'
   assign skip_block = false
-  assign cart_feature_expiry_ts = '2026-04-15 00:00:00 +0900' | date: '%s' | plus: 0
-  assign now_ts = 'now' | date: '%s' | plus: 0
-  assign cart_feature_enabled = false
 
   case spacing_above
     when '2'
@@ -39,15 +36,7 @@
     assign block_type = block.type
   endif
 
-  if now_ts < cart_feature_expiry_ts
-    assign cart_feature_enabled = true
-  endif
-
   if block_type == 'add_to_cart_button' and block.settings.product == blank and request.design_mode != true
-    assign skip_block = true
-  endif
-
-  if block_type == 'add_to_cart_button' and cart_feature_enabled != true
     assign skip_block = true
   endif
 %}
